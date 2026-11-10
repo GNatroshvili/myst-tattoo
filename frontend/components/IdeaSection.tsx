@@ -25,7 +25,7 @@ export function IdeaSection() {
     <section id="idea" className="container-x scroll-mt-20 py-12">
       <SectionDivider />
 
-      <h2 className="display text-gradient-lilac mt-6 text-center text-[clamp(2.5rem,5.4vw,3.75rem)] leading-none">
+      <h2 className="display text-gradient-lilac mt-6 text-balance text-center text-[clamp(2.1rem,9vw,3.75rem)] leading-none">
         Tell us your idea
       </h2>
       <p className="mx-auto mt-5 max-w-md text-center text-sm leading-relaxed text-lilac-200/90">
@@ -33,7 +33,9 @@ export function IdeaSection() {
         <br className="hidden sm:block" /> We&apos;ll reply to agree the details.
       </p>
 
-      <div className="mt-10 grid items-start gap-6 lg:grid-cols-[minmax(0,430px)_minmax(0,1fr)] lg:gap-8">
+      {/* explicit minmax(0,1fr) tracks: an implicit `auto` track would grow to the
+          day-picker's scroll width and push the form past the viewport on phones */}
+      <div className="mt-10 grid grid-cols-[minmax(0,1fr)] items-start gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:grid-cols-[minmax(0,430px)_minmax(0,1fr)] lg:gap-8">
         <Suspense fallback={<IdeaFormSkeleton />}>
           <IdeaFormWithDays />
         </Suspense>

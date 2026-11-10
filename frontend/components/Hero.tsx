@@ -6,14 +6,14 @@ import { ArrowUpRightIcon, SparkleIcon } from "./ui/Icons";
 export function Hero() {
   return (
     <section className="container-x relative pb-14 pt-4 lg:pb-16 lg:pt-6">
-      <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:gap-6">
+      <div className="grid grid-cols-[minmax(0,1fr)] items-center gap-8 sm:gap-10 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:gap-6">
         <div className="relative z-10 max-w-xl">
           <p className="eyebrow">
             Tattoo <span className="mx-1 text-lilac-400/60">/</span> Piercing{" "}
             <span className="mx-1 text-lilac-400/60">/</span> Art
           </p>
 
-          <h1 className="display text-gradient-lilac mt-6 text-[clamp(3.25rem,7.2vw,5.9rem)] leading-[0.92] tracking-[0.02em]">
+          <h1 className="display text-gradient-lilac mt-6 text-[clamp(2.6rem,13.5vw,5.9rem)] leading-[0.92] tracking-[0.02em] lg:text-[clamp(3.25rem,7.2vw,5.9rem)]">
             Tattoos &amp;
             <br />
             Piercings
@@ -42,7 +42,7 @@ export function Hero() {
           </div>
         </div>
 
-        <div className="relative -mx-4 lg:mx-0">
+        <div className="relative -mx-2 sm:mx-0">
           <LilyArt />
         </div>
       </div>

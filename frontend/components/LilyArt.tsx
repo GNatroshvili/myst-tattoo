@@ -23,7 +23,9 @@ const stamenAngles = [12, 72, 132, 192, 252, 312];
 
 export function LilyArt({ className = "" }: { className?: string }) {
   return (
-    <div className={`relative mx-auto w-full max-w-[620px] ${className}`}>
+    <div
+      className={`relative mx-auto w-full max-w-[400px] sm:max-w-[480px] lg:max-w-[620px] ${className}`}
+    >
       <div
         aria-hidden
         className="absolute left-1/2 top-1/2 h-[78%] w-[78%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(150,55,185,0.5),rgba(150,55,185,0.14)_55%,transparent)] blur-2xl"

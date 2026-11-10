@@ -13,10 +13,10 @@ export function Header() {
 
   return (
     <header className="relative z-30">
-      <div className="container-x flex h-24 items-center justify-between gap-6">
+      <div className="container-x flex h-20 items-center justify-between gap-4 md:h-24 md:gap-6">
         <Logo />
 
-        <nav aria-label="Main" className="hidden items-center gap-9 md:flex">
+        <nav aria-label="Main" className="hidden items-center gap-6 md:flex lg:gap-9">
           {nav.map((item) => {
             const active = pathname === item.href;
             return (

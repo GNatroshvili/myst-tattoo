@@ -23,7 +23,11 @@ export function IdeaForm({ days }: Props) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="panel p-5 sm:p-6" aria-labelledby="idea-form-title">
+    <form
+      onSubmit={handleSubmit}
+      className="panel min-w-0 p-4 sm:p-6"
+      aria-labelledby="idea-form-title"
+    >
       <h3 id="idea-form-title" className="sr-only">
         Booking request form
       </h3>
@@ -87,7 +91,7 @@ export function IdeaForm({ days }: Props) {
           <div
             role="radiogroup"
             aria-label="Preferred day"
-            className="scroll-thin -mx-1 flex snap-x gap-2 overflow-x-auto px-1 pb-3"
+            className="scroll-thin -mx-1 flex min-w-0 snap-x gap-2 overflow-x-auto px-1 pb-3"
           >
             {days.map((d, i) => {
               const active = d.iso === dayIso;
@@ -130,7 +134,7 @@ export function IdeaForm({ days }: Props) {
                   aria-checked={active}
                   data-active={active}
                   onClick={() => setTime(active ? null : t)}
-                  className="pill py-3 text-sm font-medium"
+                  className="pill min-w-0 px-1 py-3 text-[13px] font-medium sm:text-sm"
                 >
                   {t}
                 </button>
@@ -151,7 +155,7 @@ export function IdeaForm({ days }: Props) {
 /** Static shell shown while the day list streams in. */
 export function IdeaFormSkeleton() {
   return (
-    <div className="panel animate-pulse p-5 sm:p-6" aria-hidden>
+    <div className="panel min-w-0 animate-pulse p-4 sm:p-6" aria-hidden>
       <div className="space-y-5">
         <div>
           <div className="mb-2 h-4 w-24 rounded bg-white/10" />

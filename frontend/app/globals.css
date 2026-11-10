@@ -77,6 +77,11 @@
     background: rgba(243, 225, 46, 0.35);
     color: #fff;
   }
+  a,
+  button {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
   :focus-visible {
     outline: 2px solid var(--color-gold);
     outline-offset: 3px;
@@ -90,11 +95,14 @@
     margin-inline: auto;
     width: 100%;
     max-width: 1200px;
-    padding-inline: 1.25rem;
+    /* keep content clear of notches / rounded corners in landscape */
+    padding-left: max(1.25rem, env(safe-area-inset-left));
+    padding-right: max(1.25rem, env(safe-area-inset-right));
   }
   @media (min-width: 640px) {
     .container-x {
-      padding-inline: 2rem;
+      padding-left: max(2rem, env(safe-area-inset-left));
+      padding-right: max(2rem, env(safe-area-inset-right));
     }
   }
 
@@ -114,9 +122,14 @@
 
   .eyebrow {
     font-size: 0.72rem;
-    letter-spacing: 0.42em;
+    letter-spacing: 0.3em;
     text-transform: uppercase;
     color: var(--color-lilac-300);
+  }
+  @media (min-width: 640px) {
+    .eyebrow {
+      letter-spacing: 0.42em;
+    }
   }
 
   /* buttons */
@@ -179,16 +192,23 @@
   /* form controls */
   .field {
     width: 100%;
+    min-width: 0;
     border-radius: 0.85rem;
     border: 1px solid rgba(200, 143, 210, 0.25);
     background-color: rgba(20, 10, 24, 0.85);
     padding: 0.8rem 1rem;
-    font-size: 0.9rem;
+    /* 16px on phones: anything smaller makes iOS Safari zoom in on focus */
+    font-size: 1rem;
     color: var(--color-lilac-50);
     outline: none;
     transition:
       border-color 0.2s ease,
       box-shadow 0.2s ease;
+  }
+  @media (min-width: 640px) {
+    .field {
+      font-size: 0.9rem;
+    }
   }
   .field::placeholder {
     color: rgba(217, 171, 224, 0.4);

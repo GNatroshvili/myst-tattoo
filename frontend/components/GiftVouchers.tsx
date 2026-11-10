@@ -4,7 +4,7 @@ import { ArrowUpRightIcon } from "./ui/Icons";
 
 function VoucherCard() {
   return (
-    <div className="relative mx-auto w-[230px] shrink-0 py-6 sm:w-[250px]">
+    <div className="relative mx-auto w-full max-w-[230px] py-6 sm:max-w-[250px]">
       <div
         aria-hidden
         className="absolute inset-x-6 bottom-2 h-10 rounded-full bg-violet-500/40 blur-2xl"
@@ -30,13 +30,14 @@ function VoucherCard() {
 export function GiftVouchers() {
   return (
     <section id="vouchers" className="container-x scroll-mt-24 py-10">
-      <div className="relative overflow-hidden rounded-[28px] border border-lilac-400/25 bg-plum-900/40 px-7 py-8 shadow-glow-violet sm:px-10 md:px-12">
-        <div className="streak -left-20 -top-24 h-72 w-[520px] -rotate-12" />
-        <div className="streak -bottom-32 right-0 h-72 w-[560px] rotate-12" />
+      <div className="relative overflow-hidden rounded-[28px] border border-lilac-400/25 bg-plum-900/40 px-5 py-7 shadow-glow-violet sm:px-8 sm:py-8 md:px-10 lg:px-12">
+        <div aria-hidden className="streak -left-20 -top-24 h-72 w-[520px] -rotate-12" />
+        <div aria-hidden className="streak -bottom-32 right-0 h-72 w-[560px] rotate-12" />
 
-        <div className="relative grid items-center gap-6 md:grid-cols-[1fr_auto_1fr]">
+        {/* phones: stacked; tablets: text + card, button below; desktop: three columns */}
+        <div className="relative grid grid-cols-[minmax(0,1fr)] items-center gap-6 md:grid-cols-[minmax(0,1fr)_auto] lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
           <div>
-            <h2 className="display text-gradient-lilac text-[clamp(2.6rem,5.2vw,3.6rem)] leading-[0.95]">
+            <h2 className="display text-gradient-lilac text-[clamp(2.4rem,7vw,3.6rem)] leading-[0.95] lg:text-[clamp(2.6rem,5.2vw,3.6rem)]">
               Gift
               <br />
               Vouchers
@@ -48,7 +49,7 @@ export function GiftVouchers() {
 
           <VoucherCard />
 
-          <div className="md:justify-self-end">
+          <div className="md:col-span-2 lg:col-span-1 lg:justify-self-end">
             <Link href="#idea" className="btn btn-outline-gold">
               Get a Voucher <ArrowUpRightIcon className="h-4 w-4" />
             </Link>
