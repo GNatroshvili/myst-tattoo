@@ -29,6 +29,16 @@ export function SparkleIcon(props: IconProps) {
   );
 }
 
+/** Thin four-point lens flare, filled (hero divider) */
+export function FlareIcon(props: IconProps) {
+  return (
+    <svg {...filled} {...props}>
+      <path d="M12 0l1.1 10.9L24 12l-10.9 1.1L12 24l-1.1-10.9L0 12l10.9-1.1L12 0Z" />
+      <circle cx="12" cy="12" r="1.6" fill="#fff8b0" />
+    </svg>
+  );
+}
+
 /** Four-point sparkle, outlined (Tattoos quick link) */
 export function SparkleOutlineIcon(props: IconProps) {
   return (

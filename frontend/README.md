@@ -20,8 +20,8 @@ app/
   globals.css         # design tokens (@theme) + component classes
 components/
   Header.tsx          # nav + mobile menu (client)
-  Hero.tsx            # headline + CTA + LilyArt
-  LilyArt.tsx         # SVG lily illustration with golden arc
+  Hero.tsx            # headline + CTA + HeroLily
+  HeroLily.tsx        # lily artwork (public/images/hero-lily.webp) via next/image
   QuickLinks.tsx      # Tattoos / Piercing / Our Artists / Why Myst
   GiftVouchers.tsx    # voucher banner
   IdeaSection.tsx     # "Tell us your idea" layout (server)

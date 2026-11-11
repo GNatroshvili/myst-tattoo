@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { site } from "@/lib/site";
-import { LilyArt } from "./LilyArt";
-import { ArrowUpRightIcon, SparkleIcon } from "./ui/Icons";
+import { HeroLily } from "./HeroLily";
+import { ArrowUpRightIcon, FlareIcon } from "./ui/Icons";
 
 export function Hero() {
   return (
@@ -22,10 +22,11 @@ export function Hero() {
             In Tbilisi
           </p>
 
-          <div className="mt-7 flex items-center gap-3 text-gold">
-            <span className="h-px w-10 bg-gradient-to-r from-transparent to-lilac-400/70" />
-            <SparkleIcon className="h-4 w-4 animate-twinkle" />
-            <span className="h-px w-44 bg-gradient-to-r from-lilac-400/70 to-transparent" />
+          {/* gold flare divider: faint tail, bright star, long line fading to the right */}
+          <div aria-hidden className="mt-6 flex h-7 items-center text-gold">
+            <span className="h-px w-7 bg-gradient-to-r from-transparent to-gold/70" />
+            <FlareIcon className="relative z-10 -mx-0.5 h-7 w-7 drop-shadow-[0_0_6px_rgba(243,225,46,0.9)]" />
+            <span className="h-px w-48 bg-gradient-to-r from-gold via-gold/60 to-transparent" />
           </div>
 
           <p className="mt-7 max-w-[300px] text-[15px] leading-relaxed text-lilac-200/90">
@@ -43,7 +44,7 @@ export function Hero() {
         </div>
 
         <div className="relative -mx-2 sm:mx-0">
-          <LilyArt />
+          <HeroLily />
         </div>
       </div>
     </section>
