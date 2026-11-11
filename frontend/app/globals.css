@@ -264,19 +264,6 @@
     border-radius: 9999px;
   }
 
-  /* soft pink light streak used behind sections */
-  .streak {
-    position: absolute;
-    pointer-events: none;
-    border-radius: 9999px;
-    background: radial-gradient(
-      ellipse at center,
-      rgba(236, 120, 220, 0.22) 0%,
-      rgba(170, 70, 190, 0.12) 40%,
-      transparent 70%
-    );
-    filter: blur(28px);
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -1,5 +1,7 @@
 import { Suspense } from "react";
+import Image from "next/image";
 import { connection } from "next/server";
+import silkLeft from "@/public/images/silk-left.webp";
 import { getUpcomingDays } from "@/lib/dates";
 import { instagramDmUrl, site } from "@/lib/site";
 import { whatsappUrl } from "@/lib/whatsapp";
@@ -22,7 +24,15 @@ async function IdeaFormWithDays() {
 
 export function IdeaSection() {
   return (
-    <section id="idea" className="container-x scroll-mt-20 py-12">
+    <section id="idea" className="container-x relative scroll-mt-20 py-12">
+      {/* magenta light silk at the viewport's left edge, behind the heading */}
+      <Image
+        src={silkLeft}
+        alt=""
+        aria-hidden
+        draggable={false}
+        className="pointer-events-none absolute -top-6 left-[calc(50%-50vw)] -z-10 h-auto w-[110px] select-none lg:w-[164px]"
+      />
       <SectionDivider />
 
       <h2 className="display text-gradient-lilac mt-6 text-balance text-center text-[clamp(2.1rem,9vw,3.75rem)] leading-none">

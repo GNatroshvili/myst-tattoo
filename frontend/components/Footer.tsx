@@ -1,10 +1,20 @@
+import Image from "next/image";
 import Link from "next/link";
+import silkBottom from "@/public/images/silk-bottom.webp";
 import { site } from "@/lib/site";
 import { ArrowUpRightIcon, CalendarIcon, InstagramIcon, MapPinIcon } from "./ui/Icons";
 
 export function Footer() {
   return (
-    <footer className="container-x mt-8 border-t border-lilac-400/15 py-10">
+    <footer className="container-x relative mt-8 border-t border-lilac-400/15 py-10">
+      {/* magenta light silk rising from the footer's right edge, behind the columns */}
+      <Image
+        src={silkBottom}
+        alt=""
+        aria-hidden
+        draggable={false}
+        className="pointer-events-none absolute right-[calc(50%-50vw)] top-[-110px] -z-10 h-auto w-[220px] select-none lg:top-[-140px] lg:w-[332px]"
+      />
       <div className="grid gap-8 md:grid-cols-3 md:divide-x md:divide-lilac-400/20">
         <div className="flex items-start gap-4 md:pr-8">
           <MapPinIcon className="mt-0.5 h-6 w-6 shrink-0 text-lilac-300" />
