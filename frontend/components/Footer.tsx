@@ -1,66 +1,54 @@
-import Image from "next/image";
 import Link from "next/link";
-import silkBottom from "@/public/images/silk-bottom.webp";
 import { site } from "@/lib/site";
 import { ArrowUpRightIcon, CalendarIcon, InstagramIcon, MapPinIcon } from "./ui/Icons";
 
+const column = "flex min-w-0 items-center gap-6 py-1 lg:gap-[30px]";
+const divided = "md:border-l md:border-line/28 md:pl-7";
+const icon = "h-[34px] w-[34px] shrink-0 text-orchid";
+const link = "transition-colors hover:text-gold";
+
 export function Footer() {
   return (
-    <footer className="container-x relative mt-8 border-t border-lilac-400/15 py-10">
-      {/* magenta light silk rising from the footer's right edge, behind the columns */}
-      <Image
-        src={silkBottom}
-        alt=""
-        aria-hidden
-        draggable={false}
-        className="pointer-events-none absolute right-[calc(50%-50vw)] top-[-110px] -z-10 h-auto w-[220px] select-none lg:top-[-140px] lg:w-[332px]"
-      />
-      <div className="grid gap-8 md:grid-cols-3 md:divide-x md:divide-lilac-400/20">
-        <div className="flex items-start gap-4 md:pr-8">
-          <MapPinIcon className="mt-0.5 h-6 w-6 shrink-0 text-lilac-300" />
-          <div className="text-sm leading-relaxed">
-            <p className="text-lilac-50">{site.city}</p>
-            <p className="text-lilac-200/80">{site.name}</p>
-          </div>
-        </div>
-
-        <div className="flex items-start gap-4 md:px-8">
-          <InstagramIcon className="mt-0.5 h-6 w-6 shrink-0 text-lilac-300" />
-          <div className="text-sm leading-relaxed">
-            <p className="text-lilac-50">Follow us</p>
-            <p className="flex flex-wrap gap-x-4 text-lilac-200/80">
-              {site.instagram.map((acc) => (
-                <a
-                  key={acc.handle}
-                  href={acc.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="transition hover:text-gold"
-                >
-                  {acc.handle}
-                </a>
-              ))}
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-start gap-4 md:pl-8">
-          <CalendarIcon className="mt-0.5 h-6 w-6 shrink-0 text-lilac-300" />
-          <div className="text-sm leading-relaxed">
-            <p className="text-lilac-50">Book an Appointment</p>
-            <Link
-              href="#idea"
-              className="inline-flex items-center gap-1.5 text-lilac-200/80 transition hover:text-gold"
-            >
-              Online <ArrowUpRightIcon className="h-3.5 w-3.5" />
-            </Link>
-          </div>
-        </div>
+    <footer className="flex flex-col gap-y-5 pb-[50px] pt-11 text-[15px] leading-6 text-mist-200 md:flex-row md:items-center">
+      <div className={`${column} md:flex-[1_1_280px] md:pl-2 lg:pl-5`}>
+        <MapPinIcon className={icon} />
+        <p>
+          {site.city}
+          <br />
+          {site.name}
+        </p>
       </div>
 
-      <p className="mt-10 text-center text-xs tracking-wide text-lilac-300/50">
-        &copy; {site.name}. All rights reserved.
-      </p>
+      {/* a little less inset than its neighbours so both handles sit on one line */}
+      <div className={`${column} ${divided} md:flex-[1.2_1_320px] lg:gap-7 lg:pl-[60px]`}>
+        <InstagramIcon className={icon} />
+        <p>
+          Follow us
+          <br />
+          <span className="flex flex-wrap gap-x-[18px]">
+            {site.instagram.map((acc) => (
+              <a
+                key={acc.handle}
+                href={acc.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={link}
+              >
+                {acc.handle}
+              </a>
+            ))}
+          </span>
+        </p>
+      </div>
+
+      <div className={`${column} ${divided} md:flex-[1_1_280px] lg:pl-[76px]`}>
+        <CalendarIcon className={icon} />
+        <Link href="/#idea" className={link}>
+          Book an Appointment
+          <br />
+          Online <ArrowUpRightIcon className="ml-1.5 inline-block h-[13px] w-[13px] align-[-1px]" />
+        </Link>
+      </div>
     </footer>
   );
 }

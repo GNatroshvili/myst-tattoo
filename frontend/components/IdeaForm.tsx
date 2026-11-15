@@ -8,6 +8,9 @@ import { ChevronDownIcon, WhatsAppIcon } from "./ui/Icons";
 
 type Props = { days: DayOption[] };
 
+const formShell =
+  "flex min-w-0 flex-col gap-2 rounded-[18px] border border-white/[0.03] bg-surface px-5 pb-7 pt-[22px] sm:px-[26px]";
+
 export function IdeaForm({ days }: Props) {
   const [name, setName] = useState("");
   const [service, setService] = useState<string>(services[0]);
@@ -23,170 +26,140 @@ export function IdeaForm({ days }: Props) {
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="panel min-w-0 p-4 sm:p-6"
-      aria-labelledby="idea-form-title"
-    >
-      <h3 id="idea-form-title" className="sr-only">
-        Booking request form
-      </h3>
+    <form onSubmit={handleSubmit} className={formShell} aria-label="Booking request">
+      <label htmlFor="f-name" className="field-label">
+        Your name
+      </label>
+      <input
+        id="f-name"
+        name="name"
+        type="text"
+        autoComplete="name"
+        required
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        className="field field-outlined h-11 px-3.5 font-medium"
+      />
 
-      <div className="space-y-5">
-        <div>
-          <label htmlFor="name" className="mb-2 block text-sm font-semibold text-lilac-50">
-            Your name
-          </label>
-          <input
-            id="name"
-            name="name"
-            type="text"
-            autoComplete="name"
-            required
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="field"
-          />
-        </div>
-
-        <div>
-          <label htmlFor="service" className="mb-2 block text-sm font-semibold text-lilac-50">
-            Service
-          </label>
-          <div className="relative">
-            <select
-              id="service"
-              name="service"
-              value={service}
-              onChange={(e) => setService(e.target.value)}
-              className="field"
-            >
-              {services.map((s) => (
-                <option key={s} value={s}>
-                  {s}
-                </option>
-              ))}
-            </select>
-            <ChevronDownIcon className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-lilac-200" />
-          </div>
-        </div>
-
-        <div>
-          <label htmlFor="idea" className="mb-2 block text-sm font-semibold text-lilac-50">
-            Idea <span className="text-xs font-normal text-lilac-300/80">(optional)</span>
-          </label>
-          <textarea
-            id="idea"
-            name="idea"
-            rows={3}
-            value={idea}
-            onChange={(e) => setIdea(e.target.value)}
-            placeholder="e.g. moon and stars, fine line, wrist, ~5 cm"
-            className="field resize-none"
-          />
-        </div>
-
-        <fieldset className="min-w-0">
-          <legend className="mb-2 block text-sm font-semibold text-lilac-50">Preferred day</legend>
-          <div
-            role="radiogroup"
-            aria-label="Preferred day"
-            className="scroll-thin -mx-1 flex min-w-0 snap-x gap-2 overflow-x-auto px-1 pb-3"
-          >
-            {days.map((d, i) => {
-              const active = d.iso === dayIso;
-              return (
-                <button
-                  key={d.iso}
-                  type="button"
-                  role="radio"
-                  aria-checked={active}
-                  aria-label={`${d.label}, ${d.day} ${d.month}`}
-                  data-active={active}
-                  onClick={() => setDayIso(active ? null : d.iso)}
-                  className="pill flex w-[64px] shrink-0 snap-start flex-col items-center py-2.5"
-                >
-                  <span
-                    className={`text-[10px] leading-none ${
-                      i < 2 && !active ? "text-gold/90" : "opacity-80"
-                    }`}
-                  >
-                    {d.label}
-                  </span>
-                  <span className="mt-1.5 text-lg font-semibold leading-none">{d.day}</span>
-                  <span className="mt-1 text-[10px] leading-none opacity-80">{d.month}</span>
-                </button>
-              );
-            })}
-          </div>
-        </fieldset>
-
-        <fieldset className="min-w-0">
-          <legend className="mb-2 block text-sm font-semibold text-lilac-50">Time of day</legend>
-          <div role="radiogroup" aria-label="Time of day" className="grid grid-cols-3 gap-2">
-            {timesOfDay.map((t) => {
-              const active = t === time;
-              return (
-                <button
-                  key={t}
-                  type="button"
-                  role="radio"
-                  aria-checked={active}
-                  data-active={active}
-                  onClick={() => setTime(active ? null : t)}
-                  className="pill min-w-0 px-1 py-3 text-[13px] font-medium sm:text-sm"
-                >
-                  {t}
-                </button>
-              );
-            })}
-          </div>
-        </fieldset>
-
-        <button type="submit" className="btn btn-primary w-full py-4 text-[15px]">
-          <WhatsAppIcon className="h-5 w-5" />
-          Send on WhatsApp
-        </button>
+      <label htmlFor="f-service" className="field-label mt-3">
+        Service
+      </label>
+      <div className="relative">
+        <select
+          id="f-service"
+          name="service"
+          value={service}
+          onChange={(e) => setService(e.target.value)}
+          className="field h-[42px] pl-3.5 pr-10 font-semibold"
+        >
+          {services.map((s) => (
+            <option key={s} value={s}>
+              {s}
+            </option>
+          ))}
+        </select>
+        <ChevronDownIcon className="pointer-events-none absolute right-3.5 top-[17px] h-2 w-[11px] text-white" />
       </div>
+
+      <label htmlFor="f-idea" className="field-label mt-3">
+        Idea <span className="text-[11px] font-normal text-mist-700">(optional)</span>
+      </label>
+      <textarea
+        id="f-idea"
+        name="idea"
+        rows={3}
+        value={idea}
+        onChange={(e) => setIdea(e.target.value)}
+        placeholder="e.g. moon and stars, fine line, wrist, ~5 cm"
+        className="field h-[70px] min-h-[70px] resize-y px-3.5 py-[11px] leading-5"
+      />
+
+      <div id="f-day-label" className="field-label mt-3">
+        Preferred day
+      </div>
+      <div
+        role="radiogroup"
+        aria-labelledby="f-day-label"
+        className="days-scroll flex gap-[9px] overflow-x-auto pb-2"
+      >
+        {days.map((d) => {
+          const active = d.iso === dayIso;
+          return (
+            <button
+              key={d.iso}
+              type="button"
+              role="radio"
+              aria-checked={active}
+              aria-label={`${d.label}, ${d.day} ${d.month}`}
+              onClick={() => setDayIso(active ? null : d.iso)}
+              className="choice flex h-[58px] w-[54px] shrink-0 flex-col items-center justify-center"
+            >
+              <span className="text-[9.5px] leading-3 text-[#c9bacf]">{d.label}</span>
+              <span className="text-[16px] font-bold leading-5">{d.day}</span>
+              <span className="text-[9.5px] leading-3 text-[#c9bacf]">{d.month}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      <div id="f-time-label" className="field-label mt-2.5">
+        Time of day
+      </div>
+      <div
+        role="radiogroup"
+        aria-labelledby="f-time-label"
+        className="grid grid-cols-3 gap-[9px]"
+      >
+        {timesOfDay.map((t) => {
+          const active = t === time;
+          return (
+            <button
+              key={t}
+              type="button"
+              role="radio"
+              aria-checked={active}
+              onClick={() => setTime(active ? null : t)}
+              className="choice h-11 min-w-0 px-1.5 text-[13.5px] font-bold"
+            >
+              {t}
+            </button>
+          );
+        })}
+      </div>
+
+      <button type="submit" className="btn btn-gold mt-[22px] w-full gap-2.5">
+        <WhatsAppIcon className="h-5 w-5" />
+        Send on WhatsApp
+      </button>
     </form>
   );
 }
 
-/** Static shell shown while the day list streams in. */
+/** Static shell shown while the day list streams in; mirrors the form's heights. */
 export function IdeaFormSkeleton() {
+  const label = "h-5 w-24 rounded bg-white/[0.07]";
+  const well = "rounded-[10px] bg-well";
   return (
-    <div className="panel min-w-0 animate-pulse p-4 sm:p-6" aria-hidden>
-      <div className="space-y-5">
-        <div>
-          <div className="mb-2 h-4 w-24 rounded bg-white/10" />
-          <div className="h-11 rounded-xl bg-white/5" />
-        </div>
-        <div>
-          <div className="mb-2 h-4 w-16 rounded bg-white/10" />
-          <div className="h-11 rounded-xl bg-white/5" />
-        </div>
-        <div>
-          <div className="mb-2 h-4 w-12 rounded bg-white/10" />
-          <div className="h-24 rounded-xl bg-white/5" />
-        </div>
-        <div>
-          <div className="mb-2 h-4 w-28 rounded bg-white/10" />
-          <div className="flex gap-2">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="h-16 w-16 shrink-0 rounded-xl bg-white/5" />
-            ))}
-          </div>
-        </div>
-        <div>
-          <div className="mb-2 h-4 w-24 rounded bg-white/10" />
-          <div className="grid grid-cols-3 gap-2">
-            <div className="h-11 rounded-xl bg-white/5" />
-            <div className="h-11 rounded-xl bg-white/5" />
-            <div className="h-11 rounded-xl bg-white/5" />
-          </div>
-        </div>
-        <div className="h-14 rounded-full bg-gold/30" />
+    <div className={`${formShell} animate-pulse`} aria-hidden>
+      <div className={label} />
+      <div className={`${well} h-11`} />
+      <div className={`${label} mt-3 w-16`} />
+      <div className={`${well} h-[42px]`} />
+      <div className={`${label} mt-3 w-28`} />
+      <div className={`${well} h-[70px]`} />
+      <div className={`${label} mt-3`} />
+      <div className="flex gap-[9px] overflow-hidden pb-2">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <div key={i} className={`${well} h-[58px] w-[54px] shrink-0 rounded-[9px]`} />
+        ))}
       </div>
+      <div className={`${label} mt-2.5`} />
+      <div className="grid grid-cols-3 gap-[9px]">
+        <div className={`${well} h-11 rounded-[9px]`} />
+        <div className={`${well} h-11 rounded-[9px]`} />
+        <div className={`${well} h-11 rounded-[9px]`} />
+      </div>
+      <div className="mt-[22px] h-[46px] rounded-full bg-gold/25" />
     </div>
   );
 }

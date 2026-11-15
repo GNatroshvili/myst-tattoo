@@ -8,16 +8,18 @@ import { QuickLinks } from "@/components/QuickLinks";
 
 export default function HomePage() {
   return (
-    <div className="relative isolate overflow-x-clip">
+    <div className="page-ground relative isolate overflow-hidden">
       <Backdrop />
-      <Header />
-      <main>
-        <Hero />
-        <QuickLinks />
-        <GiftVouchers />
-        <IdeaSection />
-      </main>
-      <Footer />
+      <div className="container-x">
+        <Header />
+        <main>
+          <Hero />
+          <QuickLinks />
+          <GiftVouchers />
+          <IdeaSection />
+        </main>
+        <Footer />
+      </div>
     </div>
   );
 }

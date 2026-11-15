@@ -13,10 +13,13 @@ export function Header() {
 
   return (
     <header className="relative z-30">
-      <div className="container-x flex h-20 items-center justify-between gap-4 md:h-24 md:gap-6">
+      <div className="flex items-center justify-between gap-x-6 pb-1.5 pt-3.5 lg:pl-4">
         <Logo />
 
-        <nav aria-label="Main" className="hidden items-center gap-6 md:flex lg:gap-9">
+        <nav
+          aria-label="Main"
+          className="hidden items-center gap-x-[58px] text-[15px] font-medium lg:flex"
+        >
           {nav.map((item) => {
             const active = pathname === item.href;
             return (
@@ -24,64 +27,66 @@ export function Header() {
                 key={item.href}
                 href={item.href}
                 aria-current={active ? "page" : undefined}
-                className="relative py-2 text-[15px] text-lilac-100/90 transition hover:text-white"
+                className={`border-b-2 pb-2.5 pt-3 transition-colors ${
+                  active
+                    ? "border-gold text-white"
+                    : "border-transparent text-mist-100 hover:text-gold"
+                }`}
               >
                 {item.label}
-                <span
-                  aria-hidden
-                  className={`absolute inset-x-0 -bottom-0.5 h-0.5 rounded-full bg-gold transition-opacity ${
-                    active ? "opacity-100" : "opacity-0"
-                  }`}
-                />
               </Link>
             );
           })}
         </nav>
 
-        <Link href="#idea" className="btn btn-outline-gold hidden md:inline-flex">
-          Book Now <ArrowUpRightIcon className="h-4 w-4" />
-        </Link>
+        <div className="flex items-center gap-3 lg:-mr-3">
+          <Link href="/#idea" className="btn btn-outline-gold hidden sm:inline-flex">
+            Book Now <ArrowUpRightIcon className="h-3.5 w-3.5" />
+          </Link>
 
-        <button
-          type="button"
-          onClick={() => setOpen((v) => !v)}
-          aria-expanded={open}
-          aria-controls="mobile-nav"
-          className="rounded-full border border-lilac-400/30 p-2.5 text-lilac-100 transition hover:border-lilac-300 md:hidden"
-        >
-          <span className="sr-only">{open ? "Close menu" : "Open menu"}</span>
-          {open ? <CloseIcon className="h-5 w-5" /> : <MenuIcon className="h-5 w-5" />}
-        </button>
+          <button
+            type="button"
+            onClick={() => setOpen((v) => !v)}
+            aria-expanded={open}
+            aria-controls="mobile-nav"
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-line/40 text-mist-100 transition-colors hover:border-gold hover:text-gold lg:hidden"
+          >
+            <span className="sr-only">{open ? "Close menu" : "Open menu"}</span>
+            {open ? <CloseIcon className="h-5 w-5" /> : <MenuIcon className="h-5 w-5" />}
+          </button>
+        </div>
       </div>
 
       {open && (
-        <div id="mobile-nav" className="container-x pb-6 md:hidden">
-          <nav aria-label="Mobile" className="panel flex flex-col gap-1 p-3">
-            {nav.map((item) => {
-              const active = pathname === item.href;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setOpen(false)}
-                  aria-current={active ? "page" : undefined}
-                  className={`rounded-xl px-4 py-3 text-base transition hover:bg-white/5 ${
-                    active ? "text-gold" : "text-lilac-100"
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              );
-            })}
-            <Link
-              href="#idea"
-              onClick={() => setOpen(false)}
-              className="btn btn-primary mt-2"
-            >
-              Book Now <ArrowUpRightIcon className="h-4 w-4" />
-            </Link>
-          </nav>
-        </div>
+        <nav
+          id="mobile-nav"
+          aria-label="Mobile"
+          className="mb-2 mt-3 flex flex-col rounded-[18px] border border-line/20 bg-surface p-2.5 text-[16px] font-medium lg:hidden"
+        >
+          {nav.map((item) => {
+            const active = pathname === item.href;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setOpen(false)}
+                aria-current={active ? "page" : undefined}
+                className={`flex min-h-12 items-center rounded-xl px-4 transition-colors hover:bg-white/[0.04] ${
+                  active ? "text-gold" : "text-mist-100"
+                }`}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
+          <Link
+            href="/#idea"
+            onClick={() => setOpen(false)}
+            className="btn btn-gold mt-2 sm:hidden"
+          >
+            Book Now <ArrowUpRightIcon className="h-3.5 w-3.5" />
+          </Link>
+        </nav>
       )}
     </header>
   );

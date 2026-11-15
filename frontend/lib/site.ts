@@ -25,7 +25,13 @@ export const nav = [
   { label: "Why Myst", href: "/why-myst" },
 ] as const;
 
-export const services = ["Tattoo", "Piercing", "Cover-up", "Consultation"] as const;
+export const services = [
+  "Tattoo",
+  "Piercing",
+  "Gift voucher",
+  "Cover-up",
+  "Consultation",
+] as const;
 export type Service = (typeof services)[number];
 
 export const timesOfDay = ["Morning", "Afternoon", "Evening"] as const;

@@ -1,13 +1,10 @@
 import { Suspense } from "react";
-import Image from "next/image";
 import { connection } from "next/server";
-import silkLeft from "@/public/images/silk-left.webp";
 import { getUpcomingDays } from "@/lib/dates";
 import { instagramDmUrl, site } from "@/lib/site";
 import { whatsappUrl } from "@/lib/whatsapp";
 import { IdeaForm, IdeaFormSkeleton } from "./IdeaForm";
 import { SectionDivider } from "./SectionDivider";
-import { InstagramIcon, WhatsAppIcon } from "./ui/Icons";
 
 const steps = [
   { title: "Send your idea", text: "A few words is enough: design, placement, size." },
@@ -18,77 +15,77 @@ const steps = [
 /** Day pills depend on "today", so this part renders at request time. */
 async function IdeaFormWithDays() {
   await connection();
-  const days = getUpcomingDays(10, site.timeZone);
+  const days = getUpcomingDays(14, site.timeZone);
   return <IdeaForm days={days} />;
 }
 
 export function IdeaSection() {
   return (
-    <section id="idea" className="container-x relative scroll-mt-20 py-12">
-      {/* magenta light silk at the viewport's left edge, behind the heading */}
-      <Image
-        src={silkLeft}
-        alt=""
-        aria-hidden
-        draggable={false}
-        className="pointer-events-none absolute -top-6 left-[calc(50%-50vw)] -z-10 h-auto w-[110px] select-none lg:w-[164px]"
-      />
+    <section id="idea" aria-labelledby="idea-title" className="scroll-mt-4 pt-12 lg:pt-[30px]">
       <SectionDivider />
 
-      <h2 className="display text-gradient-lilac mt-6 text-balance text-center text-[clamp(2.1rem,9vw,3.75rem)] leading-none">
+      <h2
+        id="idea-title"
+        className="display mt-5 text-balance text-center text-[clamp(34px,3.75vw,48px)] leading-[1.1] tracking-[0.5px] text-mist-50"
+      >
         Tell us your idea
       </h2>
-      <p className="mx-auto mt-5 max-w-md text-center text-sm leading-relaxed text-lilac-200/90">
-        Fill in the form and a ready-made WhatsApp message opens.
-        <br className="hidden sm:block" /> We&apos;ll reply to agree the details.
+      <p className="mx-auto mt-4 max-w-[470px] text-center text-[14.5px] leading-[23px] text-mist-300">
+        Fill in the form and a ready-made WhatsApp message opens. We&apos;ll reply to agree the
+        details.
       </p>
 
-      {/* explicit minmax(0,1fr) tracks: an implicit `auto` track would grow to the
-          day-picker's scroll width and push the form past the viewport on phones */}
-      <div className="mt-10 grid grid-cols-[minmax(0,1fr)] items-start gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:grid-cols-[minmax(0,430px)_minmax(0,1fr)] lg:gap-8">
+      {/* explicit minmax(0,…) tracks so the day picker scrolls instead of widening the form */}
+      <div className="mx-auto mt-[26px] grid max-w-[926px] grid-cols-[minmax(0,1fr)] items-start gap-[26px] md:grid-cols-[minmax(0,49fr)_minmax(0,41fr)]">
         <Suspense fallback={<IdeaFormSkeleton />}>
           <IdeaFormWithDays />
         </Suspense>
 
-        <aside className="space-y-3 lg:pt-1">
-          <ol className="space-y-3">
+        <div className="flex min-w-0 flex-col gap-[9px]">
+          <ol className="flex flex-col gap-[9px]">
             {steps.map((step, i) => (
-              <li key={step.title} className="panel flex items-start gap-4 px-5 py-4">
-                <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-lilac-400/30 bg-plum-700/70 text-xs font-semibold text-lilac-50">
+              <li
+                key={step.title}
+                className="flex min-h-[70px] items-center gap-4 rounded-[14px] bg-surface px-[18px] py-3"
+              >
+                <span
+                  aria-hidden
+                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-pit text-[13px] font-bold text-white"
+                >
                   {i + 1}
                 </span>
                 <div>
-                  <p className="text-sm font-semibold text-lilac-50">{step.title}</p>
-                  <p className="mt-1 text-xs leading-relaxed text-lilac-300/90">{step.text}</p>
+                  <h3 className="text-[14px] font-bold leading-5 text-white">{step.title}</h3>
+                  <p className="mt-[3px] text-[12px] leading-[18px] text-mist-600">{step.text}</p>
                 </div>
               </li>
             ))}
           </ol>
 
-          <div className="panel px-5 py-5 sm:px-6">
-            <p className="text-sm text-lilac-100">Prefer to message us directly?</p>
-            <div className="mt-4 flex flex-wrap gap-3">
+          <div className="rounded-[14px] bg-[linear-gradient(100deg,#24122a_0%,#2b1432_55%,#3f1a4c_100%)] px-6 pb-[22px] pt-5 sm:px-7">
+            <h3 className="text-[14px] font-medium leading-5 text-white">
+              Prefer to message us directly?
+            </h3>
+            <div className="mt-3.5 flex flex-wrap gap-x-3 gap-y-2.5">
               <a
                 href={whatsappUrl()}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn btn-primary px-5 py-3"
+                className="btn btn-gold btn-sm"
               >
-                <WhatsAppIcon className="h-4 w-4" />
                 WhatsApp
               </a>
               <a
                 href={instagramDmUrl(site.instagram[0].handle)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn btn-outline px-5 py-3"
+                className="btn btn-outline btn-sm"
               >
-                <InstagramIcon className="h-4 w-4" />
                 Instagram DM
               </a>
             </div>
           </div>
-        </aside>
+        </div>
       </div>
     </section>
   );

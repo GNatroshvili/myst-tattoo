@@ -1,52 +1,66 @@
-import Image from "next/image";
 import Link from "next/link";
-import silkRight from "@/public/images/silk-right.webp";
-import voucherCard from "@/public/images/voucher-card.webp";
+import { CardLogo } from "./Logo";
 import { ArrowUpRightIcon } from "./ui/Icons";
 
 export function GiftVouchers() {
   return (
-    <section id="vouchers" className="container-x relative scroll-mt-24 py-10">
-      {/* magenta light silk sweeping past the box's top-right corner, behind the box */}
-      <Image
-        src={silkRight}
-        alt=""
+    <section
+      id="vouchers"
+      aria-labelledby="vouchers-title"
+      className="voucher-panel relative mt-10 grid min-h-[182px] scroll-mt-6 grid-cols-[minmax(0,1fr)] items-center justify-items-center gap-y-7 overflow-hidden px-6 py-9 text-center md:grid-cols-[minmax(0,1fr)_auto] md:justify-items-start md:gap-x-6 md:gap-y-5 md:py-6 md:pl-[58px] md:pr-[38px] md:text-left lg:mt-[34px] lg:grid-cols-[minmax(0,330px)_auto_auto] lg:justify-between"
+    >
+      {/* blurred orchid streaks crossing the panel */}
+      <svg
         aria-hidden
-        draggable={false}
-        className="pointer-events-none absolute -top-36 right-[calc(50%-50vw)] -z-10 h-auto w-[72px] select-none lg:-top-44 lg:w-[104px]"
-      />
+        viewBox="0 0 1064 182"
+        preserveAspectRatio="none"
+        className="pointer-events-none absolute inset-0 h-full w-full"
+      >
+        <defs>
+          <linearGradient id="gv-streak" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stopColor="#D46CF2" stopOpacity="0" />
+            <stop offset="0.5" stopColor="#D46CF2" stopOpacity="0.6" />
+            <stop offset="1" stopColor="#D46CF2" stopOpacity="0" />
+          </linearGradient>
+          <filter id="gv-soft" x="-20%" y="-40%" width="140%" height="180%">
+            <feGaussianBlur stdDeviation="5" />
+          </filter>
+        </defs>
+        <g fill="none" stroke="url(#gv-streak)" filter="url(#gv-soft)">
+          <path d="M420 200C520 120 560 40 660 -10" strokeWidth="7" />
+          <path d="M700 200C800 150 860 70 840 -10" strokeWidth="9" />
+          <path d="M610 190C760 170 900 110 1000 20" strokeWidth="5" />
+        </g>
+      </svg>
 
-      <div className="relative overflow-hidden rounded-[28px] border border-lilac-400/25 bg-plum-900/40 px-5 py-7 shadow-glow-violet sm:px-8 sm:py-8 md:px-10 lg:px-12">
-        {/* phones: stacked; tablets: text + card, button below; desktop: three columns */}
-        <div className="relative grid grid-cols-[minmax(0,1fr)] items-center gap-6 md:grid-cols-[minmax(0,1fr)_auto] lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
-          <div>
-            <h2 className="display text-gradient-lilac text-[clamp(2.4rem,7vw,3.6rem)] leading-[0.95] lg:text-[clamp(2.6rem,5.2vw,3.6rem)]">
-              Gift
-              <br />
-              Vouchers
-            </h2>
-            <p className="mt-3 text-sm text-lilac-200/90">
-              A meaningful gift for someone special.
-            </p>
-          </div>
-
-          {/* card from the design, with its magenta silk glow; the glow bleeds to the
-              box edges on wider screens via the negative vertical margin */}
-          <Image
-            src={voucherCard}
-            alt="Myst gift voucher card"
-            draggable={false}
-            sizes="(min-width: 1024px) 400px, 300px"
-            className="mx-auto h-auto w-[300px] max-w-full select-none md:-my-10 lg:w-[400px]"
-          />
-
-          <div className="md:col-span-2 lg:col-span-1 lg:justify-self-end">
-            <Link href="#idea" className="btn btn-outline-gold">
-              Get a Voucher <ArrowUpRightIcon className="h-4 w-4" />
-            </Link>
-          </div>
-        </div>
+      <div className="relative md:self-end lg:self-center">
+        <h2
+          id="vouchers-title"
+          className="display text-[clamp(42px,12vw,54px)] leading-[0.93] tracking-[0.5px] text-petal-100"
+        >
+          Gift
+          <br />
+          Vouchers
+        </h2>
+        <p className="mt-3.5 text-[15px] leading-[22px] text-mist-400">
+          A meaningful gift for someone special.
+        </p>
       </div>
+
+      {/* the voucher itself: a dark card with the studio mark, tilted and glowing */}
+      <div
+        aria-hidden
+        className="voucher-card relative my-5 flex h-[158px] w-[262px] shrink-0 -rotate-[14deg] flex-col items-center justify-center text-petal-300 md:col-start-2 md:row-span-2 md:row-start-1 md:mb-[-30px] md:mt-[-6px] lg:row-span-1"
+      >
+        <CardLogo />
+      </div>
+
+      <Link
+        href="/#idea"
+        className="btn btn-outline-gold relative md:col-start-1 md:row-start-2 md:self-start lg:col-start-3 lg:row-start-1 lg:self-center"
+      >
+        Get a Voucher <ArrowUpRightIcon className="h-3.5 w-3.5" />
+      </Link>
     </section>
   );
 }
