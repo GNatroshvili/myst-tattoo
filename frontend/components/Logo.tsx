@@ -1,7 +1,15 @@
 import Link from "next/link";
 
 /** Arc with a small four-point star: the mark that sits over the wordmark. */
-function Arc({ strokeWidth, className }: { strokeWidth: number; className?: string }) {
+function Arc({
+  strokeWidth,
+  className,
+  starClassName,
+}: {
+  strokeWidth: number;
+  className?: string;
+  starClassName?: string;
+}) {
   return (
     <svg aria-hidden viewBox="0 0 96 34" fill="none" className={className}>
       <path
@@ -13,6 +21,7 @@ function Arc({ strokeWidth, className }: { strokeWidth: number; className?: stri
       <path
         d="M44 9C44.4 12.6 45.4 13.6 49 14C45.4 14.4 44.4 15.4 44 19C43.6 15.4 42.6 14.4 39 14C42.6 13.6 43.6 12.6 44 9Z"
         fill="#E3B9EA"
+        className={starClassName}
       />
     </svg>
   );
@@ -39,7 +48,11 @@ export function Logo({ className = "" }: { className?: string }) {
 export function CardLogo() {
   return (
     <>
-      <Arc strokeWidth={1.5} className="-mb-2.5 ml-1 h-[26px] w-[74px]" />
+      <Arc
+        strokeWidth={1.5}
+        className="-mb-2.5 ml-1 h-[26px] w-[74px] overflow-visible"
+        starClassName="voucher-star"
+      />
       <span className="font-display pl-[2.5px] text-[40px] leading-10 tracking-[2.5px]">MYST</span>
       <span className="mt-[3px] pl-[3.4px] text-[6.5px] leading-[10px] tracking-[3.4px] text-petal-500">
         TATTOO STUDIO

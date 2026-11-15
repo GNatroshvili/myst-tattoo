@@ -47,12 +47,17 @@ export function GiftVouchers() {
         </p>
       </div>
 
-      {/* the voucher itself: a dark card with the studio mark, tilted and glowing */}
+      {/* the voucher itself: a dark card with the studio mark, tilted and glowing.
+          The outer box keeps the resting tilt and is the hover target, so the hit
+          area stays put while the card inside straightens, lifts and catches light. */}
       <div
         aria-hidden
-        className="voucher-card relative my-5 flex h-[158px] w-[262px] shrink-0 -rotate-[14deg] flex-col items-center justify-center text-petal-300 md:col-start-2 md:row-span-2 md:row-start-1 md:mb-[-30px] md:mt-[-6px] lg:row-span-1"
+        className="voucher-tilt relative my-5 shrink-0 -rotate-[14deg] md:col-start-2 md:row-span-2 md:row-start-1 md:mb-[-30px] md:mt-[-6px] lg:row-span-1"
       >
-        <CardLogo />
+        <div className="voucher-card relative flex h-[158px] w-[262px] flex-col items-center justify-center overflow-hidden text-petal-300">
+          <CardLogo />
+          <span className="voucher-sheen" />
+        </div>
       </div>
 
       <Link
