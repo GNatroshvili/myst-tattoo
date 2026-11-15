@@ -1,19 +1,21 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useId, useState, type FormEvent } from "react";
 import type { DayOption } from "@/lib/dates";
-import { services, timesOfDay } from "@/lib/site";
+import type { Dictionary } from "@/lib/i18n/dictionaries/en";
 import { buildWhatsAppMessage, whatsappUrl } from "@/lib/whatsapp";
 import { ChevronDownIcon, WhatsAppIcon } from "./ui/Icons";
 
-type Props = { days: DayOption[] };
+type Props = { days: DayOption[]; t: Dictionary["form"] };
 
 const formShell =
   "flex min-w-0 flex-col gap-2 rounded-[18px] border border-white/[0.03] bg-surface px-5 pb-7 pt-[22px] sm:px-[26px]";
 
-export function IdeaForm({ days }: Props) {
+export function IdeaForm({ days, t }: Props) {
+  // unique per instance: a hidden copy of the page can share the document
+  const id = useId();
   const [name, setName] = useState("");
-  const [service, setService] = useState<string>(services[0]);
+  const [service, setService] = useState<string>(t.services[0]);
   const [idea, setIdea] = useState("");
   const [dayIso, setDayIso] = useState<string | null>(null);
   const [time, setTime] = useState<string | null>(null);
@@ -21,17 +23,17 @@ export function IdeaForm({ days }: Props) {
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const day = days.find((d) => d.iso === dayIso) ?? null;
-    const message = buildWhatsAppMessage({ name, service, idea, day, time });
+    const message = buildWhatsAppMessage({ name, service, idea, day, time }, t.message);
     window.open(whatsappUrl(message), "_blank", "noopener,noreferrer");
   }
 
   return (
-    <form onSubmit={handleSubmit} className={formShell} aria-label="Booking request">
-      <label htmlFor="f-name" className="field-label">
-        Your name
+    <form onSubmit={handleSubmit} className={formShell} aria-label={t.aria}>
+      <label htmlFor={`${id}-name`} className="field-label">
+        {t.name}
       </label>
       <input
-        id="f-name"
+        id={`${id}-name`}
         name="name"
         type="text"
         autoComplete="name"
@@ -41,18 +43,18 @@ export function IdeaForm({ days }: Props) {
         className="field field-outlined h-11 px-3.5 font-medium"
       />
 
-      <label htmlFor="f-service" className="field-label mt-3">
-        Service
+      <label htmlFor={`${id}-service`} className="field-label mt-3">
+        {t.service}
       </label>
       <div className="relative">
         <select
-          id="f-service"
+          id={`${id}-service`}
           name="service"
           value={service}
           onChange={(e) => setService(e.target.value)}
           className="field h-[42px] pl-3.5 pr-10 font-semibold"
         >
-          {services.map((s) => (
+          {t.services.map((s) => (
             <option key={s} value={s}>
               {s}
             </option>
@@ -61,25 +63,25 @@ export function IdeaForm({ days }: Props) {
         <ChevronDownIcon className="pointer-events-none absolute right-3.5 top-[17px] h-2 w-[11px] text-white" />
       </div>
 
-      <label htmlFor="f-idea" className="field-label mt-3">
-        Idea <span className="text-[11px] font-normal text-mist-700">(optional)</span>
+      <label htmlFor={`${id}-idea`} className="field-label mt-3">
+        {t.idea} <span className="text-[11px] font-normal text-mist-700">{t.optional}</span>
       </label>
       <textarea
-        id="f-idea"
+        id={`${id}-idea`}
         name="idea"
         rows={3}
         value={idea}
         onChange={(e) => setIdea(e.target.value)}
-        placeholder="e.g. moon and stars, fine line, wrist, ~5 cm"
+        placeholder={t.ideaPlaceholder}
         className="field h-[70px] min-h-[70px] resize-y px-3.5 py-[11px] leading-5"
       />
 
-      <div id="f-day-label" className="field-label mt-3">
-        Preferred day
+      <div id={`${id}-day-label`} className="field-label mt-3">
+        {t.day}
       </div>
       <div
         role="radiogroup"
-        aria-labelledby="f-day-label"
+        aria-labelledby={`${id}-day-label`}
         className="days-scroll flex gap-[9px] overflow-x-auto pb-2"
       >
         {days.map((d) => {
@@ -102,26 +104,26 @@ export function IdeaForm({ days }: Props) {
         })}
       </div>
 
-      <div id="f-time-label" className="field-label mt-2.5">
-        Time of day
+      <div id={`${id}-time-label`} className="field-label mt-2.5">
+        {t.time}
       </div>
       <div
         role="radiogroup"
-        aria-labelledby="f-time-label"
+        aria-labelledby={`${id}-time-label`}
         className="grid grid-cols-3 gap-[9px]"
       >
-        {timesOfDay.map((t) => {
-          const active = t === time;
+        {t.times.map((slot) => {
+          const active = slot === time;
           return (
             <button
-              key={t}
+              key={slot}
               type="button"
               role="radio"
               aria-checked={active}
-              onClick={() => setTime(active ? null : t)}
+              onClick={() => setTime(active ? null : slot)}
               className="choice h-11 min-w-0 px-1.5 text-[13.5px] font-bold"
             >
-              {t}
+              {slot}
             </button>
           );
         })}
@@ -129,7 +131,7 @@ export function IdeaForm({ days }: Props) {
 
       <button type="submit" className="btn btn-gold mt-[22px] w-full gap-2.5">
         <WhatsAppIcon className="h-5 w-5" />
-        Send on WhatsApp
+        {t.submit}
       </button>
     </form>
   );

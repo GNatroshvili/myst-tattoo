@@ -5,20 +5,23 @@ import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { IdeaSection } from "@/components/IdeaSection";
 import { QuickLinks } from "@/components/QuickLinks";
+import { getDictionary } from "@/lib/i18n";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const { lang, dict } = await getDictionary();
+
   return (
     <div className="page-ground relative isolate overflow-hidden">
-      <Backdrop />
+      <Backdrop scope="home" />
       <div className="container-x">
-        <Header />
+        <Header lang={lang} nav={dict.nav} common={dict.common} switcherLabel={dict.langSwitcher.aria} />
         <main>
-          <Hero />
-          <QuickLinks />
-          <GiftVouchers />
-          <IdeaSection />
+          <Hero lang={lang} dict={dict} />
+          <QuickLinks lang={lang} t={dict.quickLinks} />
+          <GiftVouchers lang={lang} t={dict.vouchers} />
+          <IdeaSection lang={lang} dict={dict} />
         </main>
-        <Footer />
+        <Footer lang={lang} dict={dict} />
       </div>
     </div>
   );

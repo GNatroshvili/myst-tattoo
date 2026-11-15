@@ -9,15 +9,27 @@ export type IdeaPayload = {
   time?: string | null;
 };
 
-/** Builds the pre-filled text that opens in WhatsApp. */
-export function buildWhatsAppMessage(p: IdeaPayload) {
+/** One template per line of the message; `{placeholders}` are filled in. */
+export type MessageTemplates = {
+  greeting: string;
+  name: string;
+  idea: string;
+  day: string;
+  time: string;
+};
+
+const fill = (template: string, values: Record<string, string>) =>
+  template.replace(/\{(\w+)\}/g, (_, key: string) => values[key] ?? "");
+
+/** Builds the pre-filled text that opens in WhatsApp, in the page's language. */
+export function buildWhatsAppMessage(p: IdeaPayload, t: MessageTemplates) {
   const lines = [
-    `Hi ${site.shortName}! I'd like to book a ${p.service.toLowerCase()}.`,
-    `Name: ${p.name.trim() || "-"}`,
+    fill(t.greeting, { service: p.service }),
+    fill(t.name, { name: p.name.trim() || "-" }),
   ];
-  if (p.idea?.trim()) lines.push(`Idea: ${p.idea.trim()}`);
-  if (p.day) lines.push(`Preferred day: ${p.day.long}`);
-  if (p.time) lines.push(`Time of day: ${p.time}`);
+  if (p.idea?.trim()) lines.push(fill(t.idea, { idea: p.idea.trim() }));
+  if (p.day) lines.push(fill(t.day, { day: p.day.long }));
+  if (p.time) lines.push(fill(t.time, { time: p.time }));
   return lines.join("\n");
 }
 

@@ -2,8 +2,11 @@
 
 /* ---------- Design tokens (from the Myst Tattoo Studio design) ---------- */
 @theme {
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-italiana), "Cormorant Garamond", Georgia, serif;
+  /* Inter and Italiana cover Latin; the Noto Georgian pair takes over for
+     Georgian letters, which neither of them has. */
+  --font-sans: var(--font-inter), var(--font-georgian-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display:
+    var(--font-italiana), var(--font-georgian-serif), "Cormorant Garamond", Georgia, serif;
 
   /* grounds */
   --color-ink: #10060f; /* page */
@@ -45,6 +48,14 @@
   html {
     scroll-behavior: smooth;
     background-color: var(--color-ink);
+    /* multiplier for display headings; see the Georgian override below */
+    --display-scale: 1;
+  }
+  /* Georgian capitals (Mtavruli) are wider and heavier than Italiana's, so the
+     headings are set a little smaller and in a lighter weight to keep the same
+     presence and fit the same boxes. */
+  html:lang(ka) {
+    --display-scale: 0.9;
   }
   body {
     background-color: var(--color-ink);
@@ -92,6 +103,20 @@
     font-family: var(--font-display);
     font-weight: 400;
     text-transform: uppercase;
+  }
+  /* capitals for small labels (eyebrow, "In Tbilisi") */
+  .caps {
+    text-transform: uppercase;
+  }
+  /* Georgian arrives already converted to its capital letterforms (Mtavruli) by
+     displayCase(); `text-transform: uppercase` would turn it back into ordinary
+     letters, so it is switched off. The lighter cut matches Italiana's strokes. */
+  html:lang(ka) .display,
+  html:lang(ka) .caps {
+    text-transform: none;
+  }
+  html:lang(ka) .display {
+    font-weight: 300;
   }
 
   /* ----- buttons ----- */

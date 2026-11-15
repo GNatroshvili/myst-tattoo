@@ -28,11 +28,19 @@ function Arc({
 }
 
 /** Header logo: arc + "MYST" in Italiana + spaced "TATTOO STUDIO". Links home. */
-export function Logo({ className = "" }: { className?: string }) {
+export function Logo({
+  href,
+  label,
+  className = "",
+}: {
+  href: string;
+  label: string;
+  className?: string;
+}) {
   return (
     <Link
-      href="/"
-      aria-label="Myst Tattoo Studio — home"
+      href={href}
+      aria-label={label}
       className={`relative flex w-[132px] shrink-0 flex-col items-center pt-6 text-petal-300 transition-opacity hover:opacity-85 ${className}`}
     >
       <Arc strokeWidth={1.3} className="absolute left-[26px] top-0 h-[34px] w-24" />

@@ -1,13 +1,11 @@
 /**
  * Central place for studio details and navigation.
  * Values prefixed NEXT_PUBLIC_ can be overridden from .env.local.
+ * Everything a visitor reads lives in lib/i18n/dictionaries instead.
  */
 export const site = {
   name: "Myst Tattoo Studio",
   shortName: "Myst",
-  city: "Tbilisi, Georgia",
-  tagline:
-    "Myst Tattoo Studio — a creative space for self-expression, unique ideas and high-quality body art.",
   /** International format, digits only (no "+" or spaces), e.g. 995555123456 */
   whatsappNumber: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "995555000000",
   instagram: [
@@ -17,25 +15,14 @@ export const site = {
   timeZone: "Asia/Tbilisi",
 } as const;
 
+/** Main navigation; `key` picks the label from the dictionary's `nav` section. */
 export const nav = [
-  { label: "Home", href: "/" },
-  { label: "Artists", href: "/artists" },
-  { label: "Tattoos", href: "/tattoos" },
-  { label: "Piercing", href: "/piercing" },
-  { label: "Why Myst", href: "/why-myst" },
+  { key: "home", href: "/" },
+  { key: "artists", href: "/artists" },
+  { key: "tattoos", href: "/tattoos" },
+  { key: "piercing", href: "/piercing" },
+  { key: "whyMyst", href: "/why-myst" },
 ] as const;
-
-export const services = [
-  "Tattoo",
-  "Piercing",
-  "Gift voucher",
-  "Cover-up",
-  "Consultation",
-] as const;
-export type Service = (typeof services)[number];
-
-export const timesOfDay = ["Morning", "Afternoon", "Evening"] as const;
-export type TimeOfDay = (typeof timesOfDay)[number];
 
 export function instagramDmUrl(handle: string) {
   return `https://ig.me/m/${handle.replace(/^@/, "")}`;
