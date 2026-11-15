@@ -323,21 +323,34 @@
     background-color: var(--color-raised);
   }
 
-  /* day picker scrollbar: pale lilac rail, as drawn */
-  .days-scroll {
-    scrollbar-width: thin;
-    scrollbar-color: #b9a6c0 #efe6f2;
-  }
+  /* Day picker scrollbar: a slim groove in the same near-black as the form
+     fields, with an orchid thumb that brightens on hover and turns gold while
+     it is dragged (gold is the form's "selected" colour). */
   .days-scroll::-webkit-scrollbar {
-    height: 8px;
+    height: 6px;
   }
   .days-scroll::-webkit-scrollbar-track {
-    background: #efe6f2;
-    border-radius: 8px;
+    background: var(--color-well);
+    border-radius: 999px;
   }
   .days-scroll::-webkit-scrollbar-thumb {
-    background: #b9a6c0;
-    border-radius: 8px;
+    background: linear-gradient(90deg, #6f3a86, var(--color-orchid));
+    border-radius: 999px;
+  }
+  .days-scroll::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(90deg, #8f4dab, #e3b9ea);
+  }
+  .days-scroll::-webkit-scrollbar-thumb:active {
+    background: var(--color-gold);
+  }
+  /* Firefox has no scrollbar pseudo-elements, so it gets the standard
+     properties. They are kept away from Chrome and Safari on purpose: when
+     these are set, Chrome ignores the rules above and draws its own bar. */
+  @supports not selector(::-webkit-scrollbar) {
+    .days-scroll {
+      scrollbar-width: thin;
+      scrollbar-color: #9a5bb5 var(--color-well);
+    }
   }
 }
 

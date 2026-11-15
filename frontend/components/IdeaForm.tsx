@@ -82,7 +82,7 @@ export function IdeaForm({ days, t }: Props) {
       <div
         role="radiogroup"
         aria-labelledby={`${id}-day-label`}
-        className="days-scroll flex gap-[9px] overflow-x-auto pb-2"
+        className="days-scroll flex gap-[9px] overflow-x-auto pb-2.5"
       >
         {days.map((d) => {
           const active = d.iso === dayIso;
