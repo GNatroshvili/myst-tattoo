@@ -1,8 +1,14 @@
+const fades = {
+  short: "[mask-image:linear-gradient(to_bottom,transparent,#000_260px)]",
+  /* the artists and tattoos pages fade in over a longer stretch, as drawn */
+  long: "[mask-image:linear-gradient(to_bottom,transparent,#000_420px)]",
+};
+
 /**
  * Decorative light behind the lower half of the page: two violet glows in the
  * corners and a few blurred orchid streaks, anchored to the bottom as drawn.
  */
-export function Backdrop({ scope }: { scope: string }) {
+export function Backdrop({ scope, fade = "short" }: { scope: string; fade?: keyof typeof fades }) {
   // Next keeps the previous page in the document (hidden) after a navigation, so
   // two pages' backdrops can coexist. `scope` keeps their gradient ids apart;
   // otherwise a reference could resolve to the copy that is not being drawn.
@@ -14,7 +20,7 @@ export function Backdrop({ scope }: { scope: string }) {
       viewBox="0 0 1280 1000"
       preserveAspectRatio="none"
       /* the mask fades the top edge in, so the glow never starts on a hard line */
-      className="pointer-events-none absolute bottom-0 left-0 h-[1000px] w-full [mask-image:linear-gradient(to_bottom,transparent,#000_260px)]"
+      className={`pointer-events-none absolute bottom-0 left-0 h-[1000px] w-full ${fades[fade]}`}
     >
       <defs>
         <radialGradient id={`${id}-glow-left`} cx="0" cy="0.35" r="0.5">

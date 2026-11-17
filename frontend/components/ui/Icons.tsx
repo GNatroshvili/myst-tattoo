@@ -81,6 +81,16 @@ export function ArtistsIcon(props: IconProps) {
   );
 }
 
+/** One person: stands in for an artist's photo. */
+export function PersonIcon(props: IconProps) {
+  return (
+    <svg {...outline} viewBox="0 0 48 48" strokeWidth={1.4} {...props}>
+      <circle cx="24" cy="16" r="8" />
+      <path d="M8 42v-3a12 12 0 0 1 12-12h8a12 12 0 0 1 12 12v3Z" />
+    </svg>
+  );
+}
+
 export function WhyMystIcon(props: IconProps) {
   return (
     <svg {...outline} viewBox="0 0 48 48" strokeWidth={1.4} {...props}>
