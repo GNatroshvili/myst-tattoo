@@ -23,7 +23,7 @@ export default async function TattoosPage() {
 
   return (
     <div className="page-ground relative isolate overflow-hidden">
-      <Backdrop scope="tattoos" fade="long" />
+      <Backdrop scope="tattoos" />
       <div className="container-x">
         <Header lang={lang} nav={dict.nav} common={dict.common} switcherLabel={dict.langSwitcher.aria} />
         <main>
@@ -45,11 +45,11 @@ export default async function TattoosPage() {
             className="mt-11"
           >
             <div className="relative flex flex-wrap gap-x-4 gap-y-3">
-              <Link href={localePath(lang, "/artists")} className="btn btn-outline px-[30px]">
+              <Link href={localePath(lang, "/artists")} className="btn btn-outline">
                 {dict.common.ourArtists}
               </Link>
               <Link href={localePath(lang, "#idea")} className="btn btn-gold">
-                {dict.common.bookAppointment} <ArrowUpRightIcon className="h-3.5 w-3.5" />
+                {dict.common.bookAppointment} <ArrowUpRightIcon className="h-[13px] w-[13px]" />
               </Link>
             </div>
           </CtaPanel>

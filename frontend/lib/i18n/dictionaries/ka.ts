@@ -25,7 +25,7 @@ export const ka: Dictionary = {
     artists: "არტისტები",
     tattoos: "ტატუ",
     piercing: "პირსინგი",
-    whyMyst: "რატომ Myst",
+    info: "ინფო",
   },
   langSwitcher: {
     aria: "ენა",
@@ -37,14 +37,20 @@ export const ka: Dictionary = {
     subtitle: "თბილისში",
     tagline:
       "Myst Tattoo Studio — შემოქმედებითი სივრცე თვითგამოხატვის, უნიკალური იდეებისა და მაღალი ხარისხის ბოდი-არტისთვის.",
-    lilyAlt: "იისფერი შროშანი ოქროსფერი რგოლითა და ოთხქიმიანი ვარსკვლავით",
+    lilyAlt: "შინდისფერი შროშანი ოქროსფერი ნახევარმთვარითა და ოთხქიმიანი ვარსკვლავით",
   },
   quickLinks: {
     aria: "გვერდები",
     tattoos: "ტატუ",
     piercing: "პირსინგი",
     artists: "ჩვენი არტისტები",
-    whyMyst: "რატომ Myst",
+    info: "ინფო და მოვლა",
+  },
+  featured: {
+    eyebrow: "Myst / რჩეული ნამუშევრები",
+    title: "რჩეული პროექტები",
+    viewAll: "ყველა ტატუს ნახვა",
+    openGallery: "ტატუების გალერეის გახსნა",
   },
   vouchers: {
     titleLine1: "სასაჩუქრე",
@@ -109,7 +115,7 @@ export const ka: Dictionary = {
     ctaTitleLine1: "არ იცი,",
     ctaTitleLine2: "ვინ აირჩიო?",
     ctaText: "გვითხარი შენი იდეა და შეგირჩევთ არტისტს, რომლის სტილიც მას ყველაზე მეტად მოერგება.",
-    cta: "გვითხარი შენი იდეა",
+    cta: "დაგვიკავშირდი",
   },
   artist: {
     metaTitle: "არტისტის პროფილი",
@@ -186,8 +192,8 @@ export const ka: Dictionary = {
   footer: {
     city: "თბილისი, საქართველო",
     follow: "გამოგვყევი",
-    bookLine1: "ვიზიტის დაჯავშნა",
-    bookLine2: "ონლაინ",
+    question: "გაქვს შეკითხვა?",
+    contact: "დაგვიკავშირდი",
   },
   notFound: {
     title: "გვერდი ვერ მოიძებნა",

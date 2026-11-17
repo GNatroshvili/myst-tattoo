@@ -22,7 +22,7 @@ export const en = {
     artists: "Artists",
     tattoos: "Tattoos",
     piercing: "Piercing",
-    whyMyst: "Why Myst",
+    info: "Info",
   },
   langSwitcher: {
     aria: "Language",
@@ -34,14 +34,21 @@ export const en = {
     subtitle: "In Tbilisi",
     tagline:
       "Myst Tattoo Studio — a creative space for self-expression, unique ideas and high-quality body art.",
-    lilyAlt: "Purple lily with a golden ring and a four-point star",
+    lilyAlt: "Burgundy lily with a golden crescent and a four-point star",
   },
   quickLinks: {
     aria: "Explore",
     tattoos: "Tattoos",
     piercing: "Piercing",
     artists: "Our Artists",
-    whyMyst: "Why Myst",
+    info: "Info & Care",
+  },
+  /** A few pieces on the home page; each opens the full gallery. */
+  featured: {
+    eyebrow: "Myst / Selected work",
+    title: "Featured projects",
+    viewAll: "View all tattoos",
+    openGallery: "Open tattoo gallery",
   },
   vouchers: {
     titleLine1: "Gift",
@@ -108,7 +115,7 @@ export const en = {
     ctaTitleLine1: "Not sure",
     ctaTitleLine2: "who to choose?",
     ctaText: "Tell us your idea and we'll suggest the artist whose style fits it best.",
-    cta: "Tell Us Your Idea",
+    cta: "Contact Us",
   },
   /** One artist's profile page. */
   artist: {
@@ -189,8 +196,8 @@ export const en = {
   footer: {
     city: "Tbilisi, Georgia",
     follow: "Follow us",
-    bookLine1: "Book an Appointment",
-    bookLine2: "Online",
+    question: "Have a question?",
+    contact: "Contact us",
   },
   notFound: {
     title: "Page not found",

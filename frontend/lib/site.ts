@@ -21,7 +21,7 @@ export const nav = [
   { key: "artists", href: "/artists" },
   { key: "tattoos", href: "/tattoos" },
   { key: "piercing", href: "/piercing" },
-  { key: "whyMyst", href: "/why-myst" },
+  { key: "info", href: "/info" },
 ] as const;
 
 export function instagramDmUrl(handle: string) {

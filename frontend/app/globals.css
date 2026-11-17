@@ -2,45 +2,31 @@
 
 /* ---------- Design tokens (from the Myst Tattoo Studio design) ---------- */
 @theme {
-  /* Inter and Italiana cover Latin; the Noto Georgian pair takes over for
+  /* Outfit and Italiana cover Latin; the Noto Georgian pair takes over for
      Georgian letters, which neither of them has. */
-  --font-sans: var(--font-inter), var(--font-georgian-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-outfit), var(--font-georgian-sans), ui-sans-serif, system-ui, sans-serif;
   --font-display:
     var(--font-italiana), var(--font-georgian-serif), "Cormorant Garamond", Georgia, serif;
 
   /* grounds */
-  --color-ink: #10060f; /* page */
-  --color-well: #0e050e; /* form controls */
-  --color-pit: #0b040b; /* step numbers */
-  --color-surface: #1b0f1c; /* cards */
-  --color-raised: #2b1432; /* selected pill */
+  --color-ink: #090808; /* page, form controls */
+  --color-surface: #100c0e; /* cards, the form, the details window */
+  --color-raised: #24131b; /* selected day / time / language */
 
   /* accent */
-  --color-gold: #fae128;
-  --color-gold-bright: #fff17a;
-  --color-on-gold: #17100a;
+  --color-gold: #f7d54a;
+  --color-gold-bright: #fbe37c;
+  --color-on-gold: #15110a;
 
-  /* orchid: icon strokes, hairlines, outline buttons */
-  --color-orchid: #c98bd8;
-  --color-orchid-soft: #d9b4e3;
-  --color-line: #c99ad6;
+  /* text: cream for headings, links and labels (and, thinned out, every
+     hairline); body for paragraphs; muted for captions; faint for hints */
+  --color-cream: #ebd5cd;
+  --color-body: #cfc3bf;
+  --color-muted: #a99c9a;
+  --color-faint: #8f8482;
 
-  /* text, lightest to most muted */
-  --color-mist-50: #f4e6f5;
-  --color-mist-100: #f3e7f6;
-  --color-mist-200: #eaddef;
-  --color-mist-300: #e3d2e9;
-  --color-mist-400: #dcc6e4;
-  --color-mist-500: #d9c4e1;
-  --color-mist-600: #cdbed3;
-  --color-mist-700: #b7a6bd;
-
-  /* pink-violet display tones */
-  --color-petal-100: #f0ddf2;
-  --color-petal-200: #ebcdee;
-  --color-petal-300: #e3b9ea;
-  --color-petal-400: #d9a3e3;
-  --color-petal-500: #c79ad0;
+  /* burgundy rose: icons standing in for photos */
+  --color-rose: #9c5c7a;
 }
 
 /* ---------- Base ---------- */
@@ -59,13 +45,13 @@
   }
   body {
     background-color: var(--color-ink);
-    color: var(--color-mist-500);
+    color: var(--color-body);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
   ::selection {
-    background: rgba(250, 225, 40, 0.3);
+    background: rgba(247, 213, 74, 0.3);
     color: #fff;
   }
   a,
@@ -84,17 +70,24 @@
 
 /* ---------- Components ---------- */
 @layer components {
-  /* 1064px column with 24px gutters (and notch-safe insets in landscape) */
+  /* 1136px column; 32px gutters, 20px on phones (and notch-safe in landscape) */
   .container-x {
     position: relative;
     margin-inline: auto;
     width: 100%;
-    max-width: 1064px;
-    padding-left: max(24px, env(safe-area-inset-left));
-    padding-right: max(24px, env(safe-area-inset-right));
+    max-width: 1176px;
+    padding-left: max(20px, env(safe-area-inset-left));
+    padding-right: max(20px, env(safe-area-inset-right));
+  }
+  @media (min-width: 640px) {
+    .container-x {
+      max-width: 1200px;
+      padding-left: max(32px, env(safe-area-inset-left));
+      padding-right: max(32px, env(safe-area-inset-right));
+    }
   }
 
-  /* page ground: flat near-black plum */
+  /* page ground: flat warm near-black */
   .page-ground {
     background-color: var(--color-ink);
   }
@@ -119,6 +112,41 @@
     font-weight: 300;
   }
 
+  /* small spaced line above a title ("Myst / Artists") */
+  .eyebrow {
+    font-size: 11px;
+    line-height: 16px;
+    letter-spacing: 4.4px;
+    color: var(--color-cream);
+  }
+  /* small spaced caption ("Style", "Tattooed by", "Tattoo photo") */
+  .label-caps {
+    font-size: 11px;
+    line-height: 16px;
+    letter-spacing: 3.2px;
+    color: var(--color-muted);
+  }
+
+  /* text link with an arrow after it ("View profile", "View all tattoos") */
+  .link-arrow {
+    display: inline-flex;
+    align-items: center;
+    color: var(--color-cream);
+    transition: color 0.2s ease;
+  }
+  .link-arrow:hover {
+    color: var(--color-gold);
+  }
+  .link-arrow svg {
+    transition: transform 0.2s ease;
+  }
+  .link-arrow:hover svg {
+    transform: translateX(4px);
+  }
+  .link-arrow.link-back:hover svg {
+    transform: translateX(-4px);
+  }
+
   /* ----- buttons ----- */
   .btn {
     display: inline-flex;
@@ -126,8 +154,7 @@
     justify-content: center;
     box-sizing: border-box;
     border-radius: 999px;
-    font-size: 15px;
-    font-weight: 700;
+    font-size: 16px;
     line-height: 1;
     white-space: nowrap;
     transition:
@@ -141,68 +168,60 @@
     transform: translateY(1px);
   }
   .btn-gold {
-    gap: 9px;
+    gap: 10px;
     height: 46px;
-    padding: 0 30px;
+    padding: 0 26px;
     background-color: var(--color-gold);
     color: var(--color-on-gold);
+    font-weight: 600;
   }
   .btn-gold:hover {
     background-color: var(--color-gold-bright);
-    box-shadow: 0 0 24px rgba(250, 225, 40, 0.32);
+    box-shadow: 0 0 24px rgba(247, 213, 74, 0.3);
   }
   .btn-outline-gold {
-    gap: 8px;
-    height: 44px;
-    padding: 0 26px;
+    gap: 10px;
+    height: 46px;
+    padding: 0 28px;
     border: 1.5px solid var(--color-gold);
     color: var(--color-gold);
+    font-weight: 500;
   }
   .btn-outline-gold:hover {
-    background-color: rgba(250, 225, 40, 0.1);
-    box-shadow: 0 0 22px rgba(250, 225, 40, 0.22);
+    background-color: rgba(247, 213, 74, 0.1);
+    box-shadow: 0 0 22px rgba(247, 213, 74, 0.2);
   }
   .btn-outline {
     height: 46px;
-    padding: 0 35px;
-    border: 1.5px solid var(--color-line);
-    color: var(--color-mist-100);
+    padding: 0 32px;
+    border: 1.5px solid rgba(235, 213, 205, 0.75);
+    color: var(--color-cream);
+    font-weight: 400;
   }
   .btn-outline:hover {
     border-color: var(--color-gold);
     color: var(--color-gold);
   }
-  /* compact pair in the "message us directly" card */
+  /* compact: "Book" on an artist card, the pair in the "message us" card */
   .btn-sm {
     height: 44px;
-    padding: 0 20px;
-    font-size: 13px;
-  }
-  .btn-outline.btn-sm {
-    border-width: 1px;
-    border-color: rgba(201, 154, 214, 0.6);
-    font-weight: 600;
-  }
-  .btn-outline.btn-sm:hover {
-    border-color: var(--color-gold);
+    padding: 0 22px;
+    font-size: 15px;
   }
 
-  /* ----- gift voucher panel ----- */
+  /* ----- glowing panel: gift vouchers, closing call-to-action ----- */
   .voucher-panel {
-    border: 1px solid rgba(201, 154, 214, 0.38);
-    border-radius: 26px;
+    border: 1px solid rgba(235, 213, 205, 0.16);
+    border-radius: 18px;
     background:
-      radial-gradient(60% 130% at 62% 60%, rgba(140, 36, 180, 0.42), rgba(140, 36, 180, 0) 70%),
-      linear-gradient(90deg, #170a18, #1b0b1e);
+      radial-gradient(60% 150% at 62% 75%, rgba(125, 46, 85, 0.72), rgba(125, 46, 85, 0) 72%),
+      linear-gradient(90deg, #120c0e, #170d12);
   }
   .voucher-card {
-    border: 1px solid rgba(222, 140, 240, 0.75);
+    border: 1px solid rgba(235, 213, 205, 0.16);
     border-radius: 12px;
-    background: linear-gradient(150deg, #1d0c20 0%, #0c040d 55%, #2c1036 100%);
-    box-shadow:
-      0 0 0 1px rgba(0, 0, 0, 0.6),
-      0 18px 46px rgba(170, 50, 215, 0.55),
-      0 0 26px rgba(200, 90, 235, 0.35);
+    background: linear-gradient(150deg, #1a1014 0%, #0b0809 55%, #4a1c35 100%);
+    box-shadow: 0 22px 50px rgba(0, 0, 0, 0.55);
     transition:
       transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1),
       box-shadow 0.7s ease,
@@ -210,32 +229,21 @@
   }
 
   /* Hover (on the card, or on the "Get a Voucher" button beside it): the card
-     straightens from -14deg to -6deg and lifts clear of the panel edge, its
-     glow deepens and the star turns gold. Hovering the card itself also sets
-     off the lightning drawn by VoucherCard.tsx. Shown to everyone, including
-     visitors whose system asks for reduced motion: the studio wants it on. */
+     straightens from -14deg to -6deg and lifts clear of the panel edge, and a
+     rose glow gathers around it. Hovering the card itself also sets off the
+     lightning drawn by VoucherCard.tsx. Shown to everyone, including visitors
+     whose system asks for reduced motion: the studio wants it on. */
   .voucher-tilt:hover .voucher-card,
   .voucher-panel:has(.btn:hover, .btn:focus-visible) .voucher-card {
     transform: translateY(-2px) rotate(8deg);
-    border-color: rgba(240, 184, 255, 0.95);
+    border-color: rgba(245, 205, 220, 0.6);
     box-shadow:
-      0 0 0 1px rgba(0, 0, 0, 0.6),
-      0 22px 60px rgba(190, 70, 235, 0.75),
-      0 0 44px rgba(214, 120, 245, 0.55);
+      0 22px 60px rgba(0, 0, 0, 0.55),
+      0 14px 54px rgba(192, 98, 143, 0.55),
+      0 0 40px rgba(214, 120, 165, 0.4);
   }
 
-  .voucher-star {
-    transition:
-      fill 0.5s ease,
-      filter 0.5s ease;
-  }
-  .voucher-tilt:hover .voucher-star,
-  .voucher-panel:has(.btn:hover, .btn:focus-visible) .voucher-star {
-    fill: var(--color-gold);
-    filter: drop-shadow(0 0 3px rgba(250, 225, 40, 0.9));
-  }
-
-  /* the card lit by the strike: a lilac wash with a bright rim. VoucherCard.tsx
+  /* the card lit by the strike: a rose wash with a bright rim. VoucherCard.tsx
      drives its opacity frame by frame while the bolts are on screen. */
   .voucher-flash {
     position: absolute;
@@ -245,48 +253,42 @@
     opacity: 0;
     background: radial-gradient(
       120% 120% at 50% 50%,
-      rgba(236, 214, 255, 0.3),
-      rgba(190, 120, 255, 0.14) 55%,
-      rgba(150, 70, 230, 0) 100%
+      rgba(255, 226, 236, 0.3),
+      rgba(226, 130, 175, 0.14) 55%,
+      rgba(192, 98, 143, 0) 100%
     );
     box-shadow:
-      inset 0 0 22px rgba(232, 196, 255, 0.85),
+      inset 0 0 22px rgba(250, 205, 222, 0.85),
       inset 0 0 2px rgba(255, 255, 255, 0.9);
   }
 
   /* ----- form ----- */
   .field-label {
     display: block;
-    font-size: 13px;
+    font-size: 14px;
     line-height: 20px;
-    font-weight: 700;
-    color: #fff;
+    font-weight: 500;
+    color: var(--color-cream);
   }
   .field {
     display: block;
     width: 100%;
     min-width: 0;
     box-sizing: border-box;
-    border: 1px solid transparent;
+    border: 1px solid rgba(235, 213, 205, 0.22);
     border-radius: 10px;
-    background-color: var(--color-well);
-    color: #fff;
+    background-color: var(--color-ink);
+    color: var(--color-cream);
     /* 16px on phones: anything smaller makes iOS Safari zoom in on focus */
     font-size: 16px;
     transition: border-color 0.2s ease;
   }
   .field::placeholder {
-    color: #8f8095;
+    color: var(--color-faint);
     opacity: 1;
   }
   .field:hover {
-    border-color: rgba(201, 154, 214, 0.35);
-  }
-  .field-outlined {
-    border-color: rgba(201, 154, 214, 0.35);
-  }
-  .field-outlined:hover {
-    border-color: rgba(201, 154, 214, 0.6);
+    border-color: rgba(235, 213, 205, 0.45);
   }
   select.field {
     appearance: none;
@@ -294,51 +296,51 @@
   }
   select.field option {
     background-color: var(--color-surface);
-    color: #fff;
+    color: var(--color-cream);
   }
   @media (min-width: 640px) {
     .field {
-      font-size: 14px;
+      font-size: 15px;
     }
     textarea.field {
-      font-size: 13px;
+      font-size: 14.5px;
     }
   }
 
   /* day / time-of-day choices */
   .choice {
-    border: 1px solid transparent;
-    border-radius: 9px;
-    background-color: var(--color-well);
-    color: #fff;
+    border: 1px solid rgba(235, 213, 205, 0.22);
+    border-radius: 10px;
+    background-color: var(--color-ink);
+    color: var(--color-cream);
     transition:
       border-color 0.2s ease,
       background-color 0.2s ease;
   }
   .choice:hover {
-    border-color: rgba(201, 154, 214, 0.35);
+    border-color: rgba(235, 213, 205, 0.45);
   }
   .choice[aria-checked="true"] {
     border-color: var(--color-gold);
     background-color: var(--color-raised);
   }
 
-  /* Day picker scrollbar: a slim groove in the same near-black as the form
-     fields, with an orchid thumb that brightens on hover and turns gold while
-     it is dragged (gold is the form's "selected" colour). */
+  /* Day picker scrollbar: a slim warm-grey thumb in a dark groove, as drawn;
+     it lightens on hover and turns gold while it is dragged (gold is the
+     form's "selected" colour). */
   .days-scroll::-webkit-scrollbar {
     height: 6px;
   }
   .days-scroll::-webkit-scrollbar-track {
-    background: var(--color-well);
+    background: #171113;
     border-radius: 999px;
   }
   .days-scroll::-webkit-scrollbar-thumb {
-    background: linear-gradient(90deg, #6f3a86, var(--color-orchid));
+    background: #5a4a4e;
     border-radius: 999px;
   }
   .days-scroll::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(90deg, #8f4dab, #e3b9ea);
+    background: #7d686d;
   }
   .days-scroll::-webkit-scrollbar-thumb:active {
     background: var(--color-gold);
@@ -349,7 +351,7 @@
   @supports not selector(::-webkit-scrollbar) {
     .days-scroll {
       scrollbar-width: thin;
-      scrollbar-color: #9a5bb5 var(--color-well);
+      scrollbar-color: #5a4a4e #171113;
     }
   }
 }

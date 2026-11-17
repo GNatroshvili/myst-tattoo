@@ -5,8 +5,8 @@ import { CardLogo } from "./Logo";
 
 /**
  * The gift voucher card. Touching it with the pointer sets off a lightning
- * strike: jagged lilac bolts leap out from behind the card across the panel,
- * flicker, strike again and fade, while the card itself lights up.
+ * strike: jagged rose-white bolts leap out from behind the card across the
+ * panel, flicker, strike again and fade, while the card itself lights up.
  *
  * The bolts are generated afresh for every strike (midpoint displacement with
  * forks) and drawn on a canvas that covers the whole voucher panel.
@@ -19,6 +19,11 @@ type Strike = { at: number; grow: number; decay: number; bolts: Bolt[] };
 
 const DURATION = 950; // ms, whole effect
 const CARD_POSE = (-10 * Math.PI) / 180; // between the resting and the hovered tilt
+
+// the bolt's three layers, in the page's burgundy-rose family
+const HALO = "#d2578f";
+const BODY = "#f7bcd4";
+const CORE = "#fff6f9";
 
 const rand = (min: number, max: number) => min + Math.random() * (max - min);
 
@@ -154,11 +159,11 @@ export function VoucherCard() {
         light = Math.max(light, st < s.grow ? st / s.grow : Math.exp(-(st - s.grow) / s.decay));
       }
 
-      // soft lilac bloom around the card
+      // soft rose bloom around the card
       const bloom = ctx.createRadialGradient(center.x, center.y, 20, center.x, center.y, 380);
-      bloom.addColorStop(0, `rgba(204, 138, 255, ${0.3 * light})`);
-      bloom.addColorStop(0.45, `rgba(150, 70, 230, ${0.12 * light})`);
-      bloom.addColorStop(1, "rgba(150, 70, 230, 0)");
+      bloom.addColorStop(0, `rgba(240, 150, 190, ${0.3 * light})`);
+      bloom.addColorStop(0.45, `rgba(192, 98, 143, ${0.12 * light})`);
+      bloom.addColorStop(1, "rgba(192, 98, 143, 0)");
       ctx.shadowBlur = 0;
       ctx.fillStyle = bloom;
       ctx.fillRect(0, 0, w, h);
@@ -176,24 +181,24 @@ export function VoucherCard() {
           if (g <= 0) continue;
           const upTo = Math.max(2, Math.ceil(Math.min(1, g) * b.pts.length));
 
-          // wide violet halo, lilac body, near-white core
+          // wide rose halo, pale pink body, near-white core
           ctx.globalAlpha = alpha * 0.55;
-          ctx.shadowColor = "#a855f7";
+          ctx.shadowColor = HALO;
           ctx.shadowBlur = 24 * dpr;
-          ctx.strokeStyle = "#a855f7";
+          ctx.strokeStyle = HALO;
           ctx.lineWidth = b.width * 3;
           trace(ctx, b.pts, upTo);
 
           ctx.globalAlpha = alpha * 0.9;
-          ctx.shadowColor = "#d8b4fe";
+          ctx.shadowColor = BODY;
           ctx.shadowBlur = 10 * dpr;
-          ctx.strokeStyle = "#d8b4fe";
+          ctx.strokeStyle = BODY;
           ctx.lineWidth = b.width * 1.4;
           trace(ctx, b.pts, upTo);
 
           ctx.globalAlpha = alpha;
           ctx.shadowBlur = 0;
-          ctx.strokeStyle = "#fdf6ff";
+          ctx.strokeStyle = CORE;
           ctx.lineWidth = b.width * 0.6;
           trace(ctx, b.pts, upTo);
         }
@@ -226,9 +231,9 @@ export function VoucherCard() {
         ref={tiltRef}
         aria-hidden
         onPointerEnter={strike}
-        className="voucher-tilt relative z-[1] my-5 shrink-0 -rotate-[14deg] md:col-start-2 md:row-span-2 md:row-start-1 md:mb-[-30px] md:mt-[-6px] lg:row-span-1"
+        className="voucher-tilt relative z-[1] my-5 shrink-0 -rotate-[14deg] md:col-start-2 md:row-span-2 md:row-start-1 md:mb-[-34px] md:mt-[-8px] lg:row-span-1"
       >
-        <div className="voucher-card relative flex h-[158px] w-[262px] flex-col items-center justify-center overflow-hidden text-petal-300">
+        <div className="voucher-card relative flex h-[168px] w-[280px] items-center justify-center overflow-hidden">
           <CardLogo />
           <span ref={flashRef} className="voucher-flash" />
         </div>

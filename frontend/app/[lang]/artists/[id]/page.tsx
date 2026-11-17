@@ -8,12 +8,12 @@ import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { PhotoPlaceholder } from "@/components/PhotoPlaceholder";
 import { SectionDivider } from "@/components/SectionDivider";
+import { StarRule } from "@/components/StarRule";
 import {
   ArrowLeftIcon,
   ArrowUpRightIcon,
   InstagramIcon,
   PersonIcon,
-  StarIcon,
 } from "@/components/ui/Icons";
 import { dictionaryFor, getDictionary } from "@/lib/i18n";
 import { displayCase, hasLocale, localePath } from "@/lib/i18n/config";
@@ -51,79 +51,73 @@ export default async function ArtistPage({ params }: PageProps<"/[lang]/artists/
 
   return (
     <div className="page-ground relative isolate min-h-dvh overflow-hidden">
-      <Backdrop scope="artist" fade="long" />
+      <Backdrop scope="artist" />
       <div className="container-x">
         <Header lang={lang} nav={dict.nav} common={dict.common} switcherLabel={dict.langSwitcher.aria} />
         <main>
           <Link
             href={localePath(lang, "/artists")}
-            className="group mt-[26px] inline-flex h-11 items-center gap-2.5 text-[14px] font-medium text-mist-500 transition-colors hover:text-gold lg:ml-7"
+            className="link-arrow link-back mt-7 h-11 gap-3 text-[15px] lg:ml-5"
           >
-            <ArrowLeftIcon className="h-3 w-[18px] text-orchid-soft transition group-hover:-translate-x-1 group-hover:text-gold" />
+            <ArrowLeftIcon className="h-3 w-[18px]" />
             {t.back}
           </Link>
 
-          <section className="flex flex-wrap items-center gap-x-16 gap-y-9 pt-[18px] lg:pl-7">
+          <section className="flex flex-wrap items-center gap-x-16 gap-y-9 pt-[18px] lg:pl-5">
             <PhotoPlaceholder
               ratio="3 / 4"
               aria={dict.artists.photoAria}
               label={displayCase(dict.artists.photoLabel, lang)}
-              icon={<PersonIcon className="h-[52px] w-[52px] text-orchid" />}
-              className="min-w-[240px] flex-[0_1_340px]"
+              icon={<PersonIcon strokeWidth={1.2} className="h-[52px] w-[52px] text-rose" />}
+              className="min-w-[240px] flex-[0_1_350px]"
             />
 
             <div className="min-w-0 flex-[1_1_420px]">
-              <p className="caps text-[12px] leading-4 tracking-[4.4px] text-[#d3bbdb]">
-                {displayCase(t.eyebrow, lang)}
-              </p>
-              <h1 className="display mt-[18px] text-[length:calc(clamp(42px,5vw,64px)*var(--display-scale))] leading-[1.1] tracking-[1px] text-petal-200">
+              <p className="caps eyebrow">{displayCase(t.eyebrow, lang)}</p>
+              <h1 className="display mt-[22px] text-[length:calc(clamp(44px,5.2vw,66px)*var(--display-scale))] leading-[1.02] tracking-[0.5px] text-cream">
                 {displayCase(t.placeholder.firstName, lang)}
                 <br />
                 {displayCase(t.placeholder.lastName, lang)}
               </h1>
-              <p className="caps mt-[18px] text-[16px] leading-[22px] tracking-[5px] text-[#c7a9d0] sm:tracking-[7px]">
+              <p className="caps mt-5 text-[17px] font-light leading-[22px] tracking-[5px] text-cream sm:tracking-[7px]">
                 {displayCase(t.placeholder.styles, lang)}
               </p>
 
-              {/* gold star with a line fading out to the right */}
-              <div aria-hidden className="-ml-2.5 mt-5 flex items-center gap-1.5">
-                <StarIcon className="h-[34px] w-[34px] text-gold drop-shadow-[0_0_6px_rgba(250,225,40,0.55)]" />
-                <span className="block h-[1.5px] w-[130px] bg-gradient-to-r from-gold to-gold/0" />
-              </div>
+              <StarRule className="-ml-1.5 mt-6" star="h-[30px] w-[30px]" />
 
-              <p className="mt-5 max-w-[520px] text-[17px] leading-[27px] text-mist-400">
+              <p className="mt-6 max-w-[520px] text-[18px] font-light leading-[27px] text-body">
                 {t.placeholder.bio}
               </p>
               <a
                 href={artist.instagramUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-3.5 inline-flex min-h-11 items-center gap-3 text-[16px] font-medium text-mist-200 transition-colors hover:text-gold"
+                className="mt-3.5 inline-flex min-h-11 items-center gap-3.5 text-[17px] text-cream transition-colors hover:text-gold"
               >
-                <InstagramIcon strokeWidth={1.6} className="h-[26px] w-[26px] text-orchid" />
+                <InstagramIcon className="h-7 w-7" />
                 {t.placeholder.instagram}
               </a>
 
-              <div className="mt-[22px] flex flex-wrap gap-x-5 gap-y-3.5">
+              <div className="mt-6 flex flex-wrap gap-x-6 gap-y-3.5">
                 <a href="#book" className="btn btn-gold">
-                  {t.book} <ArrowUpRightIcon className="h-3.5 w-3.5" />
+                  {t.book} <ArrowUpRightIcon className="h-[13px] w-[13px]" />
                 </a>
-                <a href="#works" className="btn btn-outline px-[30px]">
+                <a href="#works" className="btn btn-outline">
                   {t.seeWorks}
                 </a>
               </div>
             </div>
           </section>
 
-          <section id="works" aria-labelledby="works-title" className="scroll-mt-6 pt-[60px]">
+          <section id="works" aria-labelledby="works-title" className="scroll-mt-6 pt-[72px]">
             <SectionDivider />
             <h2
               id="works-title"
-              className="display mt-5 text-center text-[length:calc(clamp(34px,3.75vw,48px)*var(--display-scale))] leading-[1.1] tracking-[0.5px] text-mist-50"
+              className="display mt-[22px] text-center text-[length:calc(clamp(36px,4vw,52px)*var(--display-scale))] leading-[1.04] tracking-[0.5px] text-cream"
             >
               {displayCase(t.worksTitle, lang)}
             </h2>
-            <p className="mx-auto mt-3.5 max-w-[470px] text-center text-[14.5px] leading-[23px] text-mist-300">
+            <p className="mx-auto mt-3.5 max-w-[470px] text-center text-[17px] font-light leading-[25px] text-body">
               {t.worksLead}
             </p>
 
@@ -138,11 +132,11 @@ export default async function ArtistPage({ params }: PageProps<"/[lang]/artists/
             className="mt-11"
           >
             <div className="relative flex flex-wrap gap-x-4 gap-y-3">
-              <Link href={localePath(lang, "/tattoos")} className="btn btn-outline px-[30px]">
+              <Link href={localePath(lang, "/tattoos")} className="btn btn-outline">
                 {t.allTattoos}
               </Link>
               <Link href={localePath(lang, "#idea")} className="btn btn-gold">
-                {dict.common.bookAppointment} <ArrowUpRightIcon className="h-3.5 w-3.5" />
+                {dict.common.bookAppointment} <ArrowUpRightIcon className="h-[13px] w-[13px]" />
               </Link>
             </div>
           </CtaPanel>

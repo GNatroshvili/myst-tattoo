@@ -30,7 +30,7 @@ export function ArtistWorks({ lang, artist, t, tattoos }: Props) {
 
   return (
     <>
-      <div role="group" aria-label={t.filterAria} className="mt-[26px] flex flex-wrap justify-center gap-[9px]">
+      <div role="group" aria-label={t.filterAria} className="mt-7 flex flex-wrap justify-center gap-2.5">
         <FilterChip on={style === "all"} onPick={() => setStyle("all")}>
           {t.allWorks}
         </FilterChip>
@@ -41,11 +41,11 @@ export function ArtistWorks({ lang, artist, t, tattoos }: Props) {
         ))}
       </div>
 
-      <p aria-live="polite" className="ml-1 mt-[22px] text-[13px] leading-5 text-mist-600">
+      <p aria-live="polite" className="ml-1 mt-6 text-[14px] leading-5 text-muted">
         {countLabel}
       </p>
 
-      <div className="mt-3.5 columns-[4_220px] gap-x-[22px]">
+      <div className="mt-3.5 columns-[4_220px] gap-x-6">
         {shown.map((work) => (
           <WorkTile
             key={work.index}

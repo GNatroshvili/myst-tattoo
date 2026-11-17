@@ -31,7 +31,7 @@ export function LangSwitcher({
   return (
     <nav
       aria-label={label}
-      className={`flex h-11 shrink-0 items-center rounded-full border border-line/35 p-1 text-[12px] font-semibold leading-none ${className}`}
+      className={`flex h-11 shrink-0 items-center rounded-full border border-cream/28 p-1 text-[12px] font-medium leading-none ${className}`}
     >
       {locales.map((locale) => {
         const active = locale === lang;
@@ -46,7 +46,7 @@ export function LangSwitcher({
             aria-current={active ? "true" : undefined}
             onClick={() => remember(locale)}
             className={`flex h-full min-w-[42px] items-center justify-center rounded-full px-2.5 tracking-[0.6px] sm:px-3 transition-colors ${
-              active ? "bg-raised text-gold" : "text-mist-100 hover:text-gold"
+              active ? "bg-raised text-gold" : "text-cream hover:text-gold"
             }`}
           >
             {localeLabels[locale].short}

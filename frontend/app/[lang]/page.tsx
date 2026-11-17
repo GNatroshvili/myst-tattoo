@@ -1,4 +1,5 @@
 import { Backdrop } from "@/components/Backdrop";
+import { FeaturedWorks } from "@/components/FeaturedWorks";
 import { Footer } from "@/components/Footer";
 import { GiftVouchers } from "@/components/GiftVouchers";
 import { Header } from "@/components/Header";
@@ -18,6 +19,7 @@ export default async function HomePage() {
         <main>
           <Hero lang={lang} dict={dict} />
           <QuickLinks lang={lang} t={dict.quickLinks} />
+          <FeaturedWorks lang={lang} dict={dict} />
           <GiftVouchers lang={lang} t={dict.vouchers} />
           <IdeaSection lang={lang} dict={dict} />
         </main>

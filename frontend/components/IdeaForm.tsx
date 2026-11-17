@@ -9,7 +9,7 @@ import { ChevronDownIcon, WhatsAppIcon } from "./ui/Icons";
 type Props = { days: DayOption[]; t: Dictionary["form"] };
 
 const formShell =
-  "flex min-w-0 flex-col gap-2 rounded-[18px] border border-white/[0.03] bg-surface px-5 pb-7 pt-[22px] sm:px-[26px]";
+  "flex min-w-0 flex-col gap-2 rounded-[18px] border border-cream/16 bg-surface px-5 pb-[30px] pt-[26px] sm:px-7";
 
 export function IdeaForm({ days, t }: Props) {
   // unique per instance: a hidden copy of the page can share the document
@@ -40,7 +40,7 @@ export function IdeaForm({ days, t }: Props) {
         required
         value={name}
         onChange={(e) => setName(e.target.value)}
-        className="field field-outlined h-11 px-3.5 font-medium"
+        className="field h-[46px] px-3.5"
       />
 
       <label htmlFor={`${id}-service`} className="field-label mt-3">
@@ -52,7 +52,7 @@ export function IdeaForm({ days, t }: Props) {
           name="service"
           value={service}
           onChange={(e) => setService(e.target.value)}
-          className="field h-[42px] pl-3.5 pr-10 font-semibold"
+          className="field h-[46px] pl-3.5 pr-10"
         >
           {t.services.map((s) => (
             <option key={s} value={s}>
@@ -60,11 +60,11 @@ export function IdeaForm({ days, t }: Props) {
             </option>
           ))}
         </select>
-        <ChevronDownIcon className="pointer-events-none absolute right-3.5 top-[17px] h-2 w-[11px] text-white" />
+        <ChevronDownIcon className="pointer-events-none absolute right-4 top-[19px] h-2 w-[11px] text-cream" />
       </div>
 
       <label htmlFor={`${id}-idea`} className="field-label mt-3">
-        {t.idea} <span className="text-[11px] font-normal text-mist-700">{t.optional}</span>
+        {t.idea} <span className="text-[12px] font-light text-muted">{t.optional}</span>
       </label>
       <textarea
         id={`${id}-idea`}
@@ -73,7 +73,7 @@ export function IdeaForm({ days, t }: Props) {
         value={idea}
         onChange={(e) => setIdea(e.target.value)}
         placeholder={t.ideaPlaceholder}
-        className="field h-[70px] min-h-[70px] resize-y px-3.5 py-[11px] leading-5"
+        className="field h-[76px] min-h-[76px] resize-y px-3.5 py-3 font-light leading-[21px]"
       />
 
       <div id={`${id}-day-label`} className="field-label mt-3">
@@ -82,7 +82,7 @@ export function IdeaForm({ days, t }: Props) {
       <div
         role="radiogroup"
         aria-labelledby={`${id}-day-label`}
-        className="days-scroll flex gap-[9px] overflow-x-auto pb-2.5"
+        className="days-scroll flex gap-[9px] overflow-x-auto pb-2"
       >
         {days.map((d) => {
           const active = d.iso === dayIso;
@@ -94,11 +94,11 @@ export function IdeaForm({ days, t }: Props) {
               aria-checked={active}
               aria-label={`${d.label}, ${d.day} ${d.month}`}
               onClick={() => setDayIso(active ? null : d.iso)}
-              className="choice flex h-[58px] w-[54px] shrink-0 flex-col items-center justify-center"
+              className="choice flex h-[62px] w-14 shrink-0 flex-col items-center justify-center"
             >
-              <span className="text-[9.5px] leading-3 text-[#c9bacf]">{d.label}</span>
-              <span className="text-[16px] font-bold leading-5">{d.day}</span>
-              <span className="text-[9.5px] leading-3 text-[#c9bacf]">{d.month}</span>
+              <span className="text-[10.5px] leading-[13px] text-muted">{d.label}</span>
+              <span className="text-[17px] font-medium leading-[21px]">{d.day}</span>
+              <span className="text-[10.5px] leading-[13px] text-muted">{d.month}</span>
             </button>
           );
         })}
@@ -121,7 +121,7 @@ export function IdeaForm({ days, t }: Props) {
               role="radio"
               aria-checked={active}
               onClick={() => setTime(active ? null : slot)}
-              className="choice h-11 min-w-0 px-1.5 text-[13.5px] font-bold"
+              className="choice h-[46px] min-w-0 px-1.5 text-[15px]"
             >
               {slot}
             </button>
@@ -129,7 +129,7 @@ export function IdeaForm({ days, t }: Props) {
         })}
       </div>
 
-      <button type="submit" className="btn btn-gold mt-[22px] w-full gap-2.5">
+      <button type="submit" className="btn btn-gold mt-6 h-12 w-full">
         <WhatsAppIcon className="h-5 w-5" />
         {t.submit}
       </button>
@@ -139,29 +139,29 @@ export function IdeaForm({ days, t }: Props) {
 
 /** Static shell shown while the day list streams in; mirrors the form's heights. */
 export function IdeaFormSkeleton() {
-  const label = "h-5 w-24 rounded bg-white/[0.07]";
-  const well = "rounded-[10px] bg-well";
+  const label = "h-5 w-24 rounded bg-cream/[0.07]";
+  const well = "rounded-[10px] border border-cream/10 bg-ink";
   return (
     <div className={`${formShell} animate-pulse`} aria-hidden>
       <div className={label} />
-      <div className={`${well} h-11`} />
+      <div className={`${well} h-[46px]`} />
       <div className={`${label} mt-3 w-16`} />
-      <div className={`${well} h-[42px]`} />
+      <div className={`${well} h-[46px]`} />
       <div className={`${label} mt-3 w-28`} />
-      <div className={`${well} h-[70px]`} />
+      <div className={`${well} h-[76px]`} />
       <div className={`${label} mt-3`} />
       <div className="flex gap-[9px] overflow-hidden pb-2">
         {Array.from({ length: 8 }).map((_, i) => (
-          <div key={i} className={`${well} h-[58px] w-[54px] shrink-0 rounded-[9px]`} />
+          <div key={i} className={`${well} h-[62px] w-14 shrink-0`} />
         ))}
       </div>
       <div className={`${label} mt-2.5`} />
       <div className="grid grid-cols-3 gap-[9px]">
-        <div className={`${well} h-11 rounded-[9px]`} />
-        <div className={`${well} h-11 rounded-[9px]`} />
-        <div className={`${well} h-11 rounded-[9px]`} />
+        <div className={`${well} h-[46px]`} />
+        <div className={`${well} h-[46px]`} />
+        <div className={`${well} h-[46px]`} />
       </div>
-      <div className="mt-[22px] h-[46px] rounded-full bg-gold/25" />
+      <div className="mt-6 h-12 rounded-full bg-gold/25" />
     </div>
   );
 }

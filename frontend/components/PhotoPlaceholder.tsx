@@ -17,10 +17,10 @@ type Props = {
 };
 
 const frame =
-  "flex flex-col items-center justify-center gap-3 rounded-2xl border border-line/36 bg-[linear-gradient(160deg,#24122a_0%,#1b0f1c_55%,#170a18_100%)]";
-const pickable = "transition-colors hover:border-line/70";
+  "flex flex-col items-center justify-center gap-3 rounded-[14px] border border-cream/16 bg-[linear-gradient(160deg,#1b1116_0%,#120e10_55%,#0e0b0c_100%)]";
+const pickable = "transition-colors hover:border-cream/45";
 
-/** Framed plum tile that holds the place of a photo until the real one is added. */
+/** Framed dark tile that holds the place of a photo until the real one is added. */
 export function PhotoPlaceholder({
   ratio,
   aria,
@@ -34,7 +34,7 @@ export function PhotoPlaceholder({
   const content = (
     <>
       {icon}
-      <span className="caps text-[10px] leading-[14px] tracking-[3.2px] text-[#c9bacf]">{label}</span>
+      <span className="caps text-[10px] leading-[14px] tracking-[3.2px] text-muted">{label}</span>
     </>
   );
 

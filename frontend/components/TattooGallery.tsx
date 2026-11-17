@@ -31,17 +31,15 @@ export function TattooGallery({ lang, t }: { lang: Locale; t: Dictionary["tattoo
   const opened = open !== null && open < shown.length ? shown[open] : null;
 
   // Georgian labels are longer, so their column is a little wider
-  const label = `caps text-[11px] leading-4 tracking-[3px] text-petal-500 ${
-    lang === "ka" ? "flex-[0_0_84px]" : "flex-[0_0_62px]"
-  }`;
+  const label = `caps label-caps ${lang === "ka" ? "flex-[0_0_88px]" : "flex-[0_0_66px]"}`;
   const row = "flex flex-wrap items-center gap-x-[18px] gap-y-2.5";
-  const chips = "flex flex-[1_1_300px] flex-wrap gap-[9px]";
+  const chips = "flex flex-[1_1_300px] flex-wrap gap-2.5";
 
   return (
     <>
       <section
         aria-label={t.filtersAria}
-        className="mt-12 flex flex-col gap-3.5 rounded-[18px] border border-white/[0.03] bg-surface px-6 py-5"
+        className="mt-[52px] flex flex-col gap-3.5 border-y border-cream/18 py-[22px]"
       >
         <div className={row}>
           <span id={`${id}-artist`} className={label}>
@@ -76,11 +74,11 @@ export function TattooGallery({ lang, t }: { lang: Locale; t: Dictionary["tattoo
         </div>
       </section>
 
-      <p aria-live="polite" className="ml-1 mt-[22px] text-[13px] leading-5 text-mist-600">
+      <p aria-live="polite" className="ml-1 mt-[22px] text-[14px] leading-5 text-muted">
         {countLabel}
       </p>
 
-      <section aria-label={t.galleryAria} className="mt-3.5 columns-[4_220px] gap-x-[22px]">
+      <section aria-label={t.galleryAria} className="mt-3.5 columns-[4_220px] gap-x-6">
         {shown.map((work, position) => (
           <WorkTile
             key={work.index}
@@ -95,18 +93,18 @@ export function TattooGallery({ lang, t }: { lang: Locale; t: Dictionary["tattoo
       </section>
 
       {shown.length === 0 && (
-        <div className="mt-1.5 flex flex-col items-center gap-3.5 rounded-[18px] border border-line/28 px-6 py-11 text-center">
-          <p className="display text-[length:calc(30px*var(--display-scale))] leading-[34px] text-petal-100">
+        <div className="mt-1.5 flex flex-col items-center gap-3.5 rounded-[18px] border border-cream/18 px-6 py-12 text-center">
+          <p className="display text-[length:calc(32px*var(--display-scale))] leading-9 text-cream">
             {displayCase(t.emptyTitle, lang)}
           </p>
-          <p className="text-[14px] leading-[22px] text-mist-400">{t.emptyText}</p>
+          <p className="text-[16px] font-light leading-6 text-body">{t.emptyText}</p>
           <button
             type="button"
             onClick={() => {
               setArtist("all");
               setStyle("all");
             }}
-            className="btn btn-outline h-11 px-6 text-[14px]"
+            className="btn btn-outline px-7"
           >
             {t.showAll}
           </button>

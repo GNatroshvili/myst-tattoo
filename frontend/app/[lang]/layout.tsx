@@ -1,13 +1,13 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Italiana, Noto_Sans_Georgian, Noto_Serif_Georgian } from "next/font/google";
+import { Italiana, Noto_Sans_Georgian, Noto_Serif_Georgian, Outfit } from "next/font/google";
 import { notFound } from "next/navigation";
 import { hasLocale, locales, localeTags } from "@/lib/i18n/config";
 import { dictionaryFor } from "@/lib/i18n";
 import "../globals.css";
 
-const inter = Inter({
+const outfit = Outfit({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-outfit",
   display: "swap",
 });
 
@@ -18,7 +18,7 @@ const italiana = Italiana({
   display: "swap",
 });
 
-// Georgian companions: Inter and Italiana have no Georgian letters, so these
+// Georgian companions: Outfit and Italiana have no Georgian letters, so these
 // take over for them. Not preloaded, so English visitors never download them.
 const georgianSans = Noto_Sans_Georgian({
   subsets: ["georgian"],
@@ -60,7 +60,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#10060f",
+  themeColor: "#090808",
 };
 
 export default async function RootLayout({ children, params }: LayoutProps<"/[lang]">) {
@@ -70,7 +70,7 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
   return (
     <html
       lang={lang}
-      className={`${inter.variable} ${italiana.variable} ${georgianSans.variable} ${georgianSerif.variable}`}
+      className={`${outfit.variable} ${italiana.variable} ${georgianSans.variable} ${georgianSerif.variable}`}
     >
       <body className="min-h-dvh">{children}</body>
     </html>
