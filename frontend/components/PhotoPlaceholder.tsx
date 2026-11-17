@@ -1,28 +1,66 @@
 import type { ReactNode } from "react";
+import Link from "next/link";
 
 type Props = {
   /** width / height, as CSS `aspect-ratio` */
   ratio: string;
-  /** what a screen reader announces in place of the photo */
+  /** what a screen reader announces: the missing photo, or what picking it does */
   aria: string;
   /** small caption under the icon, already in display case */
   label: string;
   icon: ReactNode;
+  className?: string;
+  /** makes the tile a link (an artist's photo opens their profile) */
+  href?: string;
+  /** makes the tile a button (a tattoo's photo opens its details) */
+  onClick?: () => void;
 };
 
+const frame =
+  "flex flex-col items-center justify-center gap-3 rounded-2xl border border-line/36 bg-[linear-gradient(160deg,#24122a_0%,#1b0f1c_55%,#170a18_100%)]";
+const pickable = "transition-colors hover:border-line/70";
+
 /** Framed plum tile that holds the place of a photo until the real one is added. */
-export function PhotoPlaceholder({ ratio, aria, label, icon }: Props) {
-  return (
-    <div
-      role="img"
-      aria-label={aria}
-      style={{ aspectRatio: ratio }}
-      className="flex w-full flex-col items-center justify-center gap-3 rounded-2xl border border-line/36 bg-[linear-gradient(160deg,#24122a_0%,#1b0f1c_55%,#170a18_100%)]"
-    >
+export function PhotoPlaceholder({
+  ratio,
+  aria,
+  label,
+  icon,
+  className = "w-full",
+  href,
+  onClick,
+}: Props) {
+  const style = { aspectRatio: ratio };
+  const content = (
+    <>
       {icon}
-      <span className="caps px-2 text-center text-[10px] leading-[14px] tracking-[3.2px] text-[#c9bacf]">
-        {label}
-      </span>
+      <span className="caps text-[10px] leading-[14px] tracking-[3.2px] text-[#c9bacf]">{label}</span>
+    </>
+  );
+
+  if (href) {
+    return (
+      <Link href={href} aria-label={aria} style={style} className={`${frame} ${pickable} ${className}`}>
+        {content}
+      </Link>
+    );
+  }
+  if (onClick) {
+    return (
+      <button
+        type="button"
+        aria-label={aria}
+        onClick={onClick}
+        style={style}
+        className={`${frame} ${pickable} p-0 ${className}`}
+      >
+        {content}
+      </button>
+    );
+  }
+  return (
+    <div role="img" aria-label={aria} style={style} className={`${frame} ${className}`}>
+      {content}
     </div>
   );
 }

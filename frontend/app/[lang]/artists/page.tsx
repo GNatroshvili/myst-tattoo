@@ -40,45 +40,49 @@ export default async function ArtistsPage() {
             aria-label={t.gridAria}
             className="grid grid-cols-[repeat(auto-fill,minmax(226px,1fr))] gap-x-[22px] gap-y-11 pt-14"
           >
-            {artists.map((artist) => (
-              <article key={artist.id} className="flex flex-col">
-                <PhotoPlaceholder
-                  ratio="3 / 4"
-                  aria={t.photoAria}
-                  label={displayCase(t.photoLabel, lang)}
-                  icon={<PersonIcon className="h-11 w-11 text-orchid" />}
-                />
-                <div className="flex flex-wrap items-baseline justify-between gap-x-2.5 gap-y-0.5 px-1 pt-2.5">
-                  <h2 className="text-[16px] font-semibold leading-[22px] text-[#f3e9f6]">
-                    {t.placeholder.name}
-                  </h2>
-                  <span className="text-[12.5px] leading-5 text-mist-600">{t.placeholder.style}</span>
-                </div>
-                <p className="mx-1 mt-2 text-[13.5px] leading-[21px] text-mist-400">
-                  {t.placeholder.bio}
-                </p>
-                <a
-                  href={artist.instagramUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="ml-1 inline-flex min-h-11 items-center self-start text-[13.5px] font-medium text-mist-200 transition-colors hover:text-gold"
-                >
-                  {t.placeholder.instagram}
-                </a>
-                <div className="flex flex-wrap items-center justify-between gap-x-[18px] gap-y-2 px-1">
-                  <Link
-                    href={localePath(lang, "/tattoos")}
-                    className="group inline-flex h-11 items-center gap-2 text-[14px] font-semibold text-[#f3e9f6] transition-colors hover:text-gold"
+            {artists.map((artist) => {
+              const profile = localePath(lang, `/artists/${artist.id}`);
+              return (
+                <article key={artist.id} className="flex flex-col">
+                  <PhotoPlaceholder
+                    ratio="3 / 4"
+                    aria={t.openProfile}
+                    label={displayCase(t.photoLabel, lang)}
+                    icon={<PersonIcon className="h-11 w-11 text-orchid" />}
+                    href={profile}
+                  />
+                  <div className="flex flex-wrap items-baseline justify-between gap-x-2.5 gap-y-0.5 px-1 pt-2.5">
+                    <h2 className="text-[16px] font-semibold leading-[22px] text-[#f3e9f6]">
+                      {t.placeholder.name}
+                    </h2>
+                    <span className="text-[12.5px] leading-5 text-mist-600">{t.placeholder.style}</span>
+                  </div>
+                  <p className="mx-1 mt-2 text-[13.5px] leading-[21px] text-mist-400">
+                    {t.placeholder.bio}
+                  </p>
+                  <a
+                    href={artist.instagramUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="ml-1 inline-flex min-h-11 items-center self-start text-[13.5px] font-medium text-mist-200 transition-colors hover:text-gold"
                   >
-                    {t.viewWork}
-                    <ArrowRightIcon className="h-3 w-[18px] text-orchid-soft transition group-hover:translate-x-1 group-hover:text-gold" />
-                  </Link>
-                  <a href="#book" className="btn btn-outline-gold px-[22px] text-[14px]">
-                    {t.book}
+                    {t.placeholder.instagram}
                   </a>
-                </div>
-              </article>
-            ))}
+                  <div className="flex flex-wrap items-center justify-between gap-x-[18px] gap-y-2 px-1">
+                    <Link
+                      href={profile}
+                      className="group inline-flex h-11 items-center gap-2 text-[14px] font-semibold text-[#f3e9f6] transition-colors hover:text-gold"
+                    >
+                      {t.viewProfile}
+                      <ArrowRightIcon className="h-3 w-[18px] text-orchid-soft transition group-hover:translate-x-1 group-hover:text-gold" />
+                    </Link>
+                    <a href="#book" className="btn btn-outline-gold px-[22px] text-[14px]">
+                      {t.book}
+                    </a>
+                  </div>
+                </article>
+              );
+            })}
           </section>
 
           <CtaPanel

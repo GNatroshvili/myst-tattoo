@@ -41,6 +41,26 @@ export function ArrowRightIcon(props: IconProps) {
   );
 }
 
+/** Long arrow pointing back ("All artists", "Previous"). */
+export function ArrowLeftIcon(props: IconProps) {
+  return (
+    <svg {...outline} viewBox="0 0 20 14" strokeWidth={1.4} {...props}>
+      <path d="M18 7H2" />
+      <path d="M7.5 1.5L2 7L7.5 12.5" />
+    </svg>
+  );
+}
+
+/** Small cross on the tattoo details window's close button. */
+export function XIcon(props: IconProps) {
+  return (
+    <svg {...outline} viewBox="0 0 16 16" strokeWidth={1.8} {...props}>
+      <path d="M3 3L13 13" />
+      <path d="M13 3L3 13" />
+    </svg>
+  );
+}
+
 export function ChevronDownIcon(props: IconProps) {
   return (
     <svg {...outline} viewBox="0 0 12 8" strokeWidth={1.6} {...props}>

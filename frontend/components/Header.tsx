@@ -22,6 +22,9 @@ export function Header({ lang, nav: t, common, switcherLabel }: Props) {
   const pathname = usePathname();
   const items = nav.map((item) => ({ ...item, href: localePath(lang, item.href), label: t[item.key] }));
   const bookHref = localePath(lang, "#idea");
+  // a page under a section (an artist's profile) keeps that section lit
+  const isActive = (item: (typeof items)[number]) =>
+    pathname === item.href || (item.key !== "home" && pathname.startsWith(`${item.href}/`));
 
   return (
     <header className="relative z-30">
@@ -36,7 +39,7 @@ export function Header({ lang, nav: t, common, switcherLabel }: Props) {
           }`}
         >
           {items.map((item) => {
-            const active = pathname === item.href;
+            const active = isActive(item);
             return (
               <Link
                 key={item.key}
@@ -82,7 +85,7 @@ export function Header({ lang, nav: t, common, switcherLabel }: Props) {
           className="mb-2 mt-3 flex flex-col rounded-[18px] border border-line/20 bg-surface p-2.5 text-[16px] font-medium lg:hidden"
         >
           {items.map((item) => {
-            const active = pathname === item.href;
+            const active = isActive(item);
             return (
               <Link
                 key={item.key}
