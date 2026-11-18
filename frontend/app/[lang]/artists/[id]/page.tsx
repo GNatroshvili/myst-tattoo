@@ -6,7 +6,7 @@ import { Backdrop } from "@/components/Backdrop";
 import { CtaPanel } from "@/components/CtaPanel";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
-import { PhotoPlaceholder } from "@/components/PhotoPlaceholder";
+import { PhotoFrame } from "@/components/PhotoFrame";
 import { SectionDivider } from "@/components/SectionDivider";
 import { StarRule } from "@/components/StarRule";
 import {
@@ -15,39 +15,41 @@ import {
   InstagramIcon,
   PersonIcon,
 } from "@/components/ui/Icons";
+import { getArtist } from "@/lib/api";
 import { dictionaryFor, getDictionary } from "@/lib/i18n";
 import { displayCase, hasLocale, localePath } from "@/lib/i18n/config";
-import { artists } from "@/lib/portfolio";
-
-/** One profile per artist, in each language: every real profile is prerendered. */
-export function generateStaticParams() {
-  return artists.map(({ id }) => ({ id }));
-}
+import { instagramHandle, localized } from "@/lib/types";
 
 /**
- * An address with an id that is not in the list has nothing to show early, so
- * it is allowed to wait for the real answer: a proper 404 instead of a
- * placeholder shell.
+ * The profile is read from the backend on every request, and the page waits
+ * for it rather than showing a shell first: that way an address with no artist
+ * behind it gets a proper 404 instead of a placeholder.
  */
 export const instant = false;
 
 export async function generateMetadata({
   params,
 }: PageProps<"/[lang]/artists/[id]">): Promise<Metadata> {
-  const { lang } = await params;
+  const { lang, id } = await params;
   if (!hasLocale(lang)) return {};
   const t = dictionaryFor(lang).artist;
-  return { title: t.metaTitle, description: t.metaDescription };
+  const artist = await getArtist(id);
+  if (!artist) return { title: t.metaTitle, description: t.metaDescription };
+  return {
+    title: artist.nickname,
+    description: localized(artist.bio, lang) || t.metaDescription,
+  };
 }
 
 export default async function ArtistPage({ params }: PageProps<"/[lang]/artists/[id]">) {
   const { id } = await params;
-  const index = artists.findIndex((artist) => artist.id === id);
-  if (index === -1) notFound();
-  const artist = artists[index];
+  const artist = await getArtist(id);
+  if (!artist) notFound();
 
   const { lang, dict } = await getDictionary();
   const t = dict.artist;
+  const bio = localized(artist.bio, lang);
+  const styles = artist.styles.map((style) => localized(style.name, lang)).join(" / ");
 
   return (
     <div className="page-ground relative isolate min-h-dvh overflow-hidden">
@@ -64,9 +66,11 @@ export default async function ArtistPage({ params }: PageProps<"/[lang]/artists/
           </Link>
 
           <section className="flex flex-wrap items-center gap-x-16 gap-y-9 pt-[18px] lg:pl-5">
-            <PhotoPlaceholder
+            <PhotoFrame
               ratio="3 / 4"
-              aria={dict.artists.photoAria}
+              aria={artist.photo ? artist.nickname : dict.artists.photoAria}
+              photo={artist.photo}
+              size="full"
               label={displayCase(dict.artists.photoLabel, lang)}
               icon={<PersonIcon strokeWidth={1.2} className="h-[52px] w-[52px] text-rose" />}
               className="min-w-[240px] flex-[0_1_350px]"
@@ -74,29 +78,33 @@ export default async function ArtistPage({ params }: PageProps<"/[lang]/artists/
 
             <div className="min-w-0 flex-[1_1_420px]">
               <p className="caps eyebrow">{displayCase(t.eyebrow, lang)}</p>
-              <h1 className="display mt-[22px] text-[length:calc(clamp(44px,5.2vw,66px)*var(--display-scale))] leading-[1.02] tracking-[0.5px] text-cream">
-                {displayCase(t.placeholder.firstName, lang)}
-                <br />
-                {displayCase(t.placeholder.lastName, lang)}
+              <h1 className="display mt-[22px] break-words text-[length:calc(clamp(44px,5.2vw,66px)*var(--display-scale))] leading-[1.02] tracking-[0.5px] text-cream">
+                {displayCase(artist.nickname, lang)}
               </h1>
-              <p className="caps mt-5 text-[17px] font-light leading-[22px] tracking-[5px] text-cream sm:tracking-[7px]">
-                {displayCase(t.placeholder.styles, lang)}
-              </p>
+              {styles && (
+                <p className="caps mt-5 text-[17px] font-light leading-[22px] tracking-[5px] text-cream sm:tracking-[7px]">
+                  {displayCase(styles, lang)}
+                </p>
+              )}
 
               <StarRule className="-ml-1.5 mt-6" star="h-[30px] w-[30px]" />
 
-              <p className="mt-6 max-w-[520px] text-[18px] font-light leading-[27px] text-body">
-                {t.placeholder.bio}
-              </p>
-              <a
-                href={artist.instagramUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-3.5 inline-flex min-h-11 items-center gap-3.5 text-[17px] text-cream transition-colors hover:text-gold"
-              >
-                <InstagramIcon className="h-7 w-7" />
-                {t.placeholder.instagram}
-              </a>
+              {bio && (
+                <p className="mt-6 max-w-[520px] whitespace-pre-line text-[18px] font-light leading-[27px] text-body">
+                  {bio}
+                </p>
+              )}
+              {artist.instagramUrl && (
+                <a
+                  href={artist.instagramUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-3.5 inline-flex min-h-11 items-center gap-3.5 text-[17px] text-cream transition-colors hover:text-gold"
+                >
+                  <InstagramIcon className="h-7 w-7" />
+                  {instagramHandle(artist.instagramUrl)}
+                </a>
+              )}
 
               <div className="mt-6 flex flex-wrap gap-x-6 gap-y-3.5">
                 <a href="#book" className="btn btn-gold">
@@ -121,7 +129,7 @@ export default async function ArtistPage({ params }: PageProps<"/[lang]/artists/
               {t.worksLead}
             </p>
 
-            <ArtistWorks lang={lang} artist={index} t={t} tattoos={dict.tattoos} />
+            <ArtistWorks lang={lang} t={t} tattoosCopy={dict.tattoos} tattoos={artist.tattoos ?? []} />
           </section>
 
           <CtaPanel

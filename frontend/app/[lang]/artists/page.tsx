@@ -1,21 +1,103 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Backdrop } from "@/components/Backdrop";
 import { CtaPanel } from "@/components/CtaPanel";
+import { EmptyNote } from "@/components/EmptyNote";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { PageIntro } from "@/components/PageIntro";
-import { PhotoPlaceholder } from "@/components/PhotoPlaceholder";
+import { PhotoFrame } from "@/components/PhotoFrame";
 import { ArrowRightIcon, PersonIcon } from "@/components/ui/Icons";
-import { dictionaryFor, getDictionary } from "@/lib/i18n";
+import { getArtists } from "@/lib/api";
+import { dictionaryFor, getDictionary, type Dictionary, type Locale } from "@/lib/i18n";
 import { displayCase, hasLocale, localePath } from "@/lib/i18n/config";
-import { artists } from "@/lib/portfolio";
+import { instagramHandle, localized } from "@/lib/types";
 
 export async function generateMetadata({ params }: PageProps<"/[lang]/artists">): Promise<Metadata> {
   const { lang } = await params;
   if (!hasLocale(lang)) return {};
   const t = dictionaryFor(lang).artists;
   return { title: t.metaTitle, description: t.metaDescription };
+}
+
+const grid = "grid grid-cols-[repeat(auto-fill,minmax(226px,1fr))] gap-x-6 gap-y-11 pt-[60px]";
+
+/** The artists, read from the backend when the page is requested. */
+async function ArtistsGrid({ lang, t }: { lang: Locale; t: Dictionary["artists"] }) {
+  const artists = await getArtists();
+
+  if (artists.length === 0) {
+    return <EmptyNote lang={lang} title={t.emptyTitle} text={t.emptyText} className="mt-[60px]" />;
+  }
+
+  return (
+    <section aria-label={t.gridAria} className={grid}>
+      {artists.map((artist) => {
+        const profile = localePath(lang, `/artists/${artist.slug}`);
+        const bio = localized(artist.bio, lang);
+        return (
+          <article key={artist.id} className="flex flex-col">
+            <PhotoFrame
+              ratio="3 / 4"
+              aria={`${t.openProfile}: ${artist.nickname}`}
+              photo={artist.photo}
+              label={displayCase(t.photoLabel, lang)}
+              icon={<PersonIcon className="h-11 w-11 text-rose" />}
+              href={profile}
+            />
+            <div className="flex flex-wrap items-baseline justify-between gap-x-2.5 gap-y-0.5 px-1 pt-3">
+              <h2 className="text-[18px] font-medium leading-6 text-cream">{artist.nickname}</h2>
+              <span className="text-[13px] leading-5 text-muted">
+                {artist.styles.map((style) => localized(style.name, lang)).join(" / ")}
+              </span>
+            </div>
+            {bio && (
+              <p className="mx-1 mt-2 line-clamp-3 text-[14.5px] font-light leading-[22px] text-body">
+                {bio}
+              </p>
+            )}
+            {artist.instagramUrl && (
+              <a
+                href={artist.instagramUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="ml-1 inline-flex min-h-11 items-center self-start text-[14.5px] text-cream transition-colors hover:text-gold"
+              >
+                {instagramHandle(artist.instagramUrl)}
+              </a>
+            )}
+            {/* pinned to the bottom so the buttons line up across a row of cards */}
+            <div className="mt-auto flex flex-wrap items-center justify-between gap-x-[18px] gap-y-2 px-1 pt-1">
+              <Link href={profile} className="link-arrow h-11 gap-2.5 text-[15px]">
+                {t.viewProfile}
+                <ArrowRightIcon className="h-3 w-[18px]" />
+              </Link>
+              <a href="#book" className="btn btn-outline-gold btn-sm">
+                {t.book}
+              </a>
+            </div>
+          </article>
+        );
+      })}
+    </section>
+  );
+}
+
+/** Shown while the artists load: four empty cards in the grid's shape. */
+function ArtistsGridSkeleton() {
+  return (
+    <div aria-hidden className={`${grid} animate-pulse`}>
+      {Array.from({ length: 4 }).map((_, i) => (
+        <div key={i}>
+          <div className="aspect-[3/4] rounded-[14px] border border-cream/10 bg-surface" />
+          <div className="mx-1 mt-4 h-5 w-32 rounded bg-cream/[0.07]" />
+          <div className="mx-1 mt-3 h-4 rounded bg-cream/[0.05]" />
+          <div className="mx-1 mt-2 h-4 w-2/3 rounded bg-cream/[0.05]" />
+        </div>
+      ))}
+    </div>
+  );
 }
 
 export default async function ArtistsPage() {
@@ -36,54 +118,9 @@ export default async function ArtistsPage() {
             lead={t.lead}
           />
 
-          <section
-            aria-label={t.gridAria}
-            className="grid grid-cols-[repeat(auto-fill,minmax(226px,1fr))] gap-x-6 gap-y-11 pt-[60px]"
-          >
-            {artists.map((artist) => {
-              const profile = localePath(lang, `/artists/${artist.id}`);
-              return (
-                <article key={artist.id} className="flex flex-col">
-                  <PhotoPlaceholder
-                    ratio="3 / 4"
-                    aria={t.openProfile}
-                    label={displayCase(t.photoLabel, lang)}
-                    icon={<PersonIcon className="h-11 w-11 text-rose" />}
-                    href={profile}
-                  />
-                  <div className="flex flex-wrap items-baseline justify-between gap-x-2.5 gap-y-0.5 px-1 pt-3">
-                    <h2 className="text-[18px] font-medium leading-6 text-cream">
-                      {t.placeholder.name}
-                    </h2>
-                    <span className="text-[13px] leading-5 text-muted">{t.placeholder.style}</span>
-                  </div>
-                  <p className="mx-1 mt-2 text-[14.5px] font-light leading-[22px] text-body">
-                    {t.placeholder.bio}
-                  </p>
-                  <a
-                    href={artist.instagramUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="ml-1 inline-flex min-h-11 items-center self-start text-[14.5px] text-cream transition-colors hover:text-gold"
-                  >
-                    {t.placeholder.instagram}
-                  </a>
-                  <div className="flex flex-wrap items-center justify-between gap-x-[18px] gap-y-2 px-1">
-                    <Link
-                      href={profile}
-                      className="link-arrow h-11 gap-2.5 text-[15px]"
-                    >
-                      {t.viewProfile}
-                      <ArrowRightIcon className="h-3 w-[18px]" />
-                    </Link>
-                    <a href="#book" className="btn btn-outline-gold btn-sm">
-                      {t.book}
-                    </a>
-                  </div>
-                </article>
-              );
-            })}
-          </section>
+          <Suspense fallback={<ArtistsGridSkeleton />}>
+            <ArtistsGrid lang={lang} t={t} />
+          </Suspense>
 
           <CtaPanel
             lang={lang}

@@ -103,13 +103,9 @@ export const en = {
     photoAria: "Artist photo placeholder",
     photoLabel: "Artist photo",
     openProfile: "Open artist profile",
-    /** Shown until the real artists are added in lib/portfolio.ts. */
-    placeholder: {
-      name: "[Artist name]",
-      style: "[Style]",
-      bio: "[Short bio — experience, approach and what they love to tattoo.]",
-      instagram: "@[instagram]",
-    },
+    /** Shown while no artists have been added in the admin panel. */
+    emptyTitle: "Artists coming soon",
+    emptyText: "We're putting the team's profiles together. Check back shortly.",
     viewProfile: "View profile",
     book: "Book",
     ctaTitleLine1: "Not sure",
@@ -117,22 +113,13 @@ export const en = {
     ctaText: "Tell us your idea and we'll suggest the artist whose style fits it best.",
     cta: "Contact Us",
   },
-  /** One artist's profile page. */
+  /** One artist's profile page. The title and description are the fallbacks. */
   artist: {
     metaTitle: "Artist profile",
     metaDescription:
       "A tattoo artist at Myst Tattoo Studio in Tbilisi: their style, their story and everything they have tattooed at the studio.",
     back: "All artists",
     eyebrow: "Myst / Artist",
-    /** Shown until the real artists are added in lib/portfolio.ts. */
-    placeholder: {
-      firstName: "[First name]",
-      lastName: "[Last name]",
-      styles: "[Style] / [Style]",
-      bio: "[Artist bio — who they are, how long they have been tattooing, their approach and the kind of work they love to do. Two to four sentences.]",
-      instagram: "@[instagram]",
-      placement: "[Placement]",
-    },
     book: "Book with this artist",
     seeWorks: "See works",
     worksTitle: "Works",
@@ -141,6 +128,7 @@ export const en = {
     allWorks: "All works",
     countOne: "Showing 1 work",
     countMany: "Showing {count} works",
+    noWorks: "No works have been added yet.",
     ctaTitleLine1: "Want a piece",
     ctaTitleLine2: "by this artist?",
     ctaText: "Send us your idea and we'll agree the design, placement and size.",
@@ -159,20 +147,16 @@ export const en = {
     styleLabel: "Style",
     allArtists: "All artists",
     allStyles: "All styles",
-    /** Shown until the real artists are added in lib/portfolio.ts; {n} is 1, 2, 3… */
-    artistPlaceholder: "[Artist {n}]",
-    styles: {
-      fineLine: "Fine line",
-      blackwork: "Blackwork",
-      ornamental: "Ornamental",
-      botanical: "Botanical",
-      lettering: "Lettering",
-    },
     countOne: "Showing 1 tattoo",
     countMany: "Showing {count} tattoos",
     galleryAria: "Tattoo gallery",
-    photoAria: "Tattoo photo placeholder",
-    photoLabel: "Tattoo photo",
+    /** What a photo shows, for screen readers; {style} and {artist} are filled in. */
+    photoAlt: "{style} tattoo",
+    photoAltBy: "{style} tattoo by {artist}",
+    /** Shown while no tattoos have been added in the admin panel. */
+    noneTitle: "Tattoos coming soon",
+    noneText: "We're adding our work to the gallery. Check back shortly.",
+    /** Shown when the picked artist and style have no tattoo in common. */
     emptyTitle: "Nothing here yet",
     emptyText: "No work matches this artist and style together. Try another combination.",
     showAll: "Show all tattoos",
@@ -182,7 +166,6 @@ export const en = {
       aria: "Tattoo details",
       eyebrow: "Myst / Tattoo",
       tattooedBy: "Tattooed by",
-      artistPhotoAria: "Artist photo placeholder",
       viewProfile: "View profile",
       bookSimilar: "Book a similar tattoo",
       previous: "Previous",

@@ -1,27 +1,25 @@
 "use client";
 
 import { useEffect, useRef, type KeyboardEvent } from "react";
+import Image from "next/image";
 import Link from "next/link";
-import { displayCase, type Locale } from "@/lib/i18n/config";
+import { displayCase, localePath, type Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/dictionaries/en";
+import { tattooAlt } from "@/lib/tattoos";
+import { localized, type Tattoo } from "@/lib/types";
 import { StarRule } from "./StarRule";
 import {
   ArrowLeftIcon,
   ArrowRightIcon,
   ArrowUpRightIcon,
   PersonIcon,
-  TattooIcon,
   XIcon,
 } from "./ui/Icons";
 
 type Props = {
   lang: Locale;
   t: Dictionary["tattoos"];
-  /** the tattoo's style, as shown to the visitor */
-  style: string;
-  /** who tattooed it, and the address of their profile */
-  artist: string;
-  artistHref: string;
+  tattoo: Tattoo;
   /** place among the tattoos now showing, e.g. "3 / 16" */
   position: string;
   onClose: () => void;
@@ -37,19 +35,10 @@ const step =
  * its style, the artist, a booking button and previous / next on the right.
  * Closes on the cross, a click outside or Escape; the arrow keys step through.
  */
-export function TattooModal({
-  lang,
-  t,
-  style,
-  artist,
-  artistHref,
-  position,
-  onClose,
-  onPrev,
-  onNext,
-}: Props) {
+export function TattooModal({ lang, t, tattoo, position, onClose, onPrev, onNext }: Props) {
   const dialog = useRef<HTMLDivElement>(null);
   const m = t.modal;
+  const { artist } = tattoo;
 
   // While open: keyboard focus moves into the window and the page behind stops
   // scrolling. On close both go back to how they were.
@@ -104,15 +93,17 @@ export function TattooModal({
         tabIndex={-1}
         className="relative flex max-h-[calc(100dvh-48px)] w-full max-w-[900px] flex-wrap overflow-auto rounded-[18px] border border-cream/18 bg-surface text-body shadow-[0_30px_80px_rgba(0,0,0,0.7)] outline-none"
       >
-        <div
-          role="img"
-          aria-label={t.photoAria}
-          className="flex aspect-[4/5] min-w-0 flex-[1_1_340px] flex-col items-center justify-center gap-3.5 bg-[linear-gradient(160deg,#24131b_0%,#150e11_55%,#0c0a0b_100%)]"
-        >
-          <TattooIcon strokeWidth={1.1} className="h-14 w-14 text-rose" />
-          <span className="caps text-[11px] leading-[14px] tracking-[3.4px] text-muted">
-            {displayCase(t.photoLabel, lang)}
-          </span>
+        {/* the whole photo, uncropped, on the dark ground */}
+        <div className="relative aspect-[4/5] min-w-0 flex-[1_1_340px] bg-[linear-gradient(160deg,#24131b_0%,#150e11_55%,#0c0a0b_100%)]">
+          <Image
+            key={tattoo.id}
+            src={tattoo.image.full}
+            alt={tattooAlt(tattoo, t, lang)}
+            fill
+            unoptimized
+            className="object-contain"
+            draggable={false}
+          />
         </div>
 
         <div className="flex min-w-0 flex-[1_1_300px] flex-col px-6 pb-[30px] pt-[46px] sm:px-[38px]">
@@ -125,31 +116,35 @@ export function TattooModal({
               lang === "ka" ? "font-light" : "font-normal"
             }`}
           >
-            {style}
+            {tattoo.style ? localized(tattoo.style.name, lang) : ""}
           </h2>
 
           <StarRule className="-ml-[5px] mt-5" star="h-[26px] w-[26px]" />
 
-          <p className="caps label-caps mt-[26px]">{displayCase(m.tattooedBy, lang)}</p>
-          <div className="mb-6 mt-3 flex items-center gap-4">
-            <span
-              role="img"
-              aria-label={m.artistPhotoAria}
-              className="flex h-14 flex-[0_0_56px] items-center justify-center rounded-full border border-cream/22 bg-[#1b1116]"
-            >
-              <PersonIcon strokeWidth={1.8} className="h-[26px] w-[26px] text-rose" />
-            </span>
-            <div className="min-w-0">
-              <p className="text-[19px] font-medium leading-6 text-cream">{artist}</p>
-              <Link
-                href={artistHref}
-                className="link-arrow min-h-11 gap-2.5 text-[15px]"
-              >
-                {m.viewProfile}
-                <ArrowRightIcon className="h-3 w-[18px]" />
-              </Link>
-            </div>
-          </div>
+          {artist && (
+            <>
+              <p className="caps label-caps mt-[26px]">{displayCase(m.tattooedBy, lang)}</p>
+              <div className="mb-6 mt-3 flex items-center gap-4">
+                <span className="relative flex h-14 flex-[0_0_56px] items-center justify-center overflow-hidden rounded-full border border-cream/22 bg-[#1b1116]">
+                  {artist.photo ? (
+                    <Image src={artist.photo.thumb} alt="" fill unoptimized className="object-cover" />
+                  ) : (
+                    <PersonIcon strokeWidth={1.8} className="h-[26px] w-[26px] text-rose" />
+                  )}
+                </span>
+                <div className="min-w-0">
+                  <p className="text-[19px] font-medium leading-6 text-cream">{artist.nickname}</p>
+                  <Link
+                    href={localePath(lang, `/artists/${artist.slug}`)}
+                    className="link-arrow min-h-11 gap-2.5 text-[15px]"
+                  >
+                    {m.viewProfile}
+                    <ArrowRightIcon className="h-3 w-[18px]" />
+                  </Link>
+                </div>
+              </div>
+            </>
+          )}
 
           {/* closes the window and scrolls to the page's booking panel */}
           <a href="#book" onClick={onClose} className="btn btn-gold mt-auto flex px-6">

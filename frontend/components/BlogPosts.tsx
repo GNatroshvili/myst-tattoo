@@ -6,7 +6,7 @@ import { blogTopics, featuredPost, posts, type BlogTopic } from "@/lib/blog";
 import { displayCase, localePath, type Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/dictionaries/en";
 import { FilterChip } from "./FilterChip";
-import { PhotoPlaceholder } from "./PhotoPlaceholder";
+import { PhotoFrame } from "./PhotoFrame";
 import { ArrowRightIcon, ImageIcon } from "./ui/Icons";
 
 /**
@@ -85,7 +85,7 @@ export function BlogPosts({ lang, t }: { lang: Locale; t: Dictionary["blog"] }) 
       >
         {shown.map((post) => (
           <article key={post.id} className="flex flex-col">
-            <PhotoPlaceholder
+            <PhotoFrame
               ratio="4 / 3"
               aria={t.openArticle}
               label={displayCase(t.imageLabel, lang)}

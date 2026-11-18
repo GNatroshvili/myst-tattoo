@@ -25,7 +25,7 @@ function pickLocale(request: NextRequest): Locale {
   return defaultLocale;
 }
 
-/** Every page lives under /en or /ka; anything else is redirected there. */
+/** Every public page lives under /en or /ka; anything else is redirected there. */
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const hasPrefix = locales.some(
@@ -39,6 +39,7 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // pages only: skip Next internals, API routes and anything with a file extension
-  matcher: ["/((?!_next|api|.*\\..*).*)"],
+  // public pages only: skip Next internals, the API, the admin panel (it has
+  // one language and no prefix) and anything with a file extension
+  matcher: ["/((?!_next|api|admin|.*\\..*).*)"],
 };

@@ -1,5 +1,8 @@
 import type { NextConfig } from "next";
 
+/** Where the backend API runs; see .env.example. */
+const API_URL = process.env.API_URL ?? "http://localhost:5000";
+
 const nextConfig: NextConfig = {
   /* config options here */
   cacheComponents: true,
@@ -7,6 +10,14 @@ const nextConfig: NextConfig = {
   images: {
     // 90 is used for the hero artwork, where the default 75 softens the petals
     qualities: [75, 90],
+  },
+  // The browser talks to the backend through the site's own address: the admin
+  // panel's requests (and its sign-in cookie) and every uploaded photo.
+  async rewrites() {
+    return [
+      { source: "/api/:path*", destination: `${API_URL}/api/:path*` },
+      { source: "/uploads/:path*", destination: `${API_URL}/uploads/:path*` },
+    ];
   },
   turbopack: {
     rules: {

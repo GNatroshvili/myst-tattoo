@@ -1,0 +1,37 @@
+import type { Artist, Style, Tattoo } from "./types";
+
+/**
+ * Reads from the backend API. Server Components only: the browser reaches the
+ * same API through the /api rewrite in next.config.ts instead.
+ *
+ * Nothing here is cached, so what the admin panel changes shows on the next
+ * page load. If the backend cannot be reached the lists come back empty and
+ * the pages show their "nothing here yet" states rather than an error.
+ */
+
+export const API_URL = process.env.API_URL ?? "http://localhost:5000";
+
+/** `null` means the record does not exist (or the backend is down). */
+async function get<T>(path: string): Promise<T | null> {
+  try {
+    const res = await fetch(`${API_URL}/api${path}`, { cache: "no-store" });
+    if (res.status === 404) return null;
+    if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+    return (await res.json()) as T;
+  } catch (err) {
+    console.error(`[api] GET ${path} failed:`, err instanceof Error ? err.message : err);
+    return null;
+  }
+}
+
+/** Every artist, in the order they were added, each with `tattooCount`. */
+export const getArtists = async () => (await get<Artist[]>("/artists")) ?? [];
+
+/** One artist by the slug in their profile's address, with their `tattoos`. */
+export const getArtist = (slug: string) => get<Artist>(`/artists/${encodeURIComponent(slug)}`);
+
+/** Tattoos, newest first; `limit` keeps only the first few. */
+export const getTattoos = async (limit?: number) =>
+  (await get<Tattoo[]>(limit ? `/tattoos?limit=${limit}` : "/tattoos")) ?? [];
+
+export const getStyles = async () => (await get<Style[]>("/styles")) ?? [];

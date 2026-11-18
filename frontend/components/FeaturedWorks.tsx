@@ -1,8 +1,10 @@
-import { useId } from "react";
+import { Suspense, useId } from "react";
 import Link from "next/link";
+import { getTattoos } from "@/lib/api";
 import { displayCase, localePath, type Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/dictionaries/en";
-import { works } from "@/lib/portfolio";
+import { tattooAlt } from "@/lib/tattoos";
+import { localized } from "@/lib/types";
 import { StarRule } from "./StarRule";
 import { ArrowRightIcon } from "./ui/Icons";
 import { WorkTile } from "./WorkTile";
@@ -10,16 +12,46 @@ import { WorkTile } from "./WorkTile";
 /** How many pieces the home page shows: one row on a wide screen. */
 const PICKS = 4;
 
+type Props = { lang: Locale; dict: Dictionary };
+
+// two to a row on phones, then as many 226px tiles as fit
+const grid =
+  "mt-10 grid grid-cols-2 gap-x-4 gap-y-[30px] sm:grid-cols-[repeat(auto-fill,minmax(226px,1fr))] sm:gap-x-6";
+
 /**
- * A taste of the portfolio on the home page: the first few pieces from
- * lib/portfolio.ts. Each of them, and the link beside the title, opens the
- * full gallery.
+ * A taste of the portfolio on the home page: the newest few tattoos. Each of
+ * them, and the link beside the title, opens the full gallery. The section is
+ * left out entirely while the gallery is still empty.
  */
-export function FeaturedWorks({ lang, dict }: { lang: Locale; dict: Dictionary }) {
-  const t = dict.featured;
-  const tattoos = dict.tattoos;
-  const titleId = useId();
+async function Featured({ lang, dict }: Props) {
+  const tattoos = await getTattoos(PICKS);
+  if (tattoos.length === 0) return null;
   const gallery = localePath(lang, "/tattoos");
+
+  return (
+    <Section lang={lang} dict={dict}>
+      <div className={grid}>
+        {tattoos.map((tattoo) => (
+          <WorkTile
+            key={tattoo.id}
+            ratio="3 / 4"
+            photo={tattoo.image}
+            aria={`${dict.featured.openGallery}: ${tattooAlt(tattoo, dict.tattoos, lang)}`}
+            title={tattoo.style ? localized(tattoo.style.name, lang) : ""}
+            note={tattoo.artist?.nickname}
+            href={gallery}
+            className=""
+          />
+        ))}
+      </div>
+    </Section>
+  );
+}
+
+/** The section's heading and "view all" link, around whatever fills the grid. */
+function Section({ lang, dict, children }: Props & { children: React.ReactNode }) {
+  const t = dict.featured;
+  const titleId = useId();
 
   return (
     <section id="featured" aria-labelledby={titleId} className="scroll-mt-6 pt-16 lg:pt-[84px]">
@@ -35,26 +67,30 @@ export function FeaturedWorks({ lang, dict }: { lang: Locale; dict: Dictionary }
           <StarRule className="-ml-[5px] mt-5" star="h-[26px] w-[26px]" />
         </div>
 
-        <Link href={gallery} className="link-arrow min-h-11 gap-3 text-[17px]">
+        <Link href={localePath(lang, "/tattoos")} className="link-arrow min-h-11 gap-3 text-[17px]">
           {t.viewAll} <ArrowRightIcon className="h-3 w-[18px]" />
         </Link>
       </div>
-
-      {/* two to a row on phones, then as many 226px tiles as fit */}
-      <div className="mt-10 grid grid-cols-2 gap-x-4 gap-y-[30px] sm:grid-cols-[repeat(auto-fill,minmax(226px,1fr))] sm:gap-x-6">
-        {works.slice(0, PICKS).map((work, i) => (
-          <WorkTile
-            key={i}
-            ratio="3 / 4"
-            aria={t.openGallery}
-            photoLabel={displayCase(tattoos.photoLabel, lang)}
-            title={tattoos.styles[work.style]}
-            note={tattoos.artistPlaceholder.replace("{n}", String(work.artist + 1))}
-            href={gallery}
-            className=""
-          />
-        ))}
-      </div>
+      {children}
     </section>
+  );
+}
+
+/** The tattoos are read from the backend when the page is requested. */
+export function FeaturedWorks(props: Props) {
+  return (
+    <Suspense
+      fallback={
+        <Section {...props}>
+          <div aria-hidden className={`${grid} animate-pulse`}>
+            {Array.from({ length: PICKS }).map((_, i) => (
+              <div key={i} className="aspect-[3/4] rounded-[14px] border border-cream/10 bg-surface" />
+            ))}
+          </div>
+        </Section>
+      }
+    >
+      <Featured {...props} />
+    </Suspense>
   );
 }

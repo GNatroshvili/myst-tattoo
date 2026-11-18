@@ -1,30 +1,35 @@
 "use client";
 
 import { useState } from "react";
-import { displayCase, type Locale } from "@/lib/i18n/config";
+import type { Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/dictionaries/en";
-import { tattooStyles, works, type TattooStyle } from "@/lib/portfolio";
+import { tattooAlt } from "@/lib/tattoos";
+import { localized, photoRatio, type Style, type Tattoo } from "@/lib/types";
 import { FilterChip } from "./FilterChip";
 import { WorkTile } from "./WorkTile";
 
 type Props = {
   lang: Locale;
-  /** position of the artist in `artists` */
-  artist: number;
   t: Dictionary["artist"];
-  tattoos: Dictionary["tattoos"];
+  tattoosCopy: Dictionary["tattoos"];
+  /** everything this artist has tattooed, newest first */
+  tattoos: Tattoo[];
 };
 
 /**
  * An artist's own work on their profile: one row of style filters (only the
  * styles this artist has tattooed), a count, and the masonry gallery.
  */
-export function ArtistWorks({ lang, artist, t, tattoos }: Props) {
-  const [style, setStyle] = useState<TattooStyle | "all">("all");
+export function ArtistWorks({ lang, t, tattoosCopy, tattoos }: Props) {
+  const [style, setStyle] = useState("all");
 
-  const mine = works.map((work, index) => ({ ...work, index })).filter((work) => work.artist === artist);
-  const styles = tattooStyles.filter((key) => mine.some((work) => work.style === key));
-  const shown = mine.filter((work) => style === "all" || work.style === style);
+  if (tattoos.length === 0) {
+    return <p className="mt-9 text-center text-[16px] font-light leading-6 text-muted">{t.noWorks}</p>;
+  }
+
+  const styles = new Map<string, Style>();
+  for (const tattoo of tattoos) if (tattoo.style) styles.set(tattoo.style.id, tattoo.style);
+  const shown = tattoos.filter((tattoo) => style === "all" || tattoo.style?.id === style);
   const countLabel =
     shown.length === 1 ? t.countOne : t.countMany.replace("{count}", String(shown.length));
 
@@ -34,9 +39,9 @@ export function ArtistWorks({ lang, artist, t, tattoos }: Props) {
         <FilterChip on={style === "all"} onPick={() => setStyle("all")}>
           {t.allWorks}
         </FilterChip>
-        {styles.map((key) => (
-          <FilterChip key={key} on={style === key} onPick={() => setStyle(key)}>
-            {tattoos.styles[key]}
+        {[...styles.values()].map((s) => (
+          <FilterChip key={s.id} on={style === s.id} onPick={() => setStyle(s.id)}>
+            {localized(s.name, lang)}
           </FilterChip>
         ))}
       </div>
@@ -46,14 +51,13 @@ export function ArtistWorks({ lang, artist, t, tattoos }: Props) {
       </p>
 
       <div className="mt-3.5 columns-[4_220px] gap-x-6">
-        {shown.map((work) => (
+        {shown.map((tattoo) => (
           <WorkTile
-            key={work.index}
-            ratio={work.ratio}
-            aria={tattoos.photoAria}
-            photoLabel={displayCase(tattoos.photoLabel, lang)}
-            title={tattoos.styles[work.style]}
-            note={t.placeholder.placement}
+            key={tattoo.id}
+            ratio={photoRatio(tattoo.image)}
+            photo={tattoo.image}
+            aria={tattooAlt(tattoo, tattoosCopy, lang)}
+            title={tattoo.style ? localized(tattoo.style.name, lang) : ""}
           />
         ))}
       </div>

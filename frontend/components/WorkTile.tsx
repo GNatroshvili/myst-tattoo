@@ -1,24 +1,27 @@
-import { PhotoPlaceholder } from "./PhotoPlaceholder";
+import type { Photo } from "@/lib/types";
+import { PhotoFrame } from "./PhotoFrame";
 import { TattooIcon } from "./ui/Icons";
 
 type Props = {
   /** width / height of the photo, as CSS `aspect-ratio` */
   ratio: string;
-  /** what a screen reader announces for the photo (or for picking it) */
+  /** what a screen reader announces: what the photo shows, or what picking it does */
   aria: string;
-  /** caption inside the photo's placeholder, already in display case */
-  photoLabel: string;
+  /** the photo; without one the tile is a placeholder with `photoLabel` in it */
+  photo?: Photo | null;
+  /** caption inside the placeholder, already in display case */
+  photoLabel?: string;
   /** left of the caption: the tattoo's style, or where a piercing sits */
   title: string;
-  /** right of the caption: who did it, where on the body, or the jewellery */
-  note: string;
+  /** right of the caption: who did it, or the jewellery */
+  note?: string;
   /** when set, the photo is a button that opens the tattoo's details */
   onOpen?: () => void;
   /** when set, the photo is a link (the home page's picks open the gallery) */
   href?: string;
   /** spacing around the tile; the default suits a masonry column */
   className?: string;
-  /** the photo placeholder's colouring; the piercing gallery uses "wine" */
+  /** the placeholder's colouring; the piercing gallery uses "wine" */
   tone?: "dark" | "wine";
 };
 
@@ -26,7 +29,8 @@ type Props = {
 export function WorkTile({
   ratio,
   aria,
-  photoLabel,
+  photo,
+  photoLabel = "",
   title,
   note,
   onOpen,
@@ -36,9 +40,10 @@ export function WorkTile({
 }: Props) {
   return (
     <figure className={className}>
-      <PhotoPlaceholder
+      <PhotoFrame
         ratio={ratio}
         aria={aria}
+        photo={photo}
         label={photoLabel}
         icon={<TattooIcon className={`h-10 w-10 ${tone === "wine" ? "text-[#d9a3be]" : "text-rose"}`} />}
         onClick={onOpen}
@@ -47,7 +52,7 @@ export function WorkTile({
       />
       <figcaption className="flex flex-wrap items-baseline justify-between gap-x-2.5 gap-y-0.5 px-1 pt-2.5">
         <span className="text-[15px] font-medium leading-5 text-cream">{title}</span>
-        <span className="text-[13px] leading-5 text-muted">{note}</span>
+        {note && <span className="text-[13px] leading-5 text-muted">{note}</span>}
       </figcaption>
     </figure>
   );

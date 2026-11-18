@@ -15,7 +15,8 @@ export const dictionaryFor = (locale: Locale): Dictionary => dictionaries[locale
  */
 export async function getDictionary(): Promise<{ lang: Locale; dict: Dictionary }> {
   const locale = await lang();
-  if (!hasLocale(locale)) notFound();
+  // undefined outside the /en and /ka trees (the admin panel has no language)
+  if (!locale || !hasLocale(locale)) notFound();
   return { lang: locale, dict: dictionaries[locale] };
 }
 

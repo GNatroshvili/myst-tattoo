@@ -1,18 +1,19 @@
 import "dotenv/config";
 import app from "./app.js";
 import { connectDB, disconnectDB } from "./config/db.js";
+import { env } from "./config/env.js";
+import { loginConfigured } from "./middleware/auth.js";
 
-const PORT = Number(process.env.PORT) || 5000;
-const MONGODB_URI =
-  process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/myst-tattoo";
-
-const server = app.listen(PORT, () => {
-  console.log(`[server] listening on http://localhost:${PORT}`);
+const server = app.listen(env.port, () => {
+  console.log(`[server] listening on http://localhost:${env.port}`);
+  if (!loginConfigured()) {
+    console.warn("[server] admin sign-in is off: set ADMIN_PASSWORD and SESSION_SECRET in .env");
+  }
 });
 
 // Connect to the database without blocking server start-up.
-connectDB(MONGODB_URI).catch((err) => {
-  console.error(`[db] could not connect to ${MONGODB_URI}`);
+connectDB(env.mongoUri).catch((err) => {
+  console.error(`[db] could not connect to ${env.mongoUri}`);
   console.error(`[db] ${err.message}`);
   console.error("[db] server keeps running; start MongoDB and restart to connect.");
 });

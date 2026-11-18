@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Backdrop } from "@/components/Backdrop";
@@ -7,7 +8,8 @@ import { Header } from "@/components/Header";
 import { PageIntro } from "@/components/PageIntro";
 import { TattooGallery } from "@/components/TattooGallery";
 import { ArrowUpRightIcon } from "@/components/ui/Icons";
-import { dictionaryFor, getDictionary } from "@/lib/i18n";
+import { getTattoos } from "@/lib/api";
+import { dictionaryFor, getDictionary, type Dictionary, type Locale } from "@/lib/i18n";
 import { hasLocale, localePath } from "@/lib/i18n/config";
 
 export async function generateMetadata({ params }: PageProps<"/[lang]/tattoos">): Promise<Metadata> {
@@ -17,12 +19,35 @@ export async function generateMetadata({ params }: PageProps<"/[lang]/tattoos">)
   return { title: t.metaTitle, description: t.metaDescription };
 }
 
+/** The gallery, with the tattoos read from the backend when the page is requested. */
+async function Gallery({ lang, t }: { lang: Locale; t: Dictionary["tattoos"] }) {
+  return <TattooGallery lang={lang} t={t} tattoos={await getTattoos()} />;
+}
+
+/** Shown while the tattoos load: the filter bar's outline and a few empty tiles. */
+function GallerySkeleton() {
+  return (
+    <div aria-hidden className="animate-pulse">
+      <div className="mt-[52px] h-[146px] border-y border-cream/18" />
+      <div className="mt-[56px] columns-[4_220px] gap-x-6">
+        {["3 / 4", "1 / 1", "4 / 5", "3 / 4"].map((ratio, i) => (
+          <div
+            key={i}
+            style={{ aspectRatio: ratio }}
+            className="mb-[26px] break-inside-avoid rounded-[14px] border border-cream/10 bg-surface"
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default async function TattoosPage() {
   const { lang, dict } = await getDictionary();
   const t = dict.tattoos;
 
   return (
-    <div className="page-ground relative isolate overflow-hidden">
+    <div className="page-ground relative isolate min-h-dvh overflow-hidden">
       <Backdrop scope="tattoos" />
       <div className="container-x">
         <Header lang={lang} nav={dict.nav} common={dict.common} switcherLabel={dict.langSwitcher.aria} />
@@ -35,7 +60,9 @@ export default async function TattoosPage() {
             lead={t.lead}
           />
 
-          <TattooGallery lang={lang} t={t} />
+          <Suspense fallback={<GallerySkeleton />}>
+            <Gallery lang={lang} t={t} />
+          </Suspense>
 
           <CtaPanel
             lang={lang}

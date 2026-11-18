@@ -1,31 +1,55 @@
 "use client";
 
 import { useId, useState } from "react";
-import { displayCase, localePath, type Locale } from "@/lib/i18n/config";
+import { displayCase, type Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/dictionaries/en";
-import { artists, tattooStyles, works, type TattooStyle } from "@/lib/portfolio";
+import { tattooAlt } from "@/lib/tattoos";
+import { localized, photoRatio, type ArtistBrief, type Style, type Tattoo } from "@/lib/types";
+import { EmptyNote } from "./EmptyNote";
 import { FilterChip } from "./FilterChip";
 import { TattooModal } from "./TattooModal";
 import { WorkTile } from "./WorkTile";
+
+type Props = {
+  lang: Locale;
+  t: Dictionary["tattoos"];
+  /** every tattoo, newest first */
+  tattoos: Tattoo[];
+};
+
+/** The distinct values of `pick` across the tattoos, in the order they first appear. */
+function distinct<T extends { id: string }>(tattoos: Tattoo[], pick: (tattoo: Tattoo) => T | null) {
+  const seen = new Map<string, T>();
+  for (const tattoo of tattoos) {
+    const value = pick(tattoo);
+    if (value && !seen.has(value.id)) seen.set(value.id, value);
+  }
+  return [...seen.values()];
+}
 
 /**
  * The tattoos page's portfolio: artist and style filters, a count of what is
  * showing, the masonry gallery, and a prompt when a combination has no work.
  * Picking a tattoo opens its details, which step through what is showing.
  */
-export function TattooGallery({ lang, t }: { lang: Locale; t: Dictionary["tattoos"] }) {
-  const [artist, setArtist] = useState<number | "all">("all");
-  const [style, setStyle] = useState<TattooStyle | "all">("all");
+export function TattooGallery({ lang, t, tattoos }: Props) {
+  const [artist, setArtist] = useState("all");
+  const [style, setStyle] = useState("all");
   /** position, among the tattoos showing, of the one whose details are open */
   const [open, setOpen] = useState<number | null>(null);
   const id = useId();
 
-  const artistNames = artists.map((_, i) => t.artistPlaceholder.replace("{n}", String(i + 1)));
-  const shown = works
-    .map((work, index) => ({ ...work, index }))
-    .filter(
-      (work) => (artist === "all" || work.artist === artist) && (style === "all" || work.style === style)
-    );
+  if (tattoos.length === 0) {
+    return <EmptyNote lang={lang} title={t.noneTitle} text={t.noneText} className="mt-[52px]" />;
+  }
+
+  // only artists and styles that have work here, so no filter starts out empty
+  const artists = distinct<ArtistBrief>(tattoos, (tattoo) => tattoo.artist);
+  const styles = distinct<Style>(tattoos, (tattoo) => tattoo.style);
+  const shown = tattoos.filter(
+    (tattoo) =>
+      (artist === "all" || tattoo.artist?.id === artist) && (style === "all" || tattoo.style?.id === style)
+  );
   const countLabel =
     shown.length === 1 ? t.countOne : t.countMany.replace("{count}", String(shown.length));
   const opened = open !== null && open < shown.length ? shown[open] : null;
@@ -41,21 +65,23 @@ export function TattooGallery({ lang, t }: { lang: Locale; t: Dictionary["tattoo
         aria-label={t.filtersAria}
         className="mt-[52px] flex flex-col gap-3.5 border-y border-cream/18 py-[22px]"
       >
-        <div className={row}>
-          <span id={`${id}-artist`} className={label}>
-            {displayCase(t.artistLabel, lang)}
-          </span>
-          <div role="group" aria-labelledby={`${id}-artist`} className={chips}>
-            <FilterChip on={artist === "all"} onPick={() => setArtist("all")}>
-              {t.allArtists}
-            </FilterChip>
-            {artistNames.map((name, i) => (
-              <FilterChip key={artists[i].id} on={artist === i} onPick={() => setArtist(i)}>
-                {name}
+        {artists.length > 0 && (
+          <div className={row}>
+            <span id={`${id}-artist`} className={label}>
+              {displayCase(t.artistLabel, lang)}
+            </span>
+            <div role="group" aria-labelledby={`${id}-artist`} className={chips}>
+              <FilterChip on={artist === "all"} onPick={() => setArtist("all")}>
+                {t.allArtists}
               </FilterChip>
-            ))}
+              {artists.map((a) => (
+                <FilterChip key={a.id} on={artist === a.id} onPick={() => setArtist(a.id)}>
+                  {a.nickname}
+                </FilterChip>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         <div className={row}>
           <span id={`${id}-style`} className={label}>
@@ -65,9 +91,9 @@ export function TattooGallery({ lang, t }: { lang: Locale; t: Dictionary["tattoo
             <FilterChip on={style === "all"} onPick={() => setStyle("all")}>
               {t.allStyles}
             </FilterChip>
-            {tattooStyles.map((key) => (
-              <FilterChip key={key} on={style === key} onPick={() => setStyle(key)}>
-                {t.styles[key]}
+            {styles.map((s) => (
+              <FilterChip key={s.id} on={style === s.id} onPick={() => setStyle(s.id)}>
+                {localized(s.name, lang)}
               </FilterChip>
             ))}
           </div>
@@ -79,25 +105,21 @@ export function TattooGallery({ lang, t }: { lang: Locale; t: Dictionary["tattoo
       </p>
 
       <section aria-label={t.galleryAria} className="mt-3.5 columns-[4_220px] gap-x-6">
-        {shown.map((work, position) => (
+        {shown.map((tattoo, position) => (
           <WorkTile
-            key={work.index}
-            ratio={work.ratio}
-            aria={t.modal.open}
-            photoLabel={displayCase(t.photoLabel, lang)}
-            title={t.styles[work.style]}
-            note={artistNames[work.artist]}
+            key={tattoo.id}
+            ratio={photoRatio(tattoo.image)}
+            photo={tattoo.image}
+            aria={`${t.modal.open}: ${tattooAlt(tattoo, t, lang)}`}
+            title={tattoo.style ? localized(tattoo.style.name, lang) : ""}
+            note={tattoo.artist?.nickname}
             onOpen={() => setOpen(position)}
           />
         ))}
       </section>
 
       {shown.length === 0 && (
-        <div className="mt-1.5 flex flex-col items-center gap-3.5 rounded-[18px] border border-cream/18 px-6 py-12 text-center">
-          <p className="display text-[length:calc(32px*var(--display-scale))] leading-9 text-cream">
-            {displayCase(t.emptyTitle, lang)}
-          </p>
-          <p className="text-[16px] font-light leading-6 text-body">{t.emptyText}</p>
+        <EmptyNote lang={lang} title={t.emptyTitle} text={t.emptyText} className="mt-1.5">
           <button
             type="button"
             onClick={() => {
@@ -108,20 +130,18 @@ export function TattooGallery({ lang, t }: { lang: Locale; t: Dictionary["tattoo
           >
             {t.showAll}
           </button>
-        </div>
+        </EmptyNote>
       )}
 
       {opened && open !== null && (
         <TattooModal
           lang={lang}
           t={t}
-          style={t.styles[opened.style]}
-          artist={artistNames[opened.artist]}
-          artistHref={localePath(lang, `/artists/${artists[opened.artist].id}`)}
+          tattoo={opened}
           position={`${open + 1} / ${shown.length}`}
           onClose={() => setOpen(null)}
-          onPrev={() => setOpen((at) => at === null ? at : (at - 1 + shown.length) % shown.length)}
-          onNext={() => setOpen((at) => at === null ? at : (at + 1) % shown.length)}
+          onPrev={() => setOpen((at) => (at === null ? at : (at - 1 + shown.length) % shown.length))}
+          onNext={() => setOpen((at) => (at === null ? at : (at + 1) % shown.length))}
         />
       )}
     </>

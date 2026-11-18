@@ -1,38 +1,9 @@
 import type { Metadata, Viewport } from "next";
-import { Italiana, Noto_Sans_Georgian, Noto_Serif_Georgian, Outfit } from "next/font/google";
 import { notFound } from "next/navigation";
 import { hasLocale, locales, localeTags } from "@/lib/i18n/config";
 import { dictionaryFor } from "@/lib/i18n";
+import { fontVariables } from "../fonts";
 import "../globals.css";
-
-const outfit = Outfit({
-  subsets: ["latin"],
-  variable: "--font-outfit",
-  display: "swap",
-});
-
-const italiana = Italiana({
-  subsets: ["latin"],
-  weight: "400",
-  variable: "--font-italiana",
-  display: "swap",
-});
-
-// Georgian companions: Outfit and Italiana have no Georgian letters, so these
-// take over for them. Not preloaded, so English visitors never download them.
-const georgianSans = Noto_Sans_Georgian({
-  subsets: ["georgian"],
-  variable: "--font-georgian-sans",
-  display: "swap",
-  preload: false,
-});
-
-const georgianSerif = Noto_Serif_Georgian({
-  subsets: ["georgian"],
-  variable: "--font-georgian-serif",
-  display: "swap",
-  preload: false,
-});
 
 /** One static page per language: /en and /ka. */
 export function generateStaticParams() {
@@ -68,10 +39,7 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
   if (!hasLocale(lang)) notFound();
 
   return (
-    <html
-      lang={lang}
-      className={`${outfit.variable} ${italiana.variable} ${georgianSans.variable} ${georgianSerif.variable}`}
-    >
+    <html lang={lang} className={fontVariables}>
       <body className="min-h-dvh">{children}</body>
     </html>
   );
