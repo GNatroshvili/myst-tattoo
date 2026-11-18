@@ -19,10 +19,11 @@ export const style = (doc) =>
 
 export const artist = (doc, extra = {}) => ({
   id: String(doc._id),
+  lang: doc.lang,
   slug: doc.slug,
   nickname: doc.nickname,
   styles: (doc.styles ?? []).map(style).filter(Boolean),
-  bio: { en: doc.bio?.en ?? "", ka: doc.bio?.ka ?? "" },
+  bio: typeof doc.bio === "string" ? doc.bio : "",
   instagramUrl: doc.instagramUrl ?? "",
   photo: image(doc.photo),
   ...extra,
@@ -36,6 +37,7 @@ const artistBrief = (doc) =>
 
 export const tattoo = (doc) => ({
   id: String(doc._id),
+  lang: doc.lang,
   image: image(doc.image),
   style: style(doc.style),
   artist: artistBrief(doc.artist),

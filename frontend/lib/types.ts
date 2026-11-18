@@ -32,17 +32,26 @@ export type ArtistBrief = {
 
 export type Tattoo = {
   id: string;
+  /** which site's gallery shows it: /ka or /en */
+  lang: Locale;
   image: Photo;
   /** null only if the style was deleted from under it */
   style: Style | null;
-  /** null until the tattoo is attached to an artist */
+  /** null until the tattoo is attached to an artist (always one of its own language) */
   artist: ArtistBrief | null;
   createdAt: string;
 };
 
+/**
+ * An artist as one language's site shows them: the same person on both sites
+ * is two records, each with its own nickname, bio and works.
+ */
 export type Artist = ArtistBrief & {
+  /** which site shows this artist: /ka or /en */
+  lang: Locale;
   styles: Style[];
-  bio: Localized;
+  /** in the artist's language; "" when there is none */
+  bio: string;
   /** "" when the artist has no Instagram */
   instagramUrl: string;
   /** comes with the list of artists */

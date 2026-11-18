@@ -1,10 +1,25 @@
 "use client";
 
 import { useRef, useState, type FormEvent } from "react";
+import type { Locale } from "@/lib/i18n/config";
 import type { Tattoo } from "@/lib/types";
 import type { PanelProps } from "./AdminApp";
 import { api, form, json } from "./api";
-import { Card, CardTitle, ConfirmDelete, Hint, Notice, PHOTO_TYPES, Select, Thumb } from "./ui";
+import {
+  Card,
+  CardTitle,
+  ChosenLanguage,
+  ConfirmDelete,
+  Hint,
+  LangBadge,
+  LanguageFilter,
+  LanguagePick,
+  Notice,
+  PHOTO_TYPES,
+  Select,
+  Thumb,
+  languageOf,
+} from "./ui";
 
 /** One tattoo in the grid: its photo, with its style and artist changeable in place. */
 function TattooCard({
@@ -16,6 +31,8 @@ function TattooCard({
 }: { tattoo: Tattoo } & Pick<PanelProps, "styles" | "artists" | "reload" | "explain">) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  // a tattoo can only belong to an artist added for the same language
+  const ownLanguage = artists.filter((artist) => artist.lang === tattoo.lang);
 
   async function run(action: () => Promise<unknown>) {
     setBusy(true);
@@ -41,6 +58,7 @@ function TattooCard({
         className="relative block aspect-[3/4] overflow-hidden rounded-[10px] bg-surface"
       >
         <Thumb photo={tattoo.image} />
+        <LangBadge lang={tattoo.lang} short className="absolute left-2 top-2" />
       </a>
       <Select
         aria-label="სტილი"
@@ -51,7 +69,7 @@ function TattooCard({
         {!tattoo.style && <option value="">— სტილი —</option>}
         {styles.map((style) => (
           <option key={style.id} value={style.id}>
-            {style.name.ka}
+            {style.name[tattoo.lang]}
           </option>
         ))}
       </Select>
@@ -62,7 +80,7 @@ function TattooCard({
         onChange={(e) => void change({ artist: e.target.value })}
       >
         <option value="">— არტისტის გარეშე —</option>
-        {artists.map((artist) => (
+        {ownLanguage.map((artist) => (
           <option key={artist.id} value={artist.id}>
             {artist.nickname}
           </option>
@@ -74,8 +92,13 @@ function TattooCard({
   );
 }
 
-/** Tattoos: upload photos, tag each with a style and an artist, and manage the gallery. */
+/**
+ * Tattoos: pick a language, upload photos for it, tag each with a style and an
+ * artist, and manage the gallery.
+ */
 export function TattoosPanel({ tattoos, styles, artists, reload, explain }: PanelProps) {
+  /** the language new tattoos are added for; null until it is picked */
+  const [lang, setLang] = useState<Locale | null>(null);
   const [files, setFiles] = useState<File[]>([]);
   const [style, setStyle] = useState("");
   const [artist, setArtist] = useState("");
@@ -83,12 +106,23 @@ export function TattoosPanel({ tattoos, styles, artists, reload, explain }: Pane
   const [progress, setProgress] = useState("");
   const [error, setError] = useState("");
   const [done, setDone] = useState("");
-  /** which tattoos the grid shows: all, those attached to nobody, or one artist's */
+  /** which tattoos the grid shows: every language's or one's… */
+  const [showLang, setShowLang] = useState<Locale | "all">("all");
+  /** …and all of those, those attached to nobody, or one artist's */
   const [show, setShow] = useState("all");
   const picker = useRef<HTMLInputElement>(null);
 
+  /** Picks (or un-picks) the language for new tattoos and clears what depended on it. */
+  function chooseLang(next: Locale | null) {
+    setLang(next);
+    setArtist("");
+    setError("");
+    setDone("");
+  }
+
   async function upload(event: FormEvent) {
     event.preventDefault();
+    if (!lang) return;
     setError("");
     setDone("");
     let sent = 0;
@@ -97,13 +131,15 @@ export function TattoosPanel({ tattoos, styles, artists, reload, explain }: Pane
       for (const file of files) {
         setProgress(`${sent + 1} / ${files.length}`);
         const body = new FormData();
+        body.set("lang", lang);
         body.set("photo", file);
         body.set("style", style);
         body.set("artist", artist);
         await api("/tattoos", form("POST", body));
         sent += 1;
       }
-      setDone(sent === 1 ? "ტატუ დაემატა." : `დაემატა ${sent} ტატუ.`);
+      const { onSite, site } = languageOf(lang);
+      setDone(`${sent === 1 ? "ტატუ დაემატა" : `დაემატა ${sent} ტატუ`} და ჩანს ${onSite} (${site}).`);
       setFiles([]);
       if (picker.current) picker.current.value = "";
     } catch (err) {
@@ -114,9 +150,12 @@ export function TattoosPanel({ tattoos, styles, artists, reload, explain }: Pane
     await reload();
   }
 
-  const shown = tattoos.filter(
+  const inLanguage = tattoos.filter((tattoo) => showLang === "all" || tattoo.lang === showLang);
+  const shown = inLanguage.filter(
     (tattoo) => show === "all" || (show === "none" ? !tattoo.artist : tattoo.artist?.id === show)
   );
+  // the artist filter offers only artists whose tattoos the language filter lets through
+  const filterArtists = artists.filter((a) => showLang === "all" || a.lang === showLang);
 
   return (
     <div className="flex flex-col gap-5">
@@ -126,8 +165,20 @@ export function TattoosPanel({ tattoos, styles, artists, reload, explain }: Pane
           <Hint className="mt-2">
             ტატუს დასამატებლად ჯერ ერთი სტილი მაინც დაამატე „სტილები“ ჩანართში.
           </Hint>
+        ) : !lang ? (
+          // adding starts with the language: the upload form opens only once it is picked
+          <div className="mt-4">
+            <LanguagePick onPick={chooseLang} />
+            {done && (
+              <div className="mt-4">
+                <Notice kind="ok">{done}</Notice>
+              </div>
+            )}
+          </div>
         ) : (
           <form onSubmit={upload} className="mt-4 flex flex-col gap-4">
+            <ChosenLanguage lang={lang} onChange={progress ? undefined : () => chooseLang(null)} />
+
             <label>
               <span className="field-label mb-2">ფოტო *</span>
               <input
@@ -154,7 +205,7 @@ export function TattoosPanel({ tattoos, styles, artists, reload, explain }: Pane
                   </option>
                   {styles.map((s) => (
                     <option key={s.id} value={s.id}>
-                      {s.name.ka}
+                      {s.name[lang]}
                     </option>
                   ))}
                 </Select>
@@ -163,12 +214,15 @@ export function TattoosPanel({ tattoos, styles, artists, reload, explain }: Pane
                 <span className="field-label mb-2">არტისტი</span>
                 <Select value={artist} onChange={(e) => setArtist(e.target.value)}>
                   <option value="">— არტისტის გარეშე —</option>
-                  {artists.map((a) => (
-                    <option key={a.id} value={a.id}>
-                      {a.nickname}
-                    </option>
-                  ))}
+                  {artists
+                    .filter((a) => a.lang === lang)
+                    .map((a) => (
+                      <option key={a.id} value={a.id}>
+                        {a.nickname}
+                      </option>
+                    ))}
                 </Select>
+                <Hint className="mt-2">აქ მხოლოდ იმავე ენისთვის დამატებული არტისტები ჩანს.</Hint>
               </label>
             </div>
 
@@ -187,16 +241,30 @@ export function TattoosPanel({ tattoos, styles, artists, reload, explain }: Pane
           <CardTitle>ტატუები</CardTitle>
           {tattoos.length > 0 && (
             <Select aria-label="რომელი ტატუები ჩანს" value={show} onChange={(e) => setShow(e.target.value)} className="w-full sm:w-[240px]">
-              <option value="all">ყველა ({tattoos.length})</option>
+              <option value="all">ყველა ({inLanguage.length})</option>
               <option value="none">არტისტის გარეშე</option>
-              {artists.map((a) => (
+              {filterArtists.map((a) => (
                 <option key={a.id} value={a.id}>
-                  {a.nickname}
+                  {a.nickname} ({languageOf(a.lang).short})
                 </option>
               ))}
             </Select>
           )}
         </div>
+
+        {tattoos.length > 0 && (
+          <div className="mt-4">
+            <LanguageFilter
+              value={showLang}
+              onChange={(value) => {
+                setShowLang(value);
+                // an artist picked under the other language would leave the grid empty
+                setShow("all");
+              }}
+              count={(key) => tattoos.filter((t) => key === "all" || t.lang === key).length}
+            />
+          </div>
+        )}
 
         {shown.length === 0 ? (
           <Hint className="mt-3">

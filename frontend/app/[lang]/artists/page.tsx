@@ -25,7 +25,7 @@ const grid = "grid grid-cols-[repeat(auto-fill,minmax(226px,1fr))] gap-x-6 gap-y
 
 /** The artists, read from the backend when the page is requested. */
 async function ArtistsGrid({ lang, t }: { lang: Locale; t: Dictionary["artists"] }) {
-  const artists = await getArtists();
+  const artists = await getArtists(lang);
 
   if (artists.length === 0) {
     return <EmptyNote lang={lang} title={t.emptyTitle} text={t.emptyText} className="mt-[60px]" />;
@@ -35,7 +35,7 @@ async function ArtistsGrid({ lang, t }: { lang: Locale; t: Dictionary["artists"]
     <section aria-label={t.gridAria} className={grid}>
       {artists.map((artist) => {
         const profile = localePath(lang, `/artists/${artist.slug}`);
-        const bio = localized(artist.bio, lang);
+        const { bio } = artist;
         return (
           <article key={artist.id} className="flex flex-col">
             <PhotoFrame

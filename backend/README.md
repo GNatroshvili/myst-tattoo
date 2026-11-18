@@ -38,6 +38,24 @@ MongoDB must be running (`MONGODB_URI`, local by default).
   1600px) and a small copy for galleries (at most 640px). They are served
   under `/uploads`. Back this folder up together with the database.
 
+## Languages
+
+The site has two languages, `ka` and `en`, and every artist and every tattoo
+belongs to exactly one of them:
+
+- The admin picks the language first when adding an artist or a tattoo. It is
+  sent as `lang` and cannot be changed afterwards.
+- A record shows only on its language's site: `/ka` reads with `?lang=ka`,
+  `/en` with `?lang=en`. To show on both, it is added once per language.
+- A tattoo can only be attached to an artist of its own language.
+- An artist's `slug` is unique within its language, so the Georgian and the
+  English profile of one person can share an address (`/ka/artists/nino`,
+  `/en/artists/nino`).
+- Styles are shared: one style carries its name in both languages.
+
+Records saved before languages existed are brought up to date when the server
+starts (`src/utils/upgrade.js`): they become Georgian.
+
 ## Endpoints
 
 | Method | Path | Admin | What it does |
@@ -50,13 +68,13 @@ MongoDB must be running (`MONGODB_URI`, local by default).
 | POST | `/api/styles` | yes | `{ name: { en, ka } }` |
 | PATCH | `/api/styles/:id` | yes | Rename |
 | DELETE | `/api/styles/:id` | yes | Refused (409) while tattoos use the style |
-| GET | `/api/artists` | | All artists, each with `tattooCount` |
-| GET | `/api/artists/:key` | | One artist by id or slug, with their `tattoos` |
-| POST | `/api/artists` | yes | Form: `nickname`, `styles`, `bioEn`, `bioKa`, `instagramUrl`, `photo`, `tattoos` |
-| PATCH | `/api/artists/:key` | yes | Same fields, only those sent change; `removePhoto=true` drops the photo |
+| GET | `/api/artists` | | All artists, each with `tattooCount`; `?lang=ka` for one language's |
+| GET | `/api/artists/:key` | | One artist by id or slug, with their `tattoos`; `?lang=ka` looks only in that language |
+| POST | `/api/artists` | yes | Form: `lang`, `nickname`, `styles`, `bio`, `instagramUrl`, `photo`, `tattoos` |
+| PATCH | `/api/artists/:key` | yes | Same fields except `lang`, only those sent change; `removePhoto=true` drops the photo |
 | DELETE | `/api/artists/:key` | yes | Their tattoos stay, attached to nobody |
-| GET | `/api/tattoos` | | All tattoos, newest first; `?limit=4` |
-| POST | `/api/tattoos` | yes | Form: `photo`, `style`, `artist` (optional) |
+| GET | `/api/tattoos` | | All tattoos, newest first; `?lang=ka`, `?limit=4` |
+| POST | `/api/tattoos` | yes | Form: `lang`, `photo`, `style`, `artist` (optional) |
 | PATCH | `/api/tattoos/:id` | yes | `style`, `artist` ("" detaches), `photo` |
 | DELETE | `/api/tattoos/:id` | yes | Also deletes the photo files |
 
@@ -75,7 +93,7 @@ src/
   controllers/       # request handlers: auth, styles, artists, tattoos
   models/            # mongoose schemas: Style, Artist, Tattoo
   middleware/        # admin session (auth.js), photo upload (upload.js)
-  utils/             # photo storage, slugs, input checks, API output
+  utils/             # photo storage, slugs, input checks, API output, upgrading older records
   scripts/seed.js    # starting styles
 uploads/             # uploaded photos (not in git)
 ```

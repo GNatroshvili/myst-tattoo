@@ -1,7 +1,7 @@
 import { Artist } from "../models/Artist.js";
 import { Style } from "../models/Style.js";
 import { Tattoo } from "../models/Tattoo.js";
-import { badRequest, isId, notFound } from "../utils/http.js";
+import { badRequest, isId, notFound, queryLang, readLang } from "../utils/http.js";
 import { removeImage, saveImage } from "../utils/images.js";
 import * as serialize from "../utils/serialize.js";
 
@@ -12,11 +12,16 @@ async function readStyle(value) {
   return value;
 }
 
-/** An artist's id, or null for "attached to nobody" (an empty field). */
-async function readArtist(value) {
+/**
+ * An artist's id, or null for "attached to nobody" (an empty field). A tattoo
+ * can only belong to an artist of its own language.
+ */
+async function readArtist(value, lang) {
   if (value === "" || value === null) return null;
-  if (!isId(value) || !(await Artist.exists({ _id: value }))) {
-    throw badRequest("The chosen artist does not exist");
+  const artist = isId(value) ? await Artist.findById(value).select("lang") : null;
+  if (!artist) throw badRequest("The chosen artist does not exist");
+  if (artist.lang !== lang) {
+    throw badRequest("The chosen artist belongs to the other language", "lang_mismatch");
   }
   return value;
 }
@@ -29,23 +34,30 @@ async function findTattoo(id) {
 
 const populated = (query) => query.populate("style").populate("artist");
 
-/** Every tattoo, newest first. `?limit=4` returns only the first few. */
+/**
+ * Tattoos, newest first: all of them, or with `?lang=ka` only that language's.
+ * `?limit=4` returns only the first few.
+ */
 export async function listTattoos(req, res) {
+  const lang = queryLang(req.query.lang);
   const limit = Math.min(Math.max(Number.parseInt(req.query.limit, 10) || 0, 0), 500);
-  const tattoos = await populated(Tattoo.find().sort({ createdAt: -1 }).limit(limit));
+  const tattoos = await populated(
+    Tattoo.find(lang ? { lang } : {}).sort({ createdAt: -1 }).limit(limit)
+  );
   res.json(tattoos.map(serialize.tattoo));
 }
 
 export async function createTattoo(req, res) {
   if (!req.file) throw badRequest("Upload the tattoo's photo");
+  const lang = readLang(req.body.lang);
   const style = await readStyle(req.body.style);
-  const artist = req.body.artist === undefined ? null : await readArtist(req.body.artist);
+  const artist = req.body.artist === undefined ? null : await readArtist(req.body.artist, lang);
 
   // everything is valid: only now touch the disk and the database
   const image = await saveImage(req.file.buffer);
   let tattoo;
   try {
-    tattoo = await Tattoo.create({ image, style, artist });
+    tattoo = await Tattoo.create({ lang, image, style, artist });
   } catch (err) {
     await removeImage(image);
     throw err;
@@ -53,11 +65,17 @@ export async function createTattoo(req, res) {
   res.status(201).json(serialize.tattoo(await populated(Tattoo.findById(tattoo._id))));
 }
 
-/** Changes only the fields that were sent; a new photo replaces the old one. */
+/**
+ * Changes only the fields that were sent; a new photo replaces the old one.
+ * The language is set once, when the tattoo is added.
+ */
 export async function updateTattoo(req, res) {
   const tattoo = await findTattoo(req.params.id);
+  if (req.body.lang !== undefined && req.body.lang !== tattoo.lang) {
+    throw badRequest("The language of a tattoo cannot be changed", "lang_fixed");
+  }
   if (req.body.style !== undefined) tattoo.style = await readStyle(req.body.style);
-  if (req.body.artist !== undefined) tattoo.artist = await readArtist(req.body.artist);
+  if (req.body.artist !== undefined) tattoo.artist = await readArtist(req.body.artist, tattoo.lang);
 
   // everything is valid: only now touch the disk and the database
   const oldImage = tattoo.image;

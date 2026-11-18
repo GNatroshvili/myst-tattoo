@@ -3,11 +3,26 @@
 import { useState, type FormEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import type { Locale } from "@/lib/i18n/config";
 import type { Artist } from "@/lib/types";
 import { PersonIcon } from "../ui/Icons";
 import type { PanelProps } from "./AdminApp";
 import { api, form } from "./api";
-import { Card, CardTitle, ConfirmDelete, Hint, Notice, PHOTO_TYPES, Thumb, usePreview } from "./ui";
+import {
+  Card,
+  CardTitle,
+  ChosenLanguage,
+  ConfirmDelete,
+  Hint,
+  LangBadge,
+  LanguageFilter,
+  LanguagePick,
+  Notice,
+  PHOTO_TYPES,
+  Thumb,
+  languageOf,
+  usePreview,
+} from "./ui";
 
 const chip = (on: boolean) =>
   `h-11 rounded-full border px-5 text-[15px] transition-colors ${
@@ -17,16 +32,33 @@ const chip = (on: boolean) =>
 type FormProps = Pick<PanelProps, "styles" | "tattoos" | "reload" | "explain"> & {
   /** the artist being edited, or null for a new one */
   artist: Artist | null;
+  /** the language the artist is for: picked first when adding, fixed afterwards */
+  lang: Locale;
+  /** back to picking the language; only while adding */
+  onChangeLang?: () => void;
   onDone: (message: string) => void;
   onCancel: () => void;
 };
 
-/** Add or edit an artist: nickname, styles, bio, Instagram, photo and their tattoos. */
-function ArtistForm({ artist, styles, tattoos, reload, explain, onDone, onCancel }: FormProps) {
+/**
+ * Add or edit an artist in one language: nickname, styles, bio, Instagram,
+ * photo and their tattoos. Everything typed here shows on that language's site.
+ */
+function ArtistForm({
+  artist,
+  lang,
+  onChangeLang,
+  styles,
+  tattoos,
+  reload,
+  explain,
+  onDone,
+  onCancel,
+}: FormProps) {
+  const language = languageOf(lang);
   const [nickname, setNickname] = useState(artist?.nickname ?? "");
   const [picked, setPicked] = useState(() => new Set(artist?.styles.map((style) => style.id)));
-  const [bioKa, setBioKa] = useState(artist?.bio.ka ?? "");
-  const [bioEn, setBioEn] = useState(artist?.bio.en ?? "");
+  const [bio, setBio] = useState(artist?.bio ?? "");
   const [instagram, setInstagram] = useState(artist?.instagramUrl ?? "");
   const [photo, setPhoto] = useState<File | null>(null);
   const [removePhoto, setRemovePhoto] = useState(false);
@@ -38,6 +70,8 @@ function ArtistForm({ artist, styles, tattoos, reload, explain, onDone, onCancel
   const [error, setError] = useState("");
   const preview = usePreview(photo);
   const current = removePhoto ? null : (artist?.photo ?? null);
+  // an artist can only have tattoos added for the same language
+  const ownLanguage = tattoos.filter((tattoo) => tattoo.lang === lang);
 
   const toggle = (set: Set<string>, id: string) => {
     const next = new Set(set);
@@ -51,10 +85,10 @@ function ArtistForm({ artist, styles, tattoos, reload, explain, onDone, onCancel
     setError("");
 
     const body = new FormData();
+    if (!artist) body.set("lang", lang);
     body.set("nickname", nickname);
     body.set("styles", JSON.stringify([...picked]));
-    body.set("bioKa", bioKa);
-    body.set("bioEn", bioEn);
+    body.set("bio", bio);
     body.set("instagramUrl", instagram);
     body.set("tattoos", JSON.stringify([...attached]));
     if (photo) body.set("photo", photo);
@@ -63,7 +97,9 @@ function ArtistForm({ artist, styles, tattoos, reload, explain, onDone, onCancel
     try {
       await api(artist ? `/artists/${artist.id}` : "/artists", form(artist ? "PATCH" : "POST", body));
       await reload();
-      onDone(artist ? "ცვლილებები შენახულია." : "არტისტი დაემატა.");
+      onDone(
+        artist ? "ცვლილებები შენახულია." : `არტისტი დაემატა და ჩანს ${language.onSite} (${language.site}).`
+      );
     } catch (err) {
       setError(explain(err));
       setBusy(false);
@@ -75,6 +111,8 @@ function ArtistForm({ artist, styles, tattoos, reload, explain, onDone, onCancel
       <CardTitle>{artist ? `რედაქტირება: ${artist.nickname}` : "ახალი არტისტი"}</CardTitle>
 
       <form onSubmit={save} className="mt-5 flex flex-col gap-5">
+        <ChosenLanguage lang={lang} onChange={onChangeLang} />
+
         <label>
           <span className="field-label mb-2">ნიქნეიმი *</span>
           <input
@@ -84,6 +122,7 @@ function ArtistForm({ artist, styles, tattoos, reload, explain, onDone, onCancel
             onChange={(e) => setNickname(e.target.value)}
             className="field h-[46px] px-3.5"
           />
+          <Hint className="mt-2">ჩაწერე ისე, როგორც {language.onSite} უნდა ეწეროს.</Hint>
         </label>
 
         <div>
@@ -102,38 +141,24 @@ function ArtistForm({ artist, styles, tattoos, reload, explain, onDone, onCancel
                   onClick={() => setPicked((set) => toggle(set, style.id))}
                   className={chip(picked.has(style.id))}
                 >
-                  {style.name.ka}
+                  {style.name[lang]}
                 </button>
               ))}
             </div>
           )}
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          <label>
-            <span className="field-label mb-2">ბიო ქართულად</span>
-            <textarea
-              rows={6}
-              maxLength={1200}
-              value={bioKa}
-              onChange={(e) => setBioKa(e.target.value)}
-              className="field px-3.5 py-3 font-light leading-[22px]"
-            />
-          </label>
-          <label>
-            <span className="field-label mb-2">ბიო ინგლისურად</span>
-            <textarea
-              rows={6}
-              maxLength={1200}
-              value={bioEn}
-              onChange={(e) => setBioEn(e.target.value)}
-              className="field px-3.5 py-3 font-light leading-[22px]"
-            />
-          </label>
-          <Hint className="sm:col-span-2">
-            თუ ბიოს მხოლოდ ერთ ენაზე შეავსებ, საიტის ორივე ვერსიაზე ის გამოჩნდება.
-          </Hint>
-        </div>
+        <label>
+          <span className="field-label mb-2">{language.bioLabel}</span>
+          <textarea
+            rows={6}
+            maxLength={1200}
+            value={bio}
+            onChange={(e) => setBio(e.target.value)}
+            className="field px-3.5 py-3 font-light leading-[22px]"
+          />
+          <Hint className="mt-2">არასავალდებულო. ეს ტექსტი მხოლოდ {language.onSite} გამოჩნდება.</Hint>
+        </label>
 
         <label>
           <span className="field-label mb-2">Instagram</span>
@@ -190,18 +215,19 @@ function ArtistForm({ artist, styles, tattoos, reload, explain, onDone, onCancel
             ამ არტისტის ტატუები ({attached.size})
           </span>
           <Hint className="mb-3">
-            მონიშნე ტატუები, რომლებიც ამ არტისტმა შეასრულა — ისინი მის გვერდზე გამოჩნდება. ახალი ფოტოს
-            ასატვირთად გადადი „ტატუები“ ჩანართზე.
+            მონიშნე ტატუები, რომლებიც ამ არტისტმა შეასრულა — ისინი მის გვერდზე გამოჩნდება. აქ მხოლოდ
+            იმავე ენისთვის ({language.label}) დამატებული ტატუები ჩანს. ახალი ფოტოს ასატვირთად გადადი
+            „ტატუები“ ჩანართზე.
           </Hint>
-          {tattoos.length === 0 ? (
-            <Hint>ბაზაში ტატუები ჯერ არ არის.</Hint>
+          {ownLanguage.length === 0 ? (
+            <Hint>ამ ენისთვის ტატუები ჯერ არ არის დამატებული.</Hint>
           ) : (
             <div
               role="group"
               aria-labelledby="artist-tattoos"
               className="grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] gap-3"
             >
-              {tattoos.map((tattoo) => {
+              {ownLanguage.map((tattoo) => {
                 const on = attached.has(tattoo.id);
                 const other = tattoo.artist && tattoo.artist.id !== artist?.id ? tattoo.artist : null;
                 return (
@@ -209,7 +235,7 @@ function ArtistForm({ artist, styles, tattoos, reload, explain, onDone, onCancel
                     key={tattoo.id}
                     type="button"
                     aria-pressed={on}
-                    aria-label={`ტატუ, ${tattoo.style?.name.ka ?? ""}${other ? `, ახლა: ${other.nickname}` : ""}`}
+                    aria-label={`ტატუ, ${tattoo.style?.name[lang] ?? ""}${other ? `, ახლა: ${other.nickname}` : ""}`}
                     onClick={() => setAttached((set) => toggle(set, tattoo.id))}
                     className={`relative block overflow-hidden rounded-[12px] border-2 p-0 text-left transition-colors ${
                       on ? "border-gold" : "border-cream/14 hover:border-cream/45"
@@ -227,7 +253,7 @@ function ArtistForm({ artist, styles, tattoos, reload, explain, onDone, onCancel
                       ✓
                     </span>
                     <span className="block truncate px-2 py-1.5 text-[12.5px] leading-4 text-body">
-                      {tattoo.style?.name.ka}
+                      {tattoo.style?.name[lang]}
                       {other && <span className="block truncate text-muted">ახლა: {other.nickname}</span>}
                     </span>
                   </button>
@@ -256,6 +282,10 @@ function ArtistForm({ artist, styles, tattoos, reload, explain, onDone, onCancel
 export function ArtistsPanel({ artists, styles, tattoos, reload, explain }: PanelProps) {
   /** which artist the form is open for: an id, "new", or null for the list */
   const [editing, setEditing] = useState<string | null>(null);
+  /** the language picked for a new artist; null until it is picked */
+  const [newLang, setNewLang] = useState<Locale | null>(null);
+  /** which language's artists the list shows */
+  const [show, setShow] = useState<Locale | "all">("all");
   const [done, setDone] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -274,25 +304,52 @@ export function ArtistsPanel({ artists, styles, tattoos, reload, explain }: Pane
     setBusy(false);
   }
 
-  if (editing) {
-    const artist = artists.find((a) => a.id === editing) ?? null;
+  function close() {
+    setEditing(null);
+    setNewLang(null);
+  }
+
+  // adding starts with the language: the form opens only once it is picked
+  if (editing === "new" && !newLang) {
     return (
-      <ArtistForm
-        // a fresh form for each artist
-        key={editing}
-        artist={artist}
-        styles={styles}
-        tattoos={tattoos}
-        reload={reload}
-        explain={explain}
-        onDone={(message) => {
-          setDone(message);
-          setEditing(null);
-        }}
-        onCancel={() => setEditing(null)}
-      />
+      <Card>
+        <CardTitle>ახალი არტისტი</CardTitle>
+        <div className="mt-5">
+          <LanguagePick onPick={setNewLang} />
+        </div>
+        <button type="button" onClick={close} className="btn btn-outline mt-5">
+          გაუქმება
+        </button>
+      </Card>
     );
   }
+
+  if (editing) {
+    const artist = artists.find((a) => a.id === editing) ?? null;
+    const lang = artist?.lang ?? newLang;
+    if (lang) {
+      return (
+        <ArtistForm
+          // a fresh form for each artist and each language
+          key={`${editing}-${lang}`}
+          artist={artist}
+          lang={lang}
+          onChangeLang={artist ? undefined : () => setNewLang(null)}
+          styles={styles}
+          tattoos={tattoos}
+          reload={reload}
+          explain={explain}
+          onDone={(message) => {
+            setDone(message);
+            close();
+          }}
+          onCancel={close}
+        />
+      );
+    }
+  }
+
+  const shown = artists.filter((artist) => show === "all" || artist.lang === show);
 
   return (
     <Card>
@@ -303,6 +360,7 @@ export function ArtistsPanel({ artists, styles, tattoos, reload, explain }: Pane
           onClick={() => {
             setDone("");
             setError("");
+            setNewLang(null);
             setEditing("new");
           }}
           className="btn btn-gold btn-sm"
@@ -320,40 +378,57 @@ export function ArtistsPanel({ artists, styles, tattoos, reload, explain }: Pane
       {artists.length === 0 ? (
         <Hint className="mt-4">არტისტები ჯერ არ არის დამატებული.</Hint>
       ) : (
-        <ul className="mt-3">
-          {artists.map((artist) => (
-            <li
-              key={artist.id}
-              className="flex flex-wrap items-center gap-x-4 gap-y-3 border-b border-cream/12 py-4 last:border-b-0"
-            >
-              <span className="relative flex h-16 w-12 shrink-0 items-center justify-center overflow-hidden rounded-[8px] border border-cream/16 bg-ink">
-                {artist.photo ? <Thumb photo={artist.photo} /> : <PersonIcon className="h-6 w-6 text-rose" />}
-              </span>
-              <div className="min-w-[160px] flex-1">
-                <p className="text-[17px] font-medium leading-6 text-cream">{artist.nickname}</p>
-                <p className="text-[13.5px] leading-5 text-muted">
-                  {[artist.styles.map((s) => s.name.ka).join(" / "), `${artist.tattooCount ?? 0} ტატუ`]
-                    .filter(Boolean)
-                    .join(" · ")}
-                </p>
-              </div>
-              <div className="flex flex-wrap items-center gap-2.5">
-                <Link
-                  href={`/ka/artists/${artist.slug}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn btn-outline btn-sm"
+        <>
+          <div className="mt-4">
+            <LanguageFilter
+              value={show}
+              onChange={setShow}
+              count={(lang) => artists.filter((a) => lang === "all" || a.lang === lang).length}
+            />
+          </div>
+
+          {shown.length === 0 ? (
+            <Hint className="mt-4">ამ ენისთვის არტისტები ჯერ არ არის დამატებული.</Hint>
+          ) : (
+            <ul className="mt-3">
+              {shown.map((artist) => (
+                <li
+                  key={artist.id}
+                  className="flex flex-wrap items-center gap-x-4 gap-y-3 border-b border-cream/12 py-4 last:border-b-0"
                 >
-                  გვერდი
-                </Link>
-                <button type="button" onClick={() => setEditing(artist.id)} className="btn btn-outline btn-sm">
-                  რედაქტირება
-                </button>
-                <ConfirmDelete disabled={busy} onConfirm={() => void remove(artist)} />
-              </div>
-            </li>
-          ))}
-        </ul>
+                  <span className="relative flex h-16 w-12 shrink-0 items-center justify-center overflow-hidden rounded-[8px] border border-cream/16 bg-ink">
+                    {artist.photo ? <Thumb photo={artist.photo} /> : <PersonIcon className="h-6 w-6 text-rose" />}
+                  </span>
+                  <div className="min-w-[160px] flex-1">
+                    <p className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[17px] font-medium leading-6 text-cream">
+                      {artist.nickname}
+                      <LangBadge lang={artist.lang} />
+                    </p>
+                    <p className="text-[13.5px] leading-5 text-muted">
+                      {[artist.styles.map((s) => s.name.ka).join(" / "), `${artist.tattooCount ?? 0} ტატუ`]
+                        .filter(Boolean)
+                        .join(" · ")}
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2.5">
+                    <Link
+                      href={`/${artist.lang}/artists/${artist.slug}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn-outline btn-sm"
+                    >
+                      გვერდი
+                    </Link>
+                    <button type="button" onClick={() => setEditing(artist.id)} className="btn btn-outline btn-sm">
+                      რედაქტირება
+                    </button>
+                    <ConfirmDelete disabled={busy} onConfirm={() => void remove(artist)} />
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </>
       )}
     </Card>
   );

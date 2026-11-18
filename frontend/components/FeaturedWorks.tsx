@@ -24,7 +24,7 @@ const grid =
  * left out entirely while the gallery is still empty.
  */
 async function Featured({ lang, dict }: Props) {
-  const tattoos = await getTattoos(PICKS);
+  const tattoos = await getTattoos(lang, PICKS);
   if (tattoos.length === 0) return null;
   const gallery = localePath(lang, "/tattoos");
 

@@ -66,6 +66,12 @@ export function errorText(err: unknown): string {
       return "ფოტო ვერ წავიკითხეთ. გამოიყენე JPEG, PNG, WebP ან AVIF ფორმატი.";
     case "photo_too_large":
       return "ფოტო ძალიან დიდია (მაქსიმუმ 15 MB).";
+    case "bad_lang":
+      return "აირჩიე ენა: ქართული ან ინგლისური.";
+    case "lang_mismatch":
+      return "არტისტი და ტატუ ერთი და იმავე ენის უნდა იყოს.";
+    case "lang_fixed":
+      return "ჩანაწერის ენა აღარ იცვლება. სხვა ენისთვის დაამატე ახალი ჩანაწერი.";
     case "bad_instagram":
       return "Instagram-ის ბმული არასწორია. ჩაწერე @სახელი ან instagram.com-ის სრული ბმული.";
     default:

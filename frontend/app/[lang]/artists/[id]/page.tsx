@@ -33,22 +33,23 @@ export async function generateMetadata({
   const { lang, id } = await params;
   if (!hasLocale(lang)) return {};
   const t = dictionaryFor(lang).artist;
-  const artist = await getArtist(id);
+  const artist = await getArtist(id, lang);
   if (!artist) return { title: t.metaTitle, description: t.metaDescription };
   return {
     title: artist.nickname,
-    description: localized(artist.bio, lang) || t.metaDescription,
+    description: artist.bio || t.metaDescription,
   };
 }
 
 export default async function ArtistPage({ params }: PageProps<"/[lang]/artists/[id]">) {
-  const { id } = await params;
-  const artist = await getArtist(id);
+  const { lang: site, id } = await params;
+  // an artist belongs to one language: the Georgian site only finds Georgian profiles
+  const artist = hasLocale(site) ? await getArtist(id, site) : null;
   if (!artist) notFound();
 
   const { lang, dict } = await getDictionary();
   const t = dict.artist;
-  const bio = localized(artist.bio, lang);
+  const { bio } = artist;
   const styles = artist.styles.map((style) => localized(style.name, lang)).join(" / ");
 
   return (
