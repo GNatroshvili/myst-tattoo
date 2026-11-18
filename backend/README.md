@@ -11,10 +11,17 @@ uploaded photos, and guards changes behind the admin sign-in. The site (`../fron
 cp .env.example .env   # then fill in ADMIN_PASSWORD and SESSION_SECRET
 npm install
 npm run seed           # optional, once: adds five starting tattoo styles
+npm run seed:demo      # optional: demo artists, tattoos and piercings in both languages
 npm run dev            # http://localhost:5000
 ```
 
 MongoDB must be running (`MONGODB_URI`, local by default).
+
+`npm run seed:demo` fills an empty site for trying things out: in each
+language three tattoo artists with five tattoos each, one piercer with five
+piercings, and a piercing price list. The pictures are drawn by the script and
+marked "DEMO". The records are ordinary ones, so they are edited and deleted in
+the admin panel like any others; running the script again adds nothing twice.
 
 ### Environment
 
