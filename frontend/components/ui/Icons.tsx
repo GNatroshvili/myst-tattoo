@@ -110,6 +110,17 @@ export function PersonIcon(props: IconProps) {
   );
 }
 
+/** Framed landscape: stands in for an article's image. */
+export function ImageIcon(props: IconProps) {
+  return (
+    <svg {...outline} viewBox="0 0 48 48" strokeWidth={1.3} {...props}>
+      <rect x="6" y="9" width="36" height="30" rx="4" />
+      <circle cx="17" cy="19" r="3.2" />
+      <path d="M6 33L18 24L27 31L33 26L42 33" />
+    </svg>
+  );
+}
+
 /** Circled "i": info and aftercare. */
 export function InfoIcon(props: IconProps) {
   return (

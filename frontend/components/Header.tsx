@@ -8,7 +8,7 @@ import type { Dictionary } from "@/lib/i18n/dictionaries/en";
 import { nav } from "@/lib/site";
 import { LangSwitcher } from "./LangSwitcher";
 import { Logo } from "./Logo";
-import { ArrowRightIcon, ChevronDownIcon, CloseIcon, MenuIcon } from "./ui/Icons";
+import { ArrowRightIcon, CloseIcon, MenuIcon } from "./ui/Icons";
 
 type Props = {
   lang: Locale;
@@ -45,12 +45,11 @@ export function Header({ lang, nav: t, common, switcherLabel }: Props) {
                 key={item.key}
                 href={item.href}
                 aria-current={active ? "page" : undefined}
-                className={`inline-flex items-center gap-2.5 whitespace-nowrap border-b-[1.5px] pb-2 pt-3 transition-colors ${
+                className={`whitespace-nowrap border-b-[1.5px] pb-2 pt-3 transition-colors ${
                   active ? "border-gold text-white" : "border-transparent text-cream hover:text-gold"
                 }`}
               >
                 {item.label}
-                {item.key === "info" && <ChevronDownIcon className="h-[7px] w-2.5" />}
               </Link>
             );
           })}
