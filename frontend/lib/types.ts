@@ -46,6 +46,40 @@ export type Tattoo = {
  * An artist as one language's site shows them: the same person on both sites
  * is two records, each with its own nickname, bio and works.
  */
+/** One line of a piercing zone's price list: a place within the zone and its price. */
+export type PiercingPlace = {
+  id: string;
+  name: string;
+  /** small line under the name; "" when there is none */
+  note: string;
+  /** as the visitor reads it: "80 ₾", "from 60 ₾" */
+  price: string;
+  /** how many piercing photos sit in this place (the admin panel uses it) */
+  piercingCount?: number;
+};
+
+/** A part of the body where piercings are done ("Ear", "Face"), with its price list. */
+export type PiercingZone = {
+  id: string;
+  /** which site shows this zone: /ka or /en */
+  lang: Locale;
+  name: string;
+  places: PiercingPlace[];
+};
+
+/** A photo of a piercing done at the studio. */
+export type Piercing = {
+  id: string;
+  /** which site's gallery shows it: /ka or /en */
+  lang: Locale;
+  image: Photo;
+  /** where it sits; null only if its place was deleted from under it */
+  place: { id: string; name: string; zone: { id: string; name: string } | null } | null;
+  /** null until the piercing is attached to an artist (always one of its own language) */
+  artist: ArtistBrief | null;
+  createdAt: string;
+};
+
 export type Artist = ArtistBrief & {
   /** which site shows this artist: /ka or /en */
   lang: Locale;
@@ -54,10 +88,12 @@ export type Artist = ArtistBrief & {
   bio: string;
   /** "" when the artist has no Instagram */
   instagramUrl: string;
-  /** comes with the list of artists */
+  /** come with the list of artists: a tattoo artist has tattoos, a piercer has piercings */
   tattooCount?: number;
-  /** comes with a single artist: their work, newest first */
+  piercingCount?: number;
+  /** come with a single artist: their work, newest first */
   tattoos?: Tattoo[];
+  piercings?: Piercing[];
 };
 
 /** Text in the page's language, or in the other one when that is all there is. */

@@ -35,6 +35,42 @@ const artistBrief = (doc) =>
     ? { id: String(doc._id), slug: doc.slug, nickname: doc.nickname, photo: image(doc.photo) }
     : null;
 
+/** One line of a zone's price list. */
+export const piercingPlace = (doc, extra = {}) => ({
+  id: String(doc._id),
+  name: doc.name,
+  note: doc.note ?? "",
+  price: doc.price,
+  ...extra,
+});
+
+/** A piercing zone with its (already serialized) places. */
+export const piercingZone = (doc, places = []) => ({
+  id: String(doc._id),
+  lang: doc.lang,
+  name: doc.name,
+  places,
+});
+
+/** Where a piercing sits: its place and that place's zone, by name. */
+const placeBrief = (doc) =>
+  doc && doc.name
+    ? {
+        id: String(doc._id),
+        name: doc.name,
+        zone: doc.zone && doc.zone.name ? { id: String(doc.zone._id), name: doc.zone.name } : null,
+      }
+    : null;
+
+export const piercing = (doc) => ({
+  id: String(doc._id),
+  lang: doc.lang,
+  image: image(doc.image),
+  place: placeBrief(doc.place),
+  artist: artistBrief(doc.artist),
+  createdAt: doc.createdAt,
+});
+
 export const tattoo = (doc) => ({
   id: String(doc._id),
   lang: doc.lang,

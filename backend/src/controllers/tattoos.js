@@ -1,27 +1,13 @@
-import { Artist } from "../models/Artist.js";
 import { Style } from "../models/Style.js";
 import { Tattoo } from "../models/Tattoo.js";
 import { badRequest, isId, notFound, queryLang, readLang } from "../utils/http.js";
 import { removeImage, saveImage } from "../utils/images.js";
+import { readArtist } from "../utils/refs.js";
 import * as serialize from "../utils/serialize.js";
 
 async function readStyle(value) {
   if (!isId(value) || !(await Style.exists({ _id: value }))) {
     throw badRequest("Choose the tattoo's style");
-  }
-  return value;
-}
-
-/**
- * An artist's id, or null for "attached to nobody" (an empty field). A tattoo
- * can only belong to an artist of its own language.
- */
-async function readArtist(value, lang) {
-  if (value === "" || value === null) return null;
-  const artist = isId(value) ? await Artist.findById(value).select("lang") : null;
-  if (!artist) throw badRequest("The chosen artist does not exist");
-  if (artist.lang !== lang) {
-    throw badRequest("The chosen artist belongs to the other language", "lang_mismatch");
   }
   return value;
 }

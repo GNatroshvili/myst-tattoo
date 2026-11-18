@@ -1,5 +1,5 @@
 import type { Locale } from "./i18n/config";
-import type { Artist, Style, Tattoo } from "./types";
+import type { Artist, Piercing, PiercingZone, Style, Tattoo } from "./types";
 
 /**
  * Reads from the backend API. Server Components only: the browser reaches the
@@ -47,3 +47,11 @@ export const getTattoos = async (lang: Locale, limit?: number) =>
   (await get<Tattoo[]>(`/tattoos?lang=${lang}${limit ? `&limit=${limit}` : ""}`)) ?? [];
 
 export const getStyles = async () => (await get<Style[]>("/styles")) ?? [];
+
+/** One language's piercing zones, each with its places and prices, in the order they were added. */
+export const getPiercingZones = async (lang: Locale) =>
+  (await get<PiercingZone[]>(`/piercing/zones?lang=${lang}`)) ?? [];
+
+/** One language's piercing photos, newest first. */
+export const getPiercings = async (lang: Locale) =>
+  (await get<Piercing[]>(`/piercings?lang=${lang}`)) ?? [];

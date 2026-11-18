@@ -1,10 +1,12 @@
 import { Artist } from "../models/Artist.js";
+import { Piercing } from "../models/Piercing.js";
 import { Style } from "../models/Style.js";
 import { Tattoo } from "../models/Tattoo.js";
 import { badRequest, isId, list, notFound, queryLang, readLang, text } from "../utils/http.js";
 import { removeImage, saveImage } from "../utils/images.js";
 import * as serialize from "../utils/serialize.js";
 import { uniqueSlug } from "../utils/slug.js";
+import { populatedPiercings } from "./piercings.js";
 
 /**
  * Accepts "@name", "name" or a full instagram.com address and returns the
@@ -44,25 +46,35 @@ async function readStyles(value) {
 }
 
 /**
- * The tattoo ids from the form, checked against the tattoos that exist. An
- * artist can only have tattoos of their own language.
+ * The ids of an artist's works from the form (`Model` is Tattoo or Piercing),
+ * checked against the ones that exist. An artist can only have works of their
+ * own language. `what` names them in messages: "tattoos", "piercings".
  */
-async function readTattoos(value, lang) {
-  const ids = list(value, "Tattoos");
+async function readWorks(Model, value, lang, what) {
+  const ids = list(value, what);
   if (ids === undefined) return undefined;
-  if (!ids.every(isId) || (await Tattoo.countDocuments({ _id: { $in: ids } })) !== ids.length) {
-    throw badRequest("One of the chosen tattoos does not exist");
+  if (!ids.every(isId) || (await Model.countDocuments({ _id: { $in: ids } })) !== ids.length) {
+    throw badRequest(`One of the chosen ${what} does not exist`);
   }
-  if ((await Tattoo.countDocuments({ _id: { $in: ids }, lang })) !== ids.length) {
-    throw badRequest("One of the chosen tattoos belongs to the other language", "lang_mismatch");
+  if ((await Model.countDocuments({ _id: { $in: ids }, lang })) !== ids.length) {
+    throw badRequest(`One of the chosen ${what} belongs to the other language`, "lang_mismatch");
   }
   return ids;
 }
 
-/** Makes `ids` exactly the set of tattoos attached to this artist. */
-async function attachTattoos(artistId, ids) {
-  await Tattoo.updateMany({ artist: artistId, _id: { $nin: ids } }, { artist: null });
-  await Tattoo.updateMany({ _id: { $in: ids } }, { artist: artistId });
+/** Makes `ids` exactly the set of tattoos (or piercings) attached to this artist. */
+async function attachWorks(Model, artistId, ids) {
+  await Model.updateMany({ artist: artistId, _id: { $nin: ids } }, { artist: null });
+  await Model.updateMany({ _id: { $in: ids } }, { artist: artistId });
+}
+
+/** How many tattoos (or piercings) each artist has: artist id → count. */
+async function countByArtist(Model) {
+  const counts = await Model.aggregate([
+    { $match: { artist: { $ne: null } } },
+    { $group: { _id: "$artist", n: { $sum: 1 } } },
+  ]);
+  return new Map(counts.map((c) => [String(c._id), c.n]));
 }
 
 /**
@@ -81,23 +93,44 @@ async function findArtist(key, lang) {
 const artistTattoos = (artistId) =>
   Tattoo.find({ artist: artistId }).sort({ createdAt: -1 }).populate("style").populate("artist");
 
-/** Every artist, or with `?lang=ka` only that language's. */
+const artistPiercings = (artistId) =>
+  populatedPiercings(Piercing.find({ artist: artistId }).sort({ createdAt: -1 }));
+
+/**
+ * Every artist, or with `?lang=ka` only that language's, each with how many
+ * tattoos and piercings they have. Tattoo artists and piercers are one list.
+ */
 export async function listArtists(req, res) {
   const lang = queryLang(req.query.lang);
-  const [artists, counts] = await Promise.all([
+  const [artists, tattoos, piercings] = await Promise.all([
     Artist.find(lang ? { lang } : {}).sort({ createdAt: 1 }).populate("styles"),
-    Tattoo.aggregate([{ $match: { artist: { $ne: null } } }, { $group: { _id: "$artist", n: { $sum: 1 } } }]),
+    countByArtist(Tattoo),
+    countByArtist(Piercing),
   ]);
-  const tattooCount = new Map(counts.map((c) => [String(c._id), c.n]));
-  res.json(artists.map((a) => serialize.artist(a, { tattooCount: tattooCount.get(String(a._id)) ?? 0 })));
+  res.json(
+    artists.map((a) =>
+      serialize.artist(a, {
+        tattooCount: tattoos.get(String(a._id)) ?? 0,
+        piercingCount: piercings.get(String(a._id)) ?? 0,
+      })
+    )
+  );
 }
 
-/** One artist with everything they have tattooed, newest first. */
+/** One artist with everything they have tattooed and pierced, newest first. */
 export async function getArtist(req, res) {
   const artist = await findArtist(req.params.key, queryLang(req.query.lang));
   await artist.populate("styles");
-  const tattoos = await artistTattoos(artist._id);
-  res.json(serialize.artist(artist, { tattoos: tattoos.map(serialize.tattoo) }));
+  const [tattoos, piercings] = await Promise.all([
+    artistTattoos(artist._id),
+    artistPiercings(artist._id),
+  ]);
+  res.json(
+    serialize.artist(artist, {
+      tattoos: tattoos.map(serialize.tattoo),
+      piercings: piercings.map(serialize.piercing),
+    })
+  );
 }
 
 export async function createArtist(req, res) {
@@ -112,7 +145,8 @@ export async function createArtist(req, res) {
     bio: text(req.body.bio, { field: "Bio", max: 1200 }),
     instagramUrl: instagramUrl(req.body.instagramUrl),
   };
-  const tattoos = await readTattoos(req.body.tattoos, lang);
+  const tattoos = await readWorks(Tattoo, req.body.tattoos, lang, "tattoos");
+  const piercings = await readWorks(Piercing, req.body.piercings, lang, "piercings");
 
   // everything is valid: only now touch the disk and the database
   const photo = req.file ? await saveImage(req.file.buffer) : null;
@@ -124,7 +158,8 @@ export async function createArtist(req, res) {
     await removeImage(photo);
     throw err;
   }
-  if (tattoos) await attachTattoos(artist._id, tattoos);
+  if (tattoos) await attachWorks(Tattoo, artist._id, tattoos);
+  if (piercings) await attachWorks(Piercing, artist._id, piercings);
 
   await artist.populate("styles");
   res.status(201).json(serialize.artist(artist));
@@ -152,7 +187,8 @@ export async function updateArtist(req, res) {
   if (styles) artist.styles = styles;
   if (body.bio !== undefined) artist.bio = text(body.bio, { field: "Bio", max: 1200 });
   if (body.instagramUrl !== undefined) artist.instagramUrl = instagramUrl(body.instagramUrl);
-  const tattoos = await readTattoos(body.tattoos, artist.lang);
+  const tattoos = await readWorks(Tattoo, body.tattoos, artist.lang, "tattoos");
+  const piercings = await readWorks(Piercing, body.piercings, artist.lang, "piercings");
 
   // everything is valid: only now touch the disk and the database
   const oldPhoto = artist.photo;
@@ -167,16 +203,18 @@ export async function updateArtist(req, res) {
     throw err;
   }
   if (newPhoto || body.removePhoto === "true") await removeImage(oldPhoto);
-  if (tattoos) await attachTattoos(artist._id, tattoos);
+  if (tattoos) await attachWorks(Tattoo, artist._id, tattoos);
+  if (piercings) await attachWorks(Piercing, artist._id, piercings);
 
   await artist.populate("styles");
   res.json(serialize.artist(artist));
 }
 
-/** The artist's tattoos stay in the gallery, attached to nobody. */
+/** The artist's tattoos and piercings stay in the galleries, attached to nobody. */
 export async function deleteArtist(req, res) {
   const artist = await findArtist(req.params.key);
   await Tattoo.updateMany({ artist: artist._id }, { artist: null });
+  await Piercing.updateMany({ artist: artist._id }, { artist: null });
   await artist.deleteOne();
   await removeImage(artist.photo);
   res.status(204).end();

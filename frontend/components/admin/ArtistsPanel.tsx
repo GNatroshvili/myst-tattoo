@@ -4,7 +4,7 @@ import { useState, type FormEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import type { Locale } from "@/lib/i18n/config";
-import type { Artist } from "@/lib/types";
+import type { Artist, ArtistBrief, Photo } from "@/lib/types";
 import { PersonIcon } from "../ui/Icons";
 import type { PanelProps } from "./AdminApp";
 import { api, form } from "./api";
@@ -29,7 +29,71 @@ const chip = (on: boolean) =>
     on ? "border-gold bg-raised text-gold" : "border-cream/28 text-cream hover:border-cream/60"
   }`;
 
-type FormProps = Pick<PanelProps, "styles" | "tattoos" | "reload" | "explain"> & {
+/** One tattoo or piercing as the picker shows it. */
+type Work = { id: string; image: Photo; caption: string; artist: ArtistBrief | null };
+
+/**
+ * A grid of photos to tick: the works that belong to the artist being edited.
+ * A work already attached to someone else says so, and ticking it moves it.
+ */
+function WorkPicker({
+  labelledBy,
+  works,
+  picked,
+  onToggle,
+  artistId,
+}: {
+  /** id of the label above the grid */
+  labelledBy: string;
+  works: Work[];
+  picked: Set<string>;
+  onToggle: (id: string) => void;
+  /** the artist being edited; undefined for a new one */
+  artistId?: string;
+}) {
+  return (
+    <div
+      role="group"
+      aria-labelledby={labelledBy}
+      className="grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] gap-3"
+    >
+      {works.map((work) => {
+        const on = picked.has(work.id);
+        const other = work.artist && work.artist.id !== artistId ? work.artist : null;
+        return (
+          <button
+            key={work.id}
+            type="button"
+            aria-pressed={on}
+            aria-label={`${work.caption}${other ? `, ახლა: ${other.nickname}` : ""}`}
+            onClick={() => onToggle(work.id)}
+            className={`relative block overflow-hidden rounded-[12px] border-2 p-0 text-left transition-colors ${
+              on ? "border-gold" : "border-cream/14 hover:border-cream/45"
+            }`}
+          >
+            <span className="relative block aspect-[3/4] bg-ink">
+              <Thumb photo={work.image} />
+            </span>
+            <span
+              aria-hidden
+              className={`absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full border text-[14px] font-semibold leading-none ${
+                on ? "border-gold bg-gold text-on-gold" : "border-cream/60 bg-ink/70 text-transparent"
+              }`}
+            >
+              ✓
+            </span>
+            <span className="block truncate px-2 py-1.5 text-[12.5px] leading-4 text-body">
+              {work.caption}
+              {other && <span className="block truncate text-muted">ახლა: {other.nickname}</span>}
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+type FormProps = Pick<PanelProps, "styles" | "tattoos" | "piercings" | "reload" | "explain"> & {
   /** the artist being edited, or null for a new one */
   artist: Artist | null;
   /** the language the artist is for: picked first when adding, fixed afterwards */
@@ -42,7 +106,9 @@ type FormProps = Pick<PanelProps, "styles" | "tattoos" | "reload" | "explain"> &
 
 /**
  * Add or edit an artist in one language: nickname, styles, bio, Instagram,
- * photo and their tattoos. Everything typed here shows on that language's site.
+ * photo, and their tattoos and piercings. A tattoo artist gets tattoos, a
+ * piercer gets piercings; both are the same kind of artist. Everything typed
+ * here shows on that language's site.
  */
 function ArtistForm({
   artist,
@@ -50,6 +116,7 @@ function ArtistForm({
   onChangeLang,
   styles,
   tattoos,
+  piercings,
   reload,
   explain,
   onDone,
@@ -66,12 +133,31 @@ function ArtistForm({
   const [attached, setAttached] = useState(
     () => new Set(artist ? tattoos.filter((t) => t.artist?.id === artist.id).map((t) => t.id) : [])
   );
+  /** ids of the piercings attached to this artist */
+  const [pierced, setPierced] = useState(
+    () => new Set(artist ? piercings.filter((p) => p.artist?.id === artist.id).map((p) => p.id) : [])
+  );
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const preview = usePreview(photo);
   const current = removePhoto ? null : (artist?.photo ?? null);
-  // an artist can only have tattoos added for the same language
-  const ownLanguage = tattoos.filter((tattoo) => tattoo.lang === lang);
+  // an artist can only have tattoos and piercings added for the same language
+  const ownTattoos: Work[] = tattoos
+    .filter((tattoo) => tattoo.lang === lang)
+    .map((tattoo) => ({
+      id: tattoo.id,
+      image: tattoo.image,
+      caption: tattoo.style?.name[lang] ?? "ტატუ",
+      artist: tattoo.artist,
+    }));
+  const ownPiercings: Work[] = piercings
+    .filter((piercing) => piercing.lang === lang)
+    .map((piercing) => ({
+      id: piercing.id,
+      image: piercing.image,
+      caption: piercing.place?.name ?? "პირსინგი",
+      artist: piercing.artist,
+    }));
 
   const toggle = (set: Set<string>, id: string) => {
     const next = new Set(set);
@@ -91,6 +177,7 @@ function ArtistForm({
     body.set("bio", bio);
     body.set("instagramUrl", instagram);
     body.set("tattoos", JSON.stringify([...attached]));
+    body.set("piercings", JSON.stringify([...pierced]));
     if (photo) body.set("photo", photo);
     else if (removePhoto) body.set("removePhoto", "true");
 
@@ -219,47 +306,38 @@ function ArtistForm({
             იმავე ენისთვის ({language.label}) დამატებული ტატუები ჩანს. ახალი ფოტოს ასატვირთად გადადი
             „ტატუები“ ჩანართზე.
           </Hint>
-          {ownLanguage.length === 0 ? (
+          {ownTattoos.length === 0 ? (
             <Hint>ამ ენისთვის ტატუები ჯერ არ არის დამატებული.</Hint>
           ) : (
-            <div
-              role="group"
-              aria-labelledby="artist-tattoos"
-              className="grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] gap-3"
-            >
-              {ownLanguage.map((tattoo) => {
-                const on = attached.has(tattoo.id);
-                const other = tattoo.artist && tattoo.artist.id !== artist?.id ? tattoo.artist : null;
-                return (
-                  <button
-                    key={tattoo.id}
-                    type="button"
-                    aria-pressed={on}
-                    aria-label={`ტატუ, ${tattoo.style?.name[lang] ?? ""}${other ? `, ახლა: ${other.nickname}` : ""}`}
-                    onClick={() => setAttached((set) => toggle(set, tattoo.id))}
-                    className={`relative block overflow-hidden rounded-[12px] border-2 p-0 text-left transition-colors ${
-                      on ? "border-gold" : "border-cream/14 hover:border-cream/45"
-                    }`}
-                  >
-                    <span className="relative block aspect-[3/4] bg-ink">
-                      <Thumb photo={tattoo.image} />
-                    </span>
-                    <span
-                      aria-hidden
-                      className={`absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full border text-[14px] font-semibold leading-none ${
-                        on ? "border-gold bg-gold text-on-gold" : "border-cream/60 bg-ink/70 text-transparent"
-                      }`}
-                    >
-                      ✓
-                    </span>
-                    <span className="block truncate px-2 py-1.5 text-[12.5px] leading-4 text-body">
-                      {tattoo.style?.name[lang]}
-                      {other && <span className="block truncate text-muted">ახლა: {other.nickname}</span>}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
+            <WorkPicker
+              labelledBy="artist-tattoos"
+              works={ownTattoos}
+              picked={attached}
+              onToggle={(id) => setAttached((set) => toggle(set, id))}
+              artistId={artist?.id}
+            />
+          )}
+        </div>
+
+        <div>
+          <span id="artist-piercings" className="field-label mb-1.5">
+            ამ არტისტის პირსინგები ({pierced.size})
+          </span>
+          <Hint className="mb-3">
+            თუ არტისტი პირსინგს აკეთებს, მონიშნე მისი შესრულებული პირსინგები — ისინი მის გვერდზე
+            გამოჩნდება, თვითონ კი არტისტების გვერდზე „პირსინგის“ ნიშნით ჩანს. აქ მხოლოდ იმავე ენისთვის (
+            {language.label}) დამატებული ფოტოები ჩანს. ახალი ფოტოს ასატვირთად გადადი „პირსინგი“ ჩანართზე.
+          </Hint>
+          {ownPiercings.length === 0 ? (
+            <Hint>ამ ენისთვის პირსინგის ფოტოები ჯერ არ არის დამატებული.</Hint>
+          ) : (
+            <WorkPicker
+              labelledBy="artist-piercings"
+              works={ownPiercings}
+              picked={pierced}
+              onToggle={(id) => setPierced((set) => toggle(set, id))}
+              artistId={artist?.id}
+            />
           )}
         </div>
 
@@ -279,7 +357,7 @@ function ArtistForm({
 }
 
 /** Artists: the list, and the form for adding or editing one. */
-export function ArtistsPanel({ artists, styles, tattoos, reload, explain }: PanelProps) {
+export function ArtistsPanel({ artists, styles, tattoos, piercings, reload, explain }: PanelProps) {
   /** which artist the form is open for: an id, "new", or null for the list */
   const [editing, setEditing] = useState<string | null>(null);
   /** the language picked for a new artist; null until it is picked */
@@ -297,7 +375,7 @@ export function ArtistsPanel({ artists, styles, tattoos, reload, explain }: Pane
     try {
       await api(`/artists/${artist.id}`, { method: "DELETE" });
       await reload();
-      setDone(`„${artist.nickname}“ წაიშალა. მისი ტატუები გალერეაში დარჩა, არტისტის გარეშე.`);
+      setDone(`„${artist.nickname}“ წაიშალა. მისი ტატუები და პირსინგები გალერეებში დარჩა, არტისტის გარეშე.`);
     } catch (err) {
       setError(explain(err));
     }
@@ -337,6 +415,7 @@ export function ArtistsPanel({ artists, styles, tattoos, reload, explain }: Pane
           onChangeLang={artist ? undefined : () => setNewLang(null)}
           styles={styles}
           tattoos={tattoos}
+          piercings={piercings}
           reload={reload}
           explain={explain}
           onDone={(message) => {
@@ -405,7 +484,11 @@ export function ArtistsPanel({ artists, styles, tattoos, reload, explain }: Pane
                       <LangBadge lang={artist.lang} />
                     </p>
                     <p className="text-[13.5px] leading-5 text-muted">
-                      {[artist.styles.map((s) => s.name.ka).join(" / "), `${artist.tattooCount ?? 0} ტატუ`]
+                      {[
+                        artist.styles.map((s) => s.name.ka).join(" / "),
+                        `${artist.tattooCount ?? 0} ტატუ`,
+                        `${artist.piercingCount ?? 0} პირსინგი`,
+                      ]
                         .filter(Boolean)
                         .join(" · ")}
                     </p>

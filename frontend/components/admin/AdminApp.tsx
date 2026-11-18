@@ -2,16 +2,25 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import type { Artist, Style, Tattoo } from "@/lib/types";
+import type { Artist, Piercing, PiercingZone, Style, Tattoo } from "@/lib/types";
 import { api, errorText, isSignedOut } from "./api";
 import { ArtistsPanel } from "./ArtistsPanel";
 import { LoginForm } from "./LoginForm";
+import { PiercingPanel } from "./PiercingPanel";
 import { StylesPanel } from "./StylesPanel";
 import { TattoosPanel } from "./TattoosPanel";
 import { Notice } from "./ui";
 
 /** Everything the panel shows, as the backend has it right now. */
-export type AdminData = { artists: Artist[]; tattoos: Tattoo[]; styles: Style[] };
+export type AdminData = {
+  artists: Artist[];
+  tattoos: Tattoo[];
+  /** piercing photos */
+  piercings: Piercing[];
+  /** piercing zones, each with its places and prices */
+  zones: PiercingZone[];
+  styles: Style[];
+};
 
 /** What every screen gets: the data, a way to re-read it, and error handling. */
 export type PanelProps = AdminData & {
@@ -24,6 +33,7 @@ export type PanelProps = AdminData & {
 const tabs = [
   { key: "artists", label: "არტისტები" },
   { key: "tattoos", label: "ტატუები" },
+  { key: "piercings", label: "პირსინგი" },
   { key: "styles", label: "სტილები" },
 ] as const;
 type Tab = (typeof tabs)[number]["key"];
@@ -42,12 +52,14 @@ export function AdminApp() {
 
   const reload = useCallback(async () => {
     try {
-      const [artists, tattoos, styles] = await Promise.all([
+      const [artists, tattoos, piercings, zones, styles] = await Promise.all([
         api<Artist[]>("/artists"),
         api<Tattoo[]>("/tattoos"),
+        api<Piercing[]>("/piercings"),
+        api<PiercingZone[]>("/piercing/zones"),
         api<Style[]>("/styles"),
       ]);
-      setData({ artists, tattoos, styles });
+      setData({ artists, tattoos, piercings, zones, styles });
       setLoadError("");
     } catch (err) {
       setLoadError(errorText(err));
@@ -130,6 +142,7 @@ export function AdminApp() {
 
       {panel && tab === "artists" && <ArtistsPanel {...panel} />}
       {panel && tab === "tattoos" && <TattoosPanel {...panel} />}
+      {panel && tab === "piercings" && <PiercingPanel {...panel} />}
       {panel && tab === "styles" && <StylesPanel {...panel} />}
     </div>
   );

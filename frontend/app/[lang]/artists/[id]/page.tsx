@@ -9,6 +9,7 @@ import { Header } from "@/components/Header";
 import { PhotoFrame } from "@/components/PhotoFrame";
 import { SectionDivider } from "@/components/SectionDivider";
 import { StarRule } from "@/components/StarRule";
+import { WorkTile } from "@/components/WorkTile";
 import {
   ArrowLeftIcon,
   ArrowUpRightIcon,
@@ -18,7 +19,8 @@ import {
 import { getArtist } from "@/lib/api";
 import { dictionaryFor, getDictionary } from "@/lib/i18n";
 import { displayCase, hasLocale, localePath } from "@/lib/i18n/config";
-import { instagramHandle, localized } from "@/lib/types";
+import { piercingAlt } from "@/lib/piercing";
+import { instagramHandle, localized, photoRatio } from "@/lib/types";
 
 /**
  * The profile is read from the backend on every request, and the page waits
@@ -50,7 +52,14 @@ export default async function ArtistPage({ params }: PageProps<"/[lang]/artists/
   const { lang, dict } = await getDictionary();
   const t = dict.artist;
   const { bio } = artist;
-  const styles = artist.styles.map((style) => localized(style.name, lang)).join(" / ");
+  const tattoos = artist.tattoos ?? [];
+  const piercings = artist.piercings ?? [];
+  // A piercer's profile shows their piercings in place of the (empty) tattoo
+  // section; an artist with both gets both, tattoos first.
+  const showTattoos = tattoos.length > 0 || piercings.length === 0;
+  const tags = artist.styles.map((style) => localized(style.name, lang));
+  if (piercings.length > 0) tags.push(dict.artists.piercingTag);
+  const styles = tags.join(" / ");
 
   return (
     <div className="page-ground relative isolate min-h-dvh overflow-hidden">
@@ -118,20 +127,55 @@ export default async function ArtistPage({ params }: PageProps<"/[lang]/artists/
             </div>
           </section>
 
-          <section id="works" aria-labelledby="works-title" className="scroll-mt-6 pt-[72px]">
-            <SectionDivider />
-            <h2
-              id="works-title"
-              className="display mt-[22px] text-center text-[length:calc(clamp(36px,4vw,52px)*var(--display-scale))] leading-[1.04] tracking-[0.5px] text-cream"
-            >
-              {displayCase(t.worksTitle, lang)}
-            </h2>
-            <p className="mx-auto mt-3.5 max-w-[470px] text-center text-[17px] font-light leading-[25px] text-body">
-              {t.worksLead}
-            </p>
+          {showTattoos && (
+            <section id="works" aria-labelledby="works-title" className="scroll-mt-6 pt-[72px]">
+              <SectionDivider />
+              <h2
+                id="works-title"
+                className="display mt-[22px] text-center text-[length:calc(clamp(36px,4vw,52px)*var(--display-scale))] leading-[1.04] tracking-[0.5px] text-cream"
+              >
+                {displayCase(t.worksTitle, lang)}
+              </h2>
+              <p className="mx-auto mt-3.5 max-w-[470px] text-center text-[17px] font-light leading-[25px] text-body">
+                {t.worksLead}
+              </p>
 
-            <ArtistWorks lang={lang} t={t} tattoosCopy={dict.tattoos} tattoos={artist.tattoos ?? []} />
-          </section>
+              <ArtistWorks lang={lang} t={t} tattoosCopy={dict.tattoos} tattoos={tattoos} />
+            </section>
+          )}
+
+          {piercings.length > 0 && (
+            // "See works" above jumps to #works: that is this section when there are no tattoos
+            <section
+              id={showTattoos ? "piercings" : "works"}
+              aria-labelledby="piercings-title"
+              className="scroll-mt-6 pt-[72px]"
+            >
+              <SectionDivider />
+              <h2
+                id="piercings-title"
+                className="display mt-[22px] text-center text-[length:calc(clamp(36px,4vw,52px)*var(--display-scale))] leading-[1.04] tracking-[0.5px] text-cream"
+              >
+                {displayCase(t.piercingsTitle, lang)}
+              </h2>
+              <p className="mx-auto mt-3.5 max-w-[470px] text-center text-[17px] font-light leading-[25px] text-body">
+                {t.piercingsLead}
+              </p>
+
+              <div className="mt-9 columns-[4_220px] gap-x-6">
+                {piercings.map((piercing) => (
+                  <WorkTile
+                    key={piercing.id}
+                    ratio={photoRatio(piercing.image)}
+                    photo={piercing.image}
+                    aria={piercingAlt(piercing, dict.piercing)}
+                    title={piercing.place?.name ?? ""}
+                    note={piercing.place?.zone?.name}
+                  />
+                ))}
+              </div>
+            </section>
+          )}
 
           <CtaPanel
             lang={lang}

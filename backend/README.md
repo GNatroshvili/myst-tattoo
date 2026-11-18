@@ -1,8 +1,8 @@
 # Myst Tattoo - Backend
 
-Express + MongoDB (Mongoose) API. It keeps the studio's artists, tattoos and
-tattoo styles, stores the uploaded photos, and guards changes behind the admin
-sign-in. The site (`../frontend`) reads from it and hosts the admin panel at
+Express + MongoDB (Mongoose) API. It keeps the studio's artists, tattoos,
+tattoo styles, the piercing price list and piercing photos, stores the
+uploaded photos, and guards changes behind the admin sign-in. The site (`../frontend`) reads from it and hosts the admin panel at
 `/admin`.
 
 ## Setup
@@ -40,14 +40,15 @@ MongoDB must be running (`MONGODB_URI`, local by default).
 
 ## Languages
 
-The site has two languages, `ka` and `en`, and every artist and every tattoo
-belongs to exactly one of them:
+The site has two languages, `ka` and `en`, and every artist, tattoo, piercing
+zone and piercing photo belongs to exactly one of them:
 
-- The admin picks the language first when adding an artist or a tattoo. It is
-  sent as `lang` and cannot be changed afterwards.
+- The admin picks the language first when adding an artist, a tattoo, a
+  piercing zone or a piercing photo. It is sent as `lang` and cannot be
+  changed afterwards.
 - A record shows only on its language's site: `/ka` reads with `?lang=ka`,
   `/en` with `?lang=en`. To show on both, it is added once per language.
-- A tattoo can only be attached to an artist of its own language.
+- A tattoo or a piercing can only be attached to an artist of its own language.
 - An artist's `slug` is unique within its language, so the Georgian and the
   English profile of one person can share an address (`/ka/artists/nino`,
   `/en/artists/nino`).
@@ -55,6 +56,21 @@ belongs to exactly one of them:
 
 Records saved before languages existed are brought up to date when the server
 starts (`src/utils/upgrade.js`): they become Georgian.
+
+## Piercing
+
+The piercing page has a price list and a gallery:
+
+- A **zone** is a part of the body ("Ear", "Face"). Inside it are **places**
+  ("Eyebrow", "Nose", "Lip"), each with a price and an optional note. A place
+  takes its zone's language.
+- A **piercing** is a photo of work done at the studio. It sits in a place
+  (which gives its zone and its language) and can be attached to an artist.
+- There is no separate kind of artist for piercing: a piercer is an artist
+  with piercings attached, listed with everyone else. An artist's record
+  carries `piercingCount`, and their profile their `piercings`.
+- A place that photos use cannot be deleted, nor can a zone with such a place;
+  an unused zone is deleted together with its places.
 
 ## Endpoints
 
@@ -68,18 +84,29 @@ starts (`src/utils/upgrade.js`): they become Georgian.
 | POST | `/api/styles` | yes | `{ name: { en, ka } }` |
 | PATCH | `/api/styles/:id` | yes | Rename |
 | DELETE | `/api/styles/:id` | yes | Refused (409) while tattoos use the style |
-| GET | `/api/artists` | | All artists, each with `tattooCount`; `?lang=ka` for one language's |
-| GET | `/api/artists/:key` | | One artist by id or slug, with their `tattoos`; `?lang=ka` looks only in that language |
-| POST | `/api/artists` | yes | Form: `lang`, `nickname`, `styles`, `bio`, `instagramUrl`, `photo`, `tattoos` |
+| GET | `/api/artists` | | All artists, each with `tattooCount` and `piercingCount`; `?lang=ka` for one language's |
+| GET | `/api/artists/:key` | | One artist by id or slug, with their `tattoos` and `piercings`; `?lang=ka` looks only in that language |
+| POST | `/api/artists` | yes | Form: `lang`, `nickname`, `styles`, `bio`, `instagramUrl`, `photo`, `tattoos`, `piercings` |
 | PATCH | `/api/artists/:key` | yes | Same fields except `lang`, only those sent change; `removePhoto=true` drops the photo |
-| DELETE | `/api/artists/:key` | yes | Their tattoos stay, attached to nobody |
+| DELETE | `/api/artists/:key` | yes | Their tattoos and piercings stay, attached to nobody |
 | GET | `/api/tattoos` | | All tattoos, newest first; `?lang=ka`, `?limit=4` |
 | POST | `/api/tattoos` | yes | Form: `lang`, `photo`, `style`, `artist` (optional) |
 | PATCH | `/api/tattoos/:id` | yes | `style`, `artist` ("" detaches), `photo` |
 | DELETE | `/api/tattoos/:id` | yes | Also deletes the photo files |
+| GET | `/api/piercing/zones` | | All zones, each with its `places` (name, note, price); `?lang=ka` |
+| POST | `/api/piercing/zones` | yes | `{ lang, name }` |
+| PATCH | `/api/piercing/zones/:id` | yes | `{ name }` |
+| DELETE | `/api/piercing/zones/:id` | yes | With its places; refused (409) while photos use them |
+| POST | `/api/piercing/zones/:id/places` | yes | `{ name, note, price }` → the zone with its places |
+| PATCH | `/api/piercing/places/:id` | yes | Any of `name`, `note`, `price` |
+| DELETE | `/api/piercing/places/:id` | yes | Refused (409) while photos use the place |
+| GET | `/api/piercings` | | All piercing photos, newest first; `?lang=ka`, `?limit=4` |
+| POST | `/api/piercings` | yes | Form: `photo`, `place`, `artist` (optional); the language is the place's |
+| PATCH | `/api/piercings/:id` | yes | `place`, `artist` ("" detaches), `photo` |
+| DELETE | `/api/piercings/:id` | yes | Also deletes the photo files |
 
-`styles` and `tattoos` are lists of ids, sent as a JSON array in one form field.
-`tattoos` sets exactly which tattoos belong to the artist. Errors come back as
+`styles`, `tattoos` and `piercings` are lists of ids, sent as a JSON array in one
+form field. `tattoos` and `piercings` set exactly which works belong to the artist. Errors come back as
 `{ message, code }`.
 
 ## Structure
@@ -90,8 +117,8 @@ src/
   app.js             # express app, middleware, route mounting
   config/            # environment values, mongoose connection
   routes/index.js    # every route and who may call it
-  controllers/       # request handlers: auth, styles, artists, tattoos
-  models/            # mongoose schemas: Style, Artist, Tattoo
+  controllers/       # request handlers: auth, styles, artists, tattoos, piercing zones, piercings
+  models/            # mongoose schemas: Style, Artist, Tattoo, PiercingZone, PiercingPlace, Piercing
   middleware/        # admin session (auth.js), photo upload (upload.js)
   utils/             # photo storage, slugs, input checks, API output, upgrading older records
   scripts/seed.js    # starting styles

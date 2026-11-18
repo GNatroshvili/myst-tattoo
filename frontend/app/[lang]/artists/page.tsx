@@ -36,6 +36,9 @@ async function ArtistsGrid({ lang, t }: { lang: Locale; t: Dictionary["artists"]
       {artists.map((artist) => {
         const profile = localePath(lang, `/artists/${artist.slug}`);
         const { bio } = artist;
+        // tattoo styles, and "Piercing" for an artist who has piercings attached
+        const tags = artist.styles.map((style) => localized(style.name, lang));
+        if (artist.piercingCount) tags.push(t.piercingTag);
         return (
           <article key={artist.id} className="flex flex-col">
             <PhotoFrame
@@ -49,7 +52,7 @@ async function ArtistsGrid({ lang, t }: { lang: Locale; t: Dictionary["artists"]
             <div className="flex flex-wrap items-baseline justify-between gap-x-2.5 gap-y-0.5 px-1 pt-3">
               <h2 className="text-[18px] font-medium leading-6 text-cream">{artist.nickname}</h2>
               <span className="text-[13px] leading-5 text-muted">
-                {artist.styles.map((style) => localized(style.name, lang)).join(" / ")}
+                {tags.join(" / ")}
               </span>
             </div>
             {bio && (
