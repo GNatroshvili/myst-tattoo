@@ -19,7 +19,13 @@ async function get<T>(path: string): Promise<T | null> {
     if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
     return (await res.json()) as T;
   } catch (err) {
-    console.error(`[api] GET ${path} failed:`, err instanceof Error ? err.message : err);
+    const reason = err instanceof Error ? err.message : String(err);
+    // "fetch failed" is all Node says when nothing answers at API_URL
+    const hint =
+      reason === "fetch failed"
+        ? ` (cannot reach the backend at ${API_URL}; start it with "npm run dev" in backend/)`
+        : "";
+    console.error(`[api] GET ${path} failed: ${reason}${hint}`);
     return null;
   }
 }
