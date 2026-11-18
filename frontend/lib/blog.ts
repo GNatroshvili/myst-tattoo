@@ -25,3 +25,6 @@ export const posts: Post[] = [
   { id: "post-5", topic: "aftercare" },
   { id: "post-6", topic: "tattoo" },
 ];
+
+/** Every article that has a page of its own at /blog/<id>. */
+export const articleIds = [featuredPost.id, ...posts.map((post) => post.id)];

@@ -254,6 +254,20 @@ export const ka: Dictionary = {
     countOne: "ნაჩვენებია 1 სტატია",
     countMany: "ნაჩვენებია {count} სტატია",
     articlesAria: "სტატიები",
+    article: {
+      back: "ყველა სტატია",
+      photoAria: "სტატიის ფოტოს ადგილი",
+      photoLabel: "ბლოგის ფოტო",
+      placeholder: {
+        date: "[გამოქვეყნების თარიღი]",
+        titleLine1: "როგორ მოვუაროთ",
+        titleLine2: "ახალ ტატუს",
+        paragraphs: [
+          "[ბლოგის აღწერა — რაზეა ეს პოსტი. პოსტის ტექსტი აქ იწერება.]",
+          "[მეორე აბზაცი, თუ პოსტს სჭირდება.]",
+        ],
+      },
+    },
     ctaTitleLine1: "გაქვს",
     ctaTitleLine2: "შეკითხვა?",
     ctaText: "აქ პასუხი ვერ იპოვე? მოგვწერე და დაგეხმარებით.",

@@ -9,12 +9,17 @@ const divided = "md:border-l md:border-cream/18 md:pl-7 lg:pl-16";
 const icon = "h-[34px] w-[34px] shrink-0";
 const link = "transition-colors hover:text-gold";
 
+/**
+ * Three columns. On wide screens their widths follow the design exactly: it
+ * sizes each column by its content (260 / 320 / 260px) and adds the left inset
+ * (and the 1px divider) on top, so the starting widths here include both.
+ */
 export function Footer({ lang, dict }: { lang: Locale; dict: Dictionary }) {
   const t = dict.footer;
 
   return (
     <footer className="flex flex-col gap-y-6 pb-16 pt-[72px] text-[16px] font-light leading-[22px] text-cream md:flex-row md:items-center">
-      <div className={`${column} md:flex-[1_1_260px] md:pl-2 lg:pl-11`}>
+      <div className={`${column} md:flex-[1_1_260px] md:pl-2 lg:basis-[304px] lg:pl-11`}>
         <MapPinIcon className={icon} />
         <p>
           {t.city}
@@ -23,12 +28,12 @@ export function Footer({ lang, dict }: { lang: Locale; dict: Dictionary }) {
         </p>
       </div>
 
-      <div className={`${column} ${divided} md:flex-[1.3_1_320px]`}>
+      <div className={`${column} ${divided} md:flex-[1.3_1_320px] lg:basis-[385px]`}>
         <InstagramIcon className={icon} />
         <p>
           {t.follow}
           <br />
-          <span className="flex flex-wrap gap-x-[18px]">
+          <span className="flex flex-wrap gap-x-[14px]">
             {site.instagram.map((acc) => (
               <a
                 key={acc.handle}
@@ -44,7 +49,7 @@ export function Footer({ lang, dict }: { lang: Locale; dict: Dictionary }) {
         </p>
       </div>
 
-      <div className={`${column} ${divided} md:flex-[1_1_260px]`}>
+      <div className={`${column} ${divided} md:flex-[1_1_260px] lg:basis-[325px]`}>
         <CalendarIcon className={icon} />
         <p>
           {t.question}

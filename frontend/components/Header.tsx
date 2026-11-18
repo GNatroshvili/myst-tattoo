@@ -45,7 +45,7 @@ export function Header({ lang, nav: t, common, switcherLabel }: Props) {
                 key={item.key}
                 href={item.href}
                 aria-current={active ? "page" : undefined}
-                className={`whitespace-nowrap border-b-[1.5px] pb-2 pt-3 transition-colors ${
+                className={`whitespace-nowrap border-b-[1.5px] pb-2 pt-3 leading-[normal] transition-colors ${
                   active ? "border-gold text-white" : "border-transparent text-cream hover:text-gold"
                 }`}
               >

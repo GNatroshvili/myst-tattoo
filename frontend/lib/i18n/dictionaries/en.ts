@@ -261,6 +261,22 @@ export const en = {
     countOne: "Showing 1 article",
     countMany: "Showing {count} articles",
     articlesAria: "Articles",
+    /** One article's own page. */
+    article: {
+      back: "All articles",
+      photoAria: "Article photo placeholder",
+      photoLabel: "Blog photo",
+      /** Shown until the real articles are added in lib/blog.ts. */
+      placeholder: {
+        date: "[Date posted]",
+        titleLine1: "How to care for",
+        titleLine2: "a new tattoo",
+        paragraphs: [
+          "[Blog description — what this post is about. The text of the post goes here.]",
+          "[Second paragraph, if the post needs one.]",
+        ],
+      },
+    },
     ctaTitleLine1: "Have a",
     ctaTitleLine2: "question?",
     ctaText: "Didn't find the answer here? Write to us and we'll help.",
