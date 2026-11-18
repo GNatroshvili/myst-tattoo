@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import type { Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/dictionaries/en";
 import { piercingAlt } from "@/lib/piercing";
-import { photoRatio, type Piercing } from "@/lib/types";
+import { localized, photoRatio, type Piercing } from "@/lib/types";
 import { FilterChip } from "./FilterChip";
 import { WorkTile } from "./WorkTile";
 
@@ -12,11 +13,21 @@ import { WorkTile } from "./WorkTile";
  * have photos), a count, and the masonry gallery. Each tile names the place
  * and, when the piercing is attached to one, the artist.
  */
-export function PiercingWorks({ t, piercings }: { t: Dictionary["piercing"]; piercings: Piercing[] }) {
+export function PiercingWorks({
+  lang,
+  t,
+  piercings,
+}: {
+  lang: Locale;
+  t: Dictionary["piercing"];
+  piercings: Piercing[];
+}) {
   const [zone, setZone] = useState("all");
 
   const zones = new Map<string, string>();
-  for (const { place } of piercings) if (place?.zone) zones.set(place.zone.id, place.zone.name);
+  for (const { place } of piercings) {
+    if (place?.zone) zones.set(place.zone.id, localized(place.zone.name, lang));
+  }
   const shown = piercings.filter((piercing) => zone === "all" || piercing.place?.zone?.id === zone);
   const countLabel =
     shown.length === 1 ? t.countOne : t.countMany.replace("{count}", String(shown.length));
@@ -48,9 +59,9 @@ export function PiercingWorks({ t, piercings }: { t: Dictionary["piercing"]; pie
             key={piercing.id}
             ratio={photoRatio(piercing.image)}
             photo={piercing.image}
-            aria={piercingAlt(piercing, t)}
-            title={piercing.place?.name ?? ""}
-            note={piercing.artist?.nickname}
+            aria={piercingAlt(piercing, t, lang)}
+            title={piercing.place ? localized(piercing.place.name, lang) : ""}
+            note={piercing.artist ? localized(piercing.artist.nickname, lang) : undefined}
           />
         ))}
       </div>

@@ -3,26 +3,11 @@
 import { useState, type FormEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import type { Locale } from "@/lib/i18n/config";
 import type { Artist, ArtistBrief, Photo } from "@/lib/types";
 import { PersonIcon } from "../ui/Icons";
 import type { PanelProps } from "./AdminApp";
 import { api, form } from "./api";
-import {
-  Card,
-  CardTitle,
-  ChosenLanguage,
-  ConfirmDelete,
-  Hint,
-  LangBadge,
-  LanguageFilter,
-  LanguagePick,
-  Notice,
-  PHOTO_TYPES,
-  Thumb,
-  languageOf,
-  usePreview,
-} from "./ui";
+import { Card, CardTitle, ConfirmDelete, Hint, Notice, PHOTO_TYPES, Thumb, usePreview } from "./ui";
 
 const chip = (on: boolean) =>
   `h-11 rounded-full border px-5 text-[15px] transition-colors ${
@@ -65,7 +50,7 @@ function WorkPicker({
             key={work.id}
             type="button"
             aria-pressed={on}
-            aria-label={`${work.caption}${other ? `, ახლა: ${other.nickname}` : ""}`}
+            aria-label={`${work.caption}${other ? `, ახლა: ${other.nickname.ka}` : ""}`}
             onClick={() => onToggle(work.id)}
             className={`relative block overflow-hidden rounded-[12px] border-2 p-0 text-left transition-colors ${
               on ? "border-gold" : "border-cream/14 hover:border-cream/45"
@@ -84,7 +69,7 @@ function WorkPicker({
             </span>
             <span className="block truncate px-2 py-1.5 text-[12.5px] leading-4 text-body">
               {work.caption}
-              {other && <span className="block truncate text-muted">ახლა: {other.nickname}</span>}
+              {other && <span className="block truncate text-muted">ახლა: {other.nickname.ka}</span>}
             </span>
           </button>
         );
@@ -96,36 +81,22 @@ function WorkPicker({
 type FormProps = Pick<PanelProps, "styles" | "tattoos" | "piercings" | "reload" | "explain"> & {
   /** the artist being edited, or null for a new one */
   artist: Artist | null;
-  /** the language the artist is for: picked first when adding, fixed afterwards */
-  lang: Locale;
-  /** back to picking the language; only while adding */
-  onChangeLang?: () => void;
   onDone: (message: string) => void;
   onCancel: () => void;
 };
 
 /**
- * Add or edit an artist in one language: nickname, styles, bio, Instagram,
- * photo, and their tattoos and piercings. A tattoo artist gets tattoos, a
- * piercer gets piercings; both are the same kind of artist. Everything typed
- * here shows on that language's site.
+ * Add or edit an artist. There is one artist for both sites: the nickname and
+ * the bio are filled in in Georgian and in English, and everything else
+ * (styles, Instagram, photo, tattoos, piercings) is shared. A tattoo artist
+ * gets tattoos, a piercer gets piercings; both are the same kind of artist.
  */
-function ArtistForm({
-  artist,
-  lang,
-  onChangeLang,
-  styles,
-  tattoos,
-  piercings,
-  reload,
-  explain,
-  onDone,
-  onCancel,
-}: FormProps) {
-  const language = languageOf(lang);
-  const [nickname, setNickname] = useState(artist?.nickname ?? "");
+function ArtistForm({ artist, styles, tattoos, piercings, reload, explain, onDone, onCancel }: FormProps) {
+  const [nicknameKa, setNicknameKa] = useState(artist?.nickname.ka ?? "");
+  const [nicknameEn, setNicknameEn] = useState(artist?.nickname.en ?? "");
   const [picked, setPicked] = useState(() => new Set(artist?.styles.map((style) => style.id)));
-  const [bio, setBio] = useState(artist?.bio ?? "");
+  const [bioKa, setBioKa] = useState(artist?.bio.ka ?? "");
+  const [bioEn, setBioEn] = useState(artist?.bio.en ?? "");
   const [instagram, setInstagram] = useState(artist?.instagramUrl ?? "");
   const [photo, setPhoto] = useState<File | null>(null);
   const [removePhoto, setRemovePhoto] = useState(false);
@@ -141,23 +112,18 @@ function ArtistForm({
   const [error, setError] = useState("");
   const preview = usePreview(photo);
   const current = removePhoto ? null : (artist?.photo ?? null);
-  // an artist can only have tattoos and piercings added for the same language
-  const ownTattoos: Work[] = tattoos
-    .filter((tattoo) => tattoo.lang === lang)
-    .map((tattoo) => ({
-      id: tattoo.id,
-      image: tattoo.image,
-      caption: tattoo.style?.name[lang] ?? "ტატუ",
-      artist: tattoo.artist,
-    }));
-  const ownPiercings: Work[] = piercings
-    .filter((piercing) => piercing.lang === lang)
-    .map((piercing) => ({
-      id: piercing.id,
-      image: piercing.image,
-      caption: piercing.place?.name ?? "პირსინგი",
-      artist: piercing.artist,
-    }));
+  const tattooWorks: Work[] = tattoos.map((tattoo) => ({
+    id: tattoo.id,
+    image: tattoo.image,
+    caption: tattoo.style?.name.ka ?? "ტატუ",
+    artist: tattoo.artist,
+  }));
+  const piercingWorks: Work[] = piercings.map((piercing) => ({
+    id: piercing.id,
+    image: piercing.image,
+    caption: piercing.place?.name.ka ?? "პირსინგი",
+    artist: piercing.artist,
+  }));
 
   const toggle = (set: Set<string>, id: string) => {
     const next = new Set(set);
@@ -171,10 +137,11 @@ function ArtistForm({
     setError("");
 
     const body = new FormData();
-    if (!artist) body.set("lang", lang);
-    body.set("nickname", nickname);
+    body.set("nicknameKa", nicknameKa);
+    body.set("nicknameEn", nicknameEn);
     body.set("styles", JSON.stringify([...picked]));
-    body.set("bio", bio);
+    body.set("bioKa", bioKa);
+    body.set("bioEn", bioEn);
     body.set("instagramUrl", instagram);
     body.set("tattoos", JSON.stringify([...attached]));
     body.set("piercings", JSON.stringify([...pierced]));
@@ -184,9 +151,7 @@ function ArtistForm({
     try {
       await api(artist ? `/artists/${artist.id}` : "/artists", form(artist ? "PATCH" : "POST", body));
       await reload();
-      onDone(
-        artist ? "ცვლილებები შენახულია." : `არტისტი დაემატა და ჩანს ${language.onSite} (${language.site}).`
-      );
+      onDone(artist ? "ცვლილებები შენახულია." : "არტისტი დაემატა და ჩანს საიტის ორივე ენაზე.");
     } catch (err) {
       setError(explain(err));
       setBusy(false);
@@ -195,22 +160,41 @@ function ArtistForm({
 
   return (
     <Card>
-      <CardTitle>{artist ? `რედაქტირება: ${artist.nickname}` : "ახალი არტისტი"}</CardTitle>
+      <CardTitle>{artist ? `რედაქტირება: ${artist.nickname.ka}` : "ახალი არტისტი"}</CardTitle>
+      <Hint className="mt-1.5">
+        არტისტი ერთია საიტის ორივე ენისთვის: ნიქნეიმსა და ბიოს ავსებ ქართულად და ინგლისურად, დანარჩენი
+        (სტილები, ფოტო, ნამუშევრები) საერთოა.
+      </Hint>
 
       <form onSubmit={save} className="mt-5 flex flex-col gap-5">
-        <ChosenLanguage lang={lang} onChange={onChangeLang} />
-
-        <label>
-          <span className="field-label mb-2">ნიქნეიმი *</span>
-          <input
-            required
-            maxLength={60}
-            value={nickname}
-            onChange={(e) => setNickname(e.target.value)}
-            className="field h-[46px] px-3.5"
-          />
-          <Hint className="mt-2">ჩაწერე ისე, როგორც {language.onSite} უნდა ეწეროს.</Hint>
-        </label>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <label>
+            <span className="field-label mb-2">ნიქნეიმი ქართულად *</span>
+            <input
+              required
+              maxLength={60}
+              value={nicknameKa}
+              onChange={(e) => setNicknameKa(e.target.value)}
+              placeholder="მაგ.: ნიკა"
+              className="field h-[46px] px-3.5"
+            />
+          </label>
+          <label>
+            <span className="field-label mb-2">ნიქნეიმი ინგლისურად *</span>
+            <input
+              required
+              maxLength={60}
+              value={nicknameEn}
+              onChange={(e) => setNicknameEn(e.target.value)}
+              placeholder="e.g. Nika"
+              className="field h-[46px] px-3.5"
+            />
+          </label>
+          <Hint className="sm:col-span-2">
+            ქართული ვერსია ჩანს საიტის ქართულ გვერდებზე (/ka), ინგლისური — ინგლისურზე (/en). თუ ნიქნეიმი
+            ორივეგან ერთნაირად იწერება, ორივე ველში იგივე ჩაწერე.
+          </Hint>
+        </div>
 
         <div>
           <span id="artist-styles" className="field-label mb-2">
@@ -228,24 +212,38 @@ function ArtistForm({
                   onClick={() => setPicked((set) => toggle(set, style.id))}
                   className={chip(picked.has(style.id))}
                 >
-                  {style.name[lang]}
+                  {style.name.ka}
                 </button>
               ))}
             </div>
           )}
         </div>
 
-        <label>
-          <span className="field-label mb-2">{language.bioLabel}</span>
-          <textarea
-            rows={6}
-            maxLength={1200}
-            value={bio}
-            onChange={(e) => setBio(e.target.value)}
-            className="field px-3.5 py-3 font-light leading-[22px]"
-          />
-          <Hint className="mt-2">არასავალდებულო. ეს ტექსტი მხოლოდ {language.onSite} გამოჩნდება.</Hint>
-        </label>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <label>
+            <span className="field-label mb-2">ბიო ქართულად</span>
+            <textarea
+              rows={6}
+              maxLength={1200}
+              value={bioKa}
+              onChange={(e) => setBioKa(e.target.value)}
+              className="field px-3.5 py-3 font-light leading-[22px]"
+            />
+          </label>
+          <label>
+            <span className="field-label mb-2">ბიო ინგლისურად</span>
+            <textarea
+              rows={6}
+              maxLength={1200}
+              value={bioEn}
+              onChange={(e) => setBioEn(e.target.value)}
+              className="field px-3.5 py-3 font-light leading-[22px]"
+            />
+          </label>
+          <Hint className="sm:col-span-2">
+            არასავალდებულო. თუ ბიოს მხოლოდ ერთ ენაზე შეავსებ, საიტის ორივე ვერსიაზე ის გამოჩნდება.
+          </Hint>
+        </div>
 
         <label>
           <span className="field-label mb-2">Instagram</span>
@@ -302,16 +300,15 @@ function ArtistForm({
             ამ არტისტის ტატუები ({attached.size})
           </span>
           <Hint className="mb-3">
-            მონიშნე ტატუები, რომლებიც ამ არტისტმა შეასრულა — ისინი მის გვერდზე გამოჩნდება. აქ მხოლოდ
-            იმავე ენისთვის ({language.label}) დამატებული ტატუები ჩანს. ახალი ფოტოს ასატვირთად გადადი
-            „ტატუები“ ჩანართზე.
+            მონიშნე ტატუები, რომლებიც ამ არტისტმა შეასრულა — ისინი მის გვერდზე გამოჩნდება. ახალი ფოტოს
+            ასატვირთად გადადი „ტატუები“ ჩანართზე.
           </Hint>
-          {ownTattoos.length === 0 ? (
-            <Hint>ამ ენისთვის ტატუები ჯერ არ არის დამატებული.</Hint>
+          {tattooWorks.length === 0 ? (
+            <Hint>ბაზაში ტატუები ჯერ არ არის.</Hint>
           ) : (
             <WorkPicker
               labelledBy="artist-tattoos"
-              works={ownTattoos}
+              works={tattooWorks}
               picked={attached}
               onToggle={(id) => setAttached((set) => toggle(set, id))}
               artistId={artist?.id}
@@ -325,15 +322,15 @@ function ArtistForm({
           </span>
           <Hint className="mb-3">
             თუ არტისტი პირსინგს აკეთებს, მონიშნე მისი შესრულებული პირსინგები — ისინი მის გვერდზე
-            გამოჩნდება, თვითონ კი არტისტების გვერდზე „პირსინგის“ ნიშნით ჩანს. აქ მხოლოდ იმავე ენისთვის (
-            {language.label}) დამატებული ფოტოები ჩანს. ახალი ფოტოს ასატვირთად გადადი „პირსინგი“ ჩანართზე.
+            გამოჩნდება, თვითონ კი არტისტების გვერდზე „პირსინგის“ ნიშნით ჩანს. ახალი ფოტოს ასატვირთად
+            გადადი „პირსინგი“ ჩანართზე.
           </Hint>
-          {ownPiercings.length === 0 ? (
-            <Hint>ამ ენისთვის პირსინგის ფოტოები ჯერ არ არის დამატებული.</Hint>
+          {piercingWorks.length === 0 ? (
+            <Hint>ბაზაში პირსინგის ფოტოები ჯერ არ არის.</Hint>
           ) : (
             <WorkPicker
               labelledBy="artist-piercings"
-              works={ownPiercings}
+              works={piercingWorks}
               picked={pierced}
               onToggle={(id) => setPierced((set) => toggle(set, id))}
               artistId={artist?.id}
@@ -360,10 +357,6 @@ function ArtistForm({
 export function ArtistsPanel({ artists, styles, tattoos, piercings, reload, explain }: PanelProps) {
   /** which artist the form is open for: an id, "new", or null for the list */
   const [editing, setEditing] = useState<string | null>(null);
-  /** the language picked for a new artist; null until it is picked */
-  const [newLang, setNewLang] = useState<Locale | null>(null);
-  /** which language's artists the list shows */
-  const [show, setShow] = useState<Locale | "all">("all");
   const [done, setDone] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -375,60 +368,33 @@ export function ArtistsPanel({ artists, styles, tattoos, piercings, reload, expl
     try {
       await api(`/artists/${artist.id}`, { method: "DELETE" });
       await reload();
-      setDone(`„${artist.nickname}“ წაიშალა. მისი ტატუები და პირსინგები გალერეებში დარჩა, არტისტის გარეშე.`);
+      setDone(`„${artist.nickname.ka}“ წაიშალა. მისი ტატუები და პირსინგები გალერეებში დარჩა, არტისტის გარეშე.`);
     } catch (err) {
       setError(explain(err));
     }
     setBusy(false);
   }
 
-  function close() {
-    setEditing(null);
-    setNewLang(null);
-  }
-
-  // adding starts with the language: the form opens only once it is picked
-  if (editing === "new" && !newLang) {
-    return (
-      <Card>
-        <CardTitle>ახალი არტისტი</CardTitle>
-        <div className="mt-5">
-          <LanguagePick onPick={setNewLang} />
-        </div>
-        <button type="button" onClick={close} className="btn btn-outline mt-5">
-          გაუქმება
-        </button>
-      </Card>
-    );
-  }
-
   if (editing) {
     const artist = artists.find((a) => a.id === editing) ?? null;
-    const lang = artist?.lang ?? newLang;
-    if (lang) {
-      return (
-        <ArtistForm
-          // a fresh form for each artist and each language
-          key={`${editing}-${lang}`}
-          artist={artist}
-          lang={lang}
-          onChangeLang={artist ? undefined : () => setNewLang(null)}
-          styles={styles}
-          tattoos={tattoos}
-          piercings={piercings}
-          reload={reload}
-          explain={explain}
-          onDone={(message) => {
-            setDone(message);
-            close();
-          }}
-          onCancel={close}
-        />
-      );
-    }
+    return (
+      <ArtistForm
+        // a fresh form for each artist
+        key={editing}
+        artist={artist}
+        styles={styles}
+        tattoos={tattoos}
+        piercings={piercings}
+        reload={reload}
+        explain={explain}
+        onDone={(message) => {
+          setDone(message);
+          setEditing(null);
+        }}
+        onCancel={() => setEditing(null)}
+      />
+    );
   }
-
-  const shown = artists.filter((artist) => show === "all" || artist.lang === show);
 
   return (
     <Card>
@@ -439,7 +405,6 @@ export function ArtistsPanel({ artists, styles, tattoos, piercings, reload, expl
           onClick={() => {
             setDone("");
             setError("");
-            setNewLang(null);
             setEditing("new");
           }}
           className="btn btn-gold btn-sm"
@@ -457,61 +422,49 @@ export function ArtistsPanel({ artists, styles, tattoos, piercings, reload, expl
       {artists.length === 0 ? (
         <Hint className="mt-4">არტისტები ჯერ არ არის დამატებული.</Hint>
       ) : (
-        <>
-          <div className="mt-4">
-            <LanguageFilter
-              value={show}
-              onChange={setShow}
-              count={(lang) => artists.filter((a) => lang === "all" || a.lang === lang).length}
-            />
-          </div>
-
-          {shown.length === 0 ? (
-            <Hint className="mt-4">ამ ენისთვის არტისტები ჯერ არ არის დამატებული.</Hint>
-          ) : (
-            <ul className="mt-3">
-              {shown.map((artist) => (
-                <li
-                  key={artist.id}
-                  className="flex flex-wrap items-center gap-x-4 gap-y-3 border-b border-cream/12 py-4 last:border-b-0"
+        <ul className="mt-3">
+          {artists.map((artist) => (
+            <li
+              key={artist.id}
+              className="flex flex-wrap items-center gap-x-4 gap-y-3 border-b border-cream/12 py-4 last:border-b-0"
+            >
+              <span className="relative flex h-16 w-12 shrink-0 items-center justify-center overflow-hidden rounded-[8px] border border-cream/16 bg-ink">
+                {artist.photo ? <Thumb photo={artist.photo} /> : <PersonIcon className="h-6 w-6 text-rose" />}
+              </span>
+              <div className="min-w-[160px] flex-1">
+                <p className="text-[17px] font-medium leading-6 text-cream">
+                  {artist.nickname.ka}
+                  {artist.nickname.en !== artist.nickname.ka && (
+                    <span className="font-normal text-muted"> · {artist.nickname.en}</span>
+                  )}
+                </p>
+                <p className="text-[13.5px] leading-5 text-muted">
+                  {[
+                    artist.styles.map((s) => s.name.ka).join(" / "),
+                    `${artist.tattooCount ?? 0} ტატუ`,
+                    `${artist.piercingCount ?? 0} პირსინგი`,
+                  ]
+                    .filter(Boolean)
+                    .join(" · ")}
+                </p>
+              </div>
+              <div className="flex flex-wrap items-center gap-2.5">
+                <Link
+                  href={`/ka/artists/${artist.slug}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-outline btn-sm"
                 >
-                  <span className="relative flex h-16 w-12 shrink-0 items-center justify-center overflow-hidden rounded-[8px] border border-cream/16 bg-ink">
-                    {artist.photo ? <Thumb photo={artist.photo} /> : <PersonIcon className="h-6 w-6 text-rose" />}
-                  </span>
-                  <div className="min-w-[160px] flex-1">
-                    <p className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[17px] font-medium leading-6 text-cream">
-                      {artist.nickname}
-                      <LangBadge lang={artist.lang} />
-                    </p>
-                    <p className="text-[13.5px] leading-5 text-muted">
-                      {[
-                        artist.styles.map((s) => s.name.ka).join(" / "),
-                        `${artist.tattooCount ?? 0} ტატუ`,
-                        `${artist.piercingCount ?? 0} პირსინგი`,
-                      ]
-                        .filter(Boolean)
-                        .join(" · ")}
-                    </p>
-                  </div>
-                  <div className="flex flex-wrap items-center gap-2.5">
-                    <Link
-                      href={`/${artist.lang}/artists/${artist.slug}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="btn btn-outline btn-sm"
-                    >
-                      გვერდი
-                    </Link>
-                    <button type="button" onClick={() => setEditing(artist.id)} className="btn btn-outline btn-sm">
-                      რედაქტირება
-                    </button>
-                    <ConfirmDelete disabled={busy} onConfirm={() => void remove(artist)} />
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </>
+                  გვერდი
+                </Link>
+                <button type="button" onClick={() => setEditing(artist.id)} className="btn btn-outline btn-sm">
+                  რედაქტირება
+                </button>
+                <ConfirmDelete disabled={busy} onConfirm={() => void remove(artist)} />
+              </div>
+            </li>
+          ))}
+        </ul>
       )}
     </Card>
   );

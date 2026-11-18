@@ -133,7 +133,7 @@ export function TattooModal({ lang, t, tattoo, position, onClose, onPrev, onNext
                   )}
                 </span>
                 <div className="min-w-0">
-                  <p className="text-[19px] font-medium leading-6 text-cream">{artist.nickname}</p>
+                  <p className="text-[19px] font-medium leading-6 text-cream">{localized(artist.nickname, lang)}</p>
                   <Link
                     href={localePath(lang, `/artists/${artist.slug}`)}
                     className="link-arrow min-h-11 gap-2.5 text-[15px]"

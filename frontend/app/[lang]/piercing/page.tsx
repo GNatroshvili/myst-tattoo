@@ -26,11 +26,11 @@ type Copy = { lang: Locale; t: Dictionary["piercing"] };
 
 /** Zones and prices, read from the backend when the page is requested. */
 async function Prices({ lang, t }: Copy) {
-  const zones = await getPiercingZones(lang);
+  const zones = await getPiercingZones();
   if (zones.length === 0) {
     return <EmptyNote lang={lang} title={t.pricesEmptyTitle} text={t.pricesEmptyText} className="mt-[30px]" />;
   }
-  return <PiercingPrices t={t} zones={zones} />;
+  return <PiercingPrices lang={lang} t={t} zones={zones} />;
 }
 
 /** Shown while the prices load: the zone buttons' and the list's outlines. */
@@ -56,11 +56,11 @@ function PricesSkeleton() {
 
 /** The gallery, with the photos read from the backend when the page is requested. */
 async function Works({ lang, t }: Copy) {
-  const piercings = await getPiercings(lang);
+  const piercings = await getPiercings();
   if (piercings.length === 0) {
     return <EmptyNote lang={lang} title={t.worksEmptyTitle} text={t.worksEmptyText} className="mt-9" />;
   }
-  return <PiercingWorks t={t} piercings={piercings} />;
+  return <PiercingWorks lang={lang} t={t} piercings={piercings} />;
 }
 
 /** Shown while the photos load: a few empty tiles. */

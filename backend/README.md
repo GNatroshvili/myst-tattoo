@@ -11,15 +11,15 @@ uploaded photos, and guards changes behind the admin sign-in. The site (`../fron
 cp .env.example .env   # then fill in ADMIN_PASSWORD and SESSION_SECRET
 npm install
 npm run seed           # optional, once: adds five starting tattoo styles
-npm run seed:demo      # optional: demo artists, tattoos and piercings in both languages
+npm run seed:demo      # optional: demo artists, tattoos and piercings
 npm run dev            # http://localhost:5000
 ```
 
 MongoDB must be running (`MONGODB_URI`, local by default).
 
-`npm run seed:demo` fills an empty site for trying things out: in each
-language three tattoo artists with five tattoos each, one piercer with five
-piercings, and a piercing price list. The pictures are drawn by the script and
+`npm run seed:demo` fills an empty site for trying things out: three tattoo
+artists with five tattoos each, one piercer with five piercings, and a
+piercing price list, all with their texts in both languages. The pictures are drawn by the script and
 marked "DEMO". The records are ordinary ones, so they are edited and deleted in
 the admin panel like any others; running the script again adds nothing twice.
 
@@ -47,32 +47,31 @@ the admin panel like any others; running the script again adds nothing twice.
 
 ## Languages
 
-The site has two languages, `ka` and `en`, and every artist, tattoo, piercing
-zone and piercing photo belongs to exactly one of them:
+The site has two languages, `ka` and `en`, and every record serves both: an
+artist, a tattoo, a piercing zone or a piercing photo is added once.
 
-- The admin picks the language first when adding an artist, a tattoo, a
-  piercing zone or a piercing photo. It is sent as `lang` and cannot be
-  changed afterwards.
-- A record shows only on its language's site: `/ka` reads with `?lang=ka`,
-  `/en` with `?lang=en`. To show on both, it is added once per language.
-- A tattoo or a piercing can only be attached to an artist of its own language.
-- An artist's `slug` is unique within its language, so the Georgian and the
-  English profile of one person can share an address (`/ka/artists/nino`,
-  `/en/artists/nino`).
-- Styles are shared: one style carries its name in both languages.
+- What a visitor reads is kept in both languages as `{ en, ka }`: an artist's
+  `nickname` and `bio`, a style's `name`, and the `name` and `note` of piercing
+  zones and places. The site shows the page's language, and the other one
+  where a text was left empty.
+- Nicknames and names are needed in both languages; bios and notes are optional.
+- Everything else is shared: photos, styles, prices, who did what, and an
+  artist's `slug`, so a profile has the same address on both sites
+  (`/ka/artists/nika`, `/en/artists/nika`).
 
-Records saved before languages existed are brought up to date when the server
-starts (`src/utils/upgrade.js`): they become Georgian.
+Records saved by earlier versions are brought up to date when the server
+starts (`src/utils/upgrade.js`). One of those versions kept a separate record
+per language; such records lose their language, and two artists that shared a
+profile address are joined into one.
 
 ## Piercing
 
 The piercing page has a price list and a gallery:
 
 - A **zone** is a part of the body ("Ear", "Face"). Inside it are **places**
-  ("Eyebrow", "Nose", "Lip"), each with a price and an optional note. A place
-  takes its zone's language.
+  ("Eyebrow", "Nose", "Lip"), each with a price and an optional note.
 - A **piercing** is a photo of work done at the studio. It sits in a place
-  (which gives its zone and its language) and can be attached to an artist.
+  (which gives its zone) and can be attached to an artist.
 - There is no separate kind of artist for piercing: a piercer is an artist
   with piercings attached, listed with everyone else. An artist's record
   carries `piercingCount`, and their profile their `piercings`.
@@ -91,24 +90,24 @@ The piercing page has a price list and a gallery:
 | POST | `/api/styles` | yes | `{ name: { en, ka } }` |
 | PATCH | `/api/styles/:id` | yes | Rename |
 | DELETE | `/api/styles/:id` | yes | Refused (409) while tattoos use the style |
-| GET | `/api/artists` | | All artists, each with `tattooCount` and `piercingCount`; `?lang=ka` for one language's |
-| GET | `/api/artists/:key` | | One artist by id or slug, with their `tattoos` and `piercings`; `?lang=ka` looks only in that language |
-| POST | `/api/artists` | yes | Form: `lang`, `nickname`, `styles`, `bio`, `instagramUrl`, `photo`, `tattoos`, `piercings` |
-| PATCH | `/api/artists/:key` | yes | Same fields except `lang`, only those sent change; `removePhoto=true` drops the photo |
+| GET | `/api/artists` | | All artists, each with `tattooCount` and `piercingCount` |
+| GET | `/api/artists/:key` | | One artist by id or slug, with their `tattoos` and `piercings` |
+| POST | `/api/artists` | yes | Form: `nicknameKa`, `nicknameEn`, `bioKa`, `bioEn`, `styles`, `instagramUrl`, `photo`, `tattoos`, `piercings` |
+| PATCH | `/api/artists/:key` | yes | Same fields, only those sent change; `removePhoto=true` drops the photo |
 | DELETE | `/api/artists/:key` | yes | Their tattoos and piercings stay, attached to nobody |
-| GET | `/api/tattoos` | | All tattoos, newest first; `?lang=ka`, `?limit=4` |
-| POST | `/api/tattoos` | yes | Form: `lang`, `photo`, `style`, `artist` (optional) |
+| GET | `/api/tattoos` | | All tattoos, newest first; `?limit=4` |
+| POST | `/api/tattoos` | yes | Form: `photo`, `style`, `artist` (optional) |
 | PATCH | `/api/tattoos/:id` | yes | `style`, `artist` ("" detaches), `photo` |
 | DELETE | `/api/tattoos/:id` | yes | Also deletes the photo files |
-| GET | `/api/piercing/zones` | | All zones, each with its `places` (name, note, price); `?lang=ka` |
-| POST | `/api/piercing/zones` | yes | `{ lang, name }` |
-| PATCH | `/api/piercing/zones/:id` | yes | `{ name }` |
+| GET | `/api/piercing/zones` | | All zones, each with its `places` (name, note, price) |
+| POST | `/api/piercing/zones` | yes | `{ name: { en, ka } }` |
+| PATCH | `/api/piercing/zones/:id` | yes | `{ name: { en, ka } }` |
 | DELETE | `/api/piercing/zones/:id` | yes | With its places; refused (409) while photos use them |
-| POST | `/api/piercing/zones/:id/places` | yes | `{ name, note, price }` → the zone with its places |
+| POST | `/api/piercing/zones/:id/places` | yes | `{ name: { en, ka }, note: { en, ka }, price }` → the zone with its places |
 | PATCH | `/api/piercing/places/:id` | yes | Any of `name`, `note`, `price` |
 | DELETE | `/api/piercing/places/:id` | yes | Refused (409) while photos use the place |
-| GET | `/api/piercings` | | All piercing photos, newest first; `?lang=ka`, `?limit=4` |
-| POST | `/api/piercings` | yes | Form: `photo`, `place`, `artist` (optional); the language is the place's |
+| GET | `/api/piercings` | | All piercing photos, newest first; `?limit=4` |
+| POST | `/api/piercings` | yes | Form: `photo`, `place`, `artist` (optional) |
 | PATCH | `/api/piercings/:id` | yes | `place`, `artist` ("" detaches), `photo` |
 | DELETE | `/api/piercings/:id` | yes | Also deletes the photo files |
 

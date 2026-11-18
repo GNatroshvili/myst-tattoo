@@ -24,7 +24,7 @@ const grid =
  * left out entirely while the gallery is still empty.
  */
 async function Featured({ lang, dict }: Props) {
-  const tattoos = await getTattoos(lang, PICKS);
+  const tattoos = await getTattoos(PICKS);
   if (tattoos.length === 0) return null;
   const gallery = localePath(lang, "/tattoos");
 
@@ -38,7 +38,7 @@ async function Featured({ lang, dict }: Props) {
             photo={tattoo.image}
             aria={`${dict.featured.openGallery}: ${tattooAlt(tattoo, dict.tattoos, lang)}`}
             title={tattoo.style ? localized(tattoo.style.name, lang) : ""}
-            note={tattoo.artist?.nickname}
+            note={tattoo.artist ? localized(tattoo.artist.nickname, lang) : undefined}
             href={gallery}
             className=""
           />

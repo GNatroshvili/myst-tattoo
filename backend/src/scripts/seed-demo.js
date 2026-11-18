@@ -7,7 +7,6 @@ import { PiercingPlace } from "../models/PiercingPlace.js";
 import { PiercingZone } from "../models/PiercingZone.js";
 import { Style } from "../models/Style.js";
 import { Tattoo } from "../models/Tattoo.js";
-import { LANGS } from "../utils/http.js";
 import { saveImage } from "../utils/images.js";
 import { uniqueSlug } from "../utils/slug.js";
 
@@ -15,14 +14,14 @@ import { uniqueSlug } from "../utils/slug.js";
  * Fills the database with demo content for trying the site and the admin
  * panel out: `npm run seed:demo`.
  *
- * In each language it adds three tattoo artists with five tattoos each, one
- * piercer with five piercings, and a piercing price list (zones with places).
- * The records are exactly what the admin panel would create, so they can be
- * edited and deleted there. The pictures are drawn here (simple line art
- * marked "DEMO"), not real work.
+ * It adds three tattoo artists with five tattoos each, one piercer with five
+ * piercings, and a piercing price list (zones with places). Every record
+ * serves both sites, with its texts in both languages. They are exactly what
+ * the admin panel would create, so they can be edited and deleted there. The
+ * pictures are drawn here (simple line art marked "DEMO"), not real work.
  *
  * Safe to run again: an artist, zone or place that already exists (same
- * language and name) is left alone, with its works.
+ * English name) is left alone, with its works.
  */
 
 /* ---------- what gets added ---------- */
@@ -87,32 +86,32 @@ const ZONES = [
   {
     name: { ka: "ყური", en: "Ear" },
     places: [
-      { key: "lobe", name: { ka: "ბიბილო", en: "Lobe" }, price: { ka: "40 ₾", en: "40 GEL" } },
+      { key: "lobe", name: { ka: "ბიბილო", en: "Lobe" }, price: "40 ₾" },
       {
         key: "helix",
         name: { ka: "ჰელიქსი", en: "Helix" },
         note: { ka: "ყურის ზედა ხრტილი", en: "Upper ear cartilage" },
-        price: { ka: "60 ₾", en: "60 GEL" },
+        price: "60 ₾",
       },
-      { key: "tragus", name: { ka: "ტრაგუსი", en: "Tragus" }, price: { ka: "70 ₾", en: "70 GEL" } },
+      { key: "tragus", name: { ka: "ტრაგუსი", en: "Tragus" }, price: "70 ₾" },
     ],
   },
   {
     name: { ka: "სახე", en: "Face" },
     places: [
-      { key: "eyebrow", name: { ka: "წარბი", en: "Eyebrow" }, price: { ka: "80 ₾", en: "80 GEL" } },
+      { key: "eyebrow", name: { ka: "წარბი", en: "Eyebrow" }, price: "80 ₾" },
       {
         key: "nose",
         name: { ka: "ცხვირი", en: "Nose" },
         note: { ka: "ნესტო ან ძგიდე", en: "Nostril or septum" },
-        price: { ka: "70 ₾", en: "70 GEL" },
+        price: "70 ₾",
       },
-      { key: "lip", name: { ka: "ტუჩი", en: "Lip" }, price: { ka: "90 ₾", en: "90 GEL" } },
+      { key: "lip", name: { ka: "ტუჩი", en: "Lip" }, price: "90 ₾" },
     ],
   },
   {
     name: { ka: "სხეული", en: "Body" },
-    places: [{ key: "navel", name: { ka: "ჭიპი", en: "Navel" }, price: { ka: "100 ₾", en: "100 GEL" } }],
+    places: [{ key: "navel", name: { ka: "ჭიპი", en: "Navel" }, price: "100 ₾" }],
   },
 ];
 
@@ -285,69 +284,64 @@ for (const name of STYLES) {
   styles.set(name.en, style);
 }
 
-for (const lang of LANGS) {
-  // the price list: zones, and the places inside each
-  const places = new Map();
-  for (const zone of ZONES) {
-    let zoneDoc = await PiercingZone.findOne({ lang, name: zone.name[lang] });
-    if (!zoneDoc) {
-      zoneDoc = await PiercingZone.create({ lang, name: zone.name[lang] });
-      added.zones += 1;
-    }
-    for (const place of zone.places) {
-      let placeDoc = await PiercingPlace.findOne({ zone: zoneDoc._id, name: place.name[lang] });
-      if (!placeDoc) {
-        placeDoc = await PiercingPlace.create({
-          zone: zoneDoc._id,
-          lang,
-          name: place.name[lang],
-          note: place.note?.[lang] ?? "",
-          price: place.price[lang],
-        });
-        added.places += 1;
-      }
-      places.set(place.key, placeDoc);
-    }
+// the price list: zones, and the places inside each
+const places = new Map();
+for (const zone of ZONES) {
+  let zoneDoc = await PiercingZone.findOne({ "name.en": zone.name.en });
+  if (!zoneDoc) {
+    zoneDoc = await PiercingZone.create({ name: zone.name });
+    added.zones += 1;
   }
-
-  // the artists; one that is already there keeps what it has and gets nothing new
-  const fresh = [];
-  for (const [index, artist] of ARTISTS.entries()) {
-    const nickname = artist.name[lang];
-    if (await Artist.exists({ lang, nickname })) {
-      console.log(`[seed] ${lang}: ${nickname} is already there, left as is`);
-      continue;
+  for (const place of zone.places) {
+    let placeDoc = await PiercingPlace.findOne({ zone: zoneDoc._id, "name.en": place.name.en });
+    if (!placeDoc) {
+      placeDoc = await PiercingPlace.create({
+        zone: zoneDoc._id,
+        name: place.name,
+        note: place.note ?? { ka: "", en: "" },
+        price: place.price,
+      });
+      added.places += 1;
     }
-    const doc = await Artist.create({
-      lang,
-      nickname,
-      slug: await uniqueSlug(nickname, (slug) => Artist.exists({ lang, slug })),
-      styles: artist.styles.map((name) => styles.get(name)._id),
-      bio: artist.bio[lang],
-      instagramUrl: artist.instagram,
-      photo: await saveImage(portrait(artist.hue)),
-    });
-    added.artists += 1;
-    fresh.push({ artist, doc, index });
+    places.set(place.key, placeDoc);
   }
+}
 
-  // their works, one round at a time, so the galleries mix the artists
-  for (let round = 0; round < 5; round++) {
-    for (const { artist, doc, index } of fresh) {
-      const rnd = random(index * 100 + round + 1);
-      const [width, height] = SIZES[(round + index) % SIZES.length];
-      const style = artist.tattoos?.[round];
-      if (style) {
-        const image = await saveImage(picture(width, height, artist.hue, TATTOO_ART[style](rnd, round)));
-        await Tattoo.create({ lang, image, style: styles.get(style)._id, artist: doc._id });
-        added.tattoos += 1;
-      }
-      const place = artist.piercings?.[round];
-      if (place) {
-        const image = await saveImage(picture(width, height, artist.hue, PIERCING_ART[place](rnd)));
-        await Piercing.create({ lang, image, place: places.get(place)._id, artist: doc._id });
-        added.piercings += 1;
-      }
+// the artists; one that is already there keeps what it has and gets nothing new
+const fresh = [];
+for (const [index, artist] of ARTISTS.entries()) {
+  if (await Artist.exists({ "nickname.en": artist.name.en })) {
+    console.log(`[seed] ${artist.name.en} is already there, left as is`);
+    continue;
+  }
+  const doc = await Artist.create({
+    nickname: artist.name,
+    slug: await uniqueSlug(artist.name.en, (slug) => Artist.exists({ slug })),
+    styles: artist.styles.map((name) => styles.get(name)._id),
+    bio: artist.bio,
+    instagramUrl: artist.instagram,
+    photo: await saveImage(portrait(artist.hue)),
+  });
+  added.artists += 1;
+  fresh.push({ artist, doc, index });
+}
+
+// their works, one round at a time, so the galleries mix the artists
+for (let round = 0; round < 5; round++) {
+  for (const { artist, doc, index } of fresh) {
+    const rnd = random(index * 100 + round + 1);
+    const [width, height] = SIZES[(round + index) % SIZES.length];
+    const style = artist.tattoos?.[round];
+    if (style) {
+      const image = await saveImage(picture(width, height, artist.hue, TATTOO_ART[style](rnd, round)));
+      await Tattoo.create({ image, style: styles.get(style)._id, artist: doc._id });
+      added.tattoos += 1;
+    }
+    const place = artist.piercings?.[round];
+    if (place) {
+      const image = await saveImage(picture(width, height, artist.hue, PIERCING_ART[place](rnd)));
+      await Piercing.create({ image, place: places.get(place)._id, artist: doc._id });
+      added.piercings += 1;
     }
   }
 }

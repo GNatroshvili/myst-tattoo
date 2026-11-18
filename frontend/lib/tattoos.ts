@@ -6,6 +6,6 @@ import { localized, type Tattoo } from "./types";
 export function tattooAlt(tattoo: Tattoo, t: Dictionary["tattoos"], lang: Locale) {
   const style = tattoo.style ? localized(tattoo.style.name, lang) : "";
   return tattoo.artist
-    ? t.photoAltBy.replace("{style}", style).replace("{artist}", tattoo.artist.nickname)
+    ? t.photoAltBy.replace("{style}", style).replace("{artist}", localized(tattoo.artist.nickname, lang))
     : t.photoAlt.replace("{style}", style);
 }

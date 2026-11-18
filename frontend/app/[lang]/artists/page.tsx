@@ -25,7 +25,7 @@ const grid = "grid grid-cols-[repeat(auto-fill,minmax(226px,1fr))] gap-x-6 gap-y
 
 /** The artists, read from the backend when the page is requested. */
 async function ArtistsGrid({ lang, t }: { lang: Locale; t: Dictionary["artists"] }) {
-  const artists = await getArtists(lang);
+  const artists = await getArtists();
 
   if (artists.length === 0) {
     return <EmptyNote lang={lang} title={t.emptyTitle} text={t.emptyText} className="mt-[60px]" />;
@@ -35,7 +35,8 @@ async function ArtistsGrid({ lang, t }: { lang: Locale; t: Dictionary["artists"]
     <section aria-label={t.gridAria} className={grid}>
       {artists.map((artist) => {
         const profile = localePath(lang, `/artists/${artist.slug}`);
-        const { bio } = artist;
+        const name = localized(artist.nickname, lang);
+        const bio = localized(artist.bio, lang);
         // tattoo styles, and "Piercing" for an artist who has piercings attached
         const tags = artist.styles.map((style) => localized(style.name, lang));
         if (artist.piercingCount) tags.push(t.piercingTag);
@@ -43,14 +44,14 @@ async function ArtistsGrid({ lang, t }: { lang: Locale; t: Dictionary["artists"]
           <article key={artist.id} className="flex flex-col">
             <PhotoFrame
               ratio="3 / 4"
-              aria={`${t.openProfile}: ${artist.nickname}`}
+              aria={`${t.openProfile}: ${name}`}
               photo={artist.photo}
               label={displayCase(t.photoLabel, lang)}
               icon={<PersonIcon className="h-11 w-11 text-rose" />}
               href={profile}
             />
             <div className="flex flex-wrap items-baseline justify-between gap-x-2.5 gap-y-0.5 px-1 pt-3">
-              <h2 className="text-[18px] font-medium leading-6 text-cream">{artist.nickname}</h2>
+              <h2 className="text-[18px] font-medium leading-6 text-cream">{name}</h2>
               <span className="text-[13px] leading-5 text-muted">
                 {tags.join(" / ")}
               </span>

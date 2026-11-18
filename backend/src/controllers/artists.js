@@ -2,7 +2,7 @@ import { Artist } from "../models/Artist.js";
 import { Piercing } from "../models/Piercing.js";
 import { Style } from "../models/Style.js";
 import { Tattoo } from "../models/Tattoo.js";
-import { badRequest, isId, list, notFound, queryLang, readLang, text } from "../utils/http.js";
+import { badRequest, isId, list, notFound, text } from "../utils/http.js";
 import { removeImage, saveImage } from "../utils/images.js";
 import * as serialize from "../utils/serialize.js";
 import { uniqueSlug } from "../utils/slug.js";
@@ -35,6 +35,13 @@ function instagramUrl(value) {
   return `https://instagram.com/${handle}`;
 }
 
+/** The nickname in one language; it cannot be empty. */
+function readNickname(value, language) {
+  const nickname = text(value, { field: `${language} nickname`, max: 60 });
+  if (!nickname) throw badRequest("A nickname is needed in both languages", "both_languages");
+  return nickname;
+}
+
 /** The style ids from the form, checked against the styles that exist. */
 async function readStyles(value) {
   const ids = list(value, "Styles");
@@ -47,17 +54,13 @@ async function readStyles(value) {
 
 /**
  * The ids of an artist's works from the form (`Model` is Tattoo or Piercing),
- * checked against the ones that exist. An artist can only have works of their
- * own language. `what` names them in messages: "tattoos", "piercings".
+ * checked against the ones that exist. `what` names them in messages.
  */
-async function readWorks(Model, value, lang, what) {
+async function readWorks(Model, value, what) {
   const ids = list(value, what);
   if (ids === undefined) return undefined;
   if (!ids.every(isId) || (await Model.countDocuments({ _id: { $in: ids } })) !== ids.length) {
     throw badRequest(`One of the chosen ${what} does not exist`);
-  }
-  if ((await Model.countDocuments({ _id: { $in: ids }, lang })) !== ids.length) {
-    throw badRequest(`One of the chosen ${what} belongs to the other language`, "lang_mismatch");
   }
   return ids;
 }
@@ -77,15 +80,9 @@ async function countByArtist(Model) {
   return new Map(counts.map((c) => [String(c._id), c.n]));
 }
 
-/**
- * By id (the admin panel) or by slug (the public profile page). A slug is only
- * unique within a language, so the public page says which one it wants; given
- * a language, an artist of the other one is not found.
- */
-async function findArtist(key, lang) {
-  const filter = isId(key) ? { _id: key } : { slug: key };
-  if (lang) filter.lang = lang;
-  const artist = await Artist.findOne(filter);
+/** By id (the admin panel) or by slug (the public profile page). */
+async function findArtist(key) {
+  const artist = await Artist.findOne(isId(key) ? { _id: key } : { slug: key });
   if (!artist) throw notFound("Artist not found");
   return artist;
 }
@@ -97,13 +94,12 @@ const artistPiercings = (artistId) =>
   populatedPiercings(Piercing.find({ artist: artistId }).sort({ createdAt: -1 }));
 
 /**
- * Every artist, or with `?lang=ka` only that language's, each with how many
- * tattoos and piercings they have. Tattoo artists and piercers are one list.
+ * Every artist, each with how many tattoos and piercings they have. Tattoo
+ * artists and piercers are one list.
  */
-export async function listArtists(req, res) {
-  const lang = queryLang(req.query.lang);
+export async function listArtists(_req, res) {
   const [artists, tattoos, piercings] = await Promise.all([
-    Artist.find(lang ? { lang } : {}).sort({ createdAt: 1 }).populate("styles"),
+    Artist.find().sort({ createdAt: 1 }).populate("styles"),
     countByArtist(Tattoo),
     countByArtist(Piercing),
   ]);
@@ -119,7 +115,7 @@ export async function listArtists(req, res) {
 
 /** One artist with everything they have tattooed and pierced, newest first. */
 export async function getArtist(req, res) {
-  const artist = await findArtist(req.params.key, queryLang(req.query.lang));
+  const artist = await findArtist(req.params.key);
   await artist.populate("styles");
   const [tattoos, piercings] = await Promise.all([
     artistTattoos(artist._id),
@@ -133,26 +129,30 @@ export async function getArtist(req, res) {
   );
 }
 
+/** One artist for both sites: the nickname and the bio come in both languages. */
 export async function createArtist(req, res) {
-  const lang = readLang(req.body.lang);
-  const nickname = text(req.body.nickname, { field: "Nickname", max: 60 });
-  if (!nickname) throw badRequest("A nickname is required");
-
+  const nickname = {
+    ka: readNickname(req.body.nicknameKa, "Georgian"),
+    en: readNickname(req.body.nicknameEn, "English"),
+  };
   const fields = {
-    lang,
     nickname,
     styles: (await readStyles(req.body.styles)) ?? [],
-    bio: text(req.body.bio, { field: "Bio", max: 1200 }),
+    bio: {
+      ka: text(req.body.bioKa, { field: "Georgian bio", max: 1200 }),
+      en: text(req.body.bioEn, { field: "English bio", max: 1200 }),
+    },
     instagramUrl: instagramUrl(req.body.instagramUrl),
   };
-  const tattoos = await readWorks(Tattoo, req.body.tattoos, lang, "tattoos");
-  const piercings = await readWorks(Piercing, req.body.piercings, lang, "piercings");
+  const tattoos = await readWorks(Tattoo, req.body.tattoos, "tattoos");
+  const piercings = await readWorks(Piercing, req.body.piercings, "piercings");
 
   // everything is valid: only now touch the disk and the database
   const photo = req.file ? await saveImage(req.file.buffer) : null;
   let artist;
   try {
-    const slug = await uniqueSlug(nickname, (s) => Artist.exists({ lang, slug: s }));
+    // the address comes from the English nickname (Georgian letters are written in Latin ones)
+    const slug = await uniqueSlug(nickname.en, (s) => Artist.exists({ slug: s }));
     artist = await Artist.create({ ...fields, slug, photo });
   } catch (err) {
     await removeImage(photo);
@@ -165,30 +165,28 @@ export async function createArtist(req, res) {
   res.status(201).json(serialize.artist(artist));
 }
 
-/** Changes only the fields that were sent. The language is set once, when the artist is added. */
+/** Changes only the fields that were sent. */
 export async function updateArtist(req, res) {
   const artist = await findArtist(req.params.key);
   const body = req.body;
-  if (body.lang !== undefined && body.lang !== artist.lang) {
-    throw badRequest("The language of an artist cannot be changed", "lang_fixed");
-  }
 
-  if (body.nickname !== undefined) {
-    const nickname = text(body.nickname, { field: "Nickname", max: 60 });
-    if (!nickname) throw badRequest("A nickname is required");
-    if (nickname !== artist.nickname) {
-      artist.nickname = nickname;
+  if (body.nicknameKa !== undefined) artist.nickname.ka = readNickname(body.nicknameKa, "Georgian");
+  if (body.nicknameEn !== undefined) {
+    const nickname = readNickname(body.nicknameEn, "English");
+    if (nickname !== artist.nickname.en) {
+      artist.nickname.en = nickname;
       artist.slug = await uniqueSlug(nickname, (s) =>
-        Artist.exists({ lang: artist.lang, slug: s, _id: { $ne: artist._id } })
+        Artist.exists({ slug: s, _id: { $ne: artist._id } })
       );
     }
   }
   const styles = await readStyles(body.styles);
   if (styles) artist.styles = styles;
-  if (body.bio !== undefined) artist.bio = text(body.bio, { field: "Bio", max: 1200 });
+  if (body.bioKa !== undefined) artist.bio.ka = text(body.bioKa, { field: "Georgian bio", max: 1200 });
+  if (body.bioEn !== undefined) artist.bio.en = text(body.bioEn, { field: "English bio", max: 1200 });
   if (body.instagramUrl !== undefined) artist.instagramUrl = instagramUrl(body.instagramUrl);
-  const tattoos = await readWorks(Tattoo, body.tattoos, artist.lang, "tattoos");
-  const piercings = await readWorks(Piercing, body.piercings, artist.lang, "piercings");
+  const tattoos = await readWorks(Tattoo, body.tattoos, "tattoos");
+  const piercings = await readWorks(Piercing, body.piercings, "piercings");
 
   // everything is valid: only now touch the disk and the database
   const oldPhoto = artist.photo;

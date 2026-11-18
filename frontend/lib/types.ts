@@ -26,33 +26,28 @@ export type ArtistBrief = {
   id: string;
   /** last part of the profile's address: /artists/<slug> */
   slug: string;
-  nickname: string;
+  /** as each site shows it: "ნიკა" on /ka, "Nika" on /en */
+  nickname: Localized;
   photo: Photo | null;
 };
 
 export type Tattoo = {
   id: string;
-  /** which site's gallery shows it: /ka or /en */
-  lang: Locale;
   image: Photo;
   /** null only if the style was deleted from under it */
   style: Style | null;
-  /** null until the tattoo is attached to an artist (always one of its own language) */
+  /** null until the tattoo is attached to an artist */
   artist: ArtistBrief | null;
   createdAt: string;
 };
 
-/**
- * An artist as one language's site shows them: the same person on both sites
- * is two records, each with its own nickname, bio and works.
- */
 /** One line of a piercing zone's price list: a place within the zone and its price. */
 export type PiercingPlace = {
   id: string;
-  name: string;
-  /** small line under the name; "" when there is none */
-  note: string;
-  /** as the visitor reads it: "80 ₾", "from 60 ₾" */
+  name: Localized;
+  /** small line under the name; "" in a language that has none */
+  note: Localized;
+  /** as the visitor reads it on both sites: "80 ₾" */
   price: string;
   /** how many piercing photos sit in this place (the admin panel uses it) */
   piercingCount?: number;
@@ -61,31 +56,26 @@ export type PiercingPlace = {
 /** A part of the body where piercings are done ("Ear", "Face"), with its price list. */
 export type PiercingZone = {
   id: string;
-  /** which site shows this zone: /ka or /en */
-  lang: Locale;
-  name: string;
+  name: Localized;
   places: PiercingPlace[];
 };
 
 /** A photo of a piercing done at the studio. */
 export type Piercing = {
   id: string;
-  /** which site's gallery shows it: /ka or /en */
-  lang: Locale;
   image: Photo;
   /** where it sits; null only if its place was deleted from under it */
-  place: { id: string; name: string; zone: { id: string; name: string } | null } | null;
-  /** null until the piercing is attached to an artist (always one of its own language) */
+  place: { id: string; name: Localized; zone: { id: string; name: Localized } | null } | null;
+  /** null until the piercing is attached to an artist */
   artist: ArtistBrief | null;
   createdAt: string;
 };
 
+/** An artist. One record serves both sites: the nickname and the bio are in both languages. */
 export type Artist = ArtistBrief & {
-  /** which site shows this artist: /ka or /en */
-  lang: Locale;
   styles: Style[];
-  /** in the artist's language; "" when there is none */
-  bio: string;
+  /** "" in a language that has none; the page then shows the other one */
+  bio: Localized;
   /** "" when the artist has no Instagram */
   instagramUrl: string;
   /** come with the list of artists: a tattoo artist has tattoos, a piercer has piercings */

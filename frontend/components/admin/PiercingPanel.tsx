@@ -1,25 +1,10 @@
 "use client";
 
 import { useRef, useState, type FormEvent } from "react";
-import type { Locale } from "@/lib/i18n/config";
 import type { Piercing, PiercingPlace, PiercingZone } from "@/lib/types";
 import type { PanelProps } from "./AdminApp";
 import { api, form, json } from "./api";
-import {
-  Card,
-  CardTitle,
-  ChosenLanguage,
-  ConfirmDelete,
-  Hint,
-  LangBadge,
-  LanguageFilter,
-  LanguagePick,
-  Notice,
-  PHOTO_TYPES,
-  Select,
-  Thumb,
-  languageOf,
-} from "./ui";
+import { Card, CardTitle, ConfirmDelete, Hint, Notice, PHOTO_TYPES, Select, Thumb } from "./ui";
 
 type Actions = Pick<PanelProps, "reload" | "explain">;
 
@@ -46,17 +31,17 @@ function useAction({ reload, explain }: Actions) {
   return { busy, error, run };
 }
 
-/** The places of one language as a drop-down's choices, grouped under their zones. */
-function PlaceOptions({ zones, lang }: { zones: PiercingZone[]; lang: Locale }) {
+/** Every place as a drop-down's choices, grouped under its zone. */
+function PlaceOptions({ zones }: { zones: PiercingZone[] }) {
   return (
     <>
       {zones
-        .filter((zone) => zone.lang === lang && zone.places.length > 0)
+        .filter((zone) => zone.places.length > 0)
         .map((zone) => (
-          <optgroup key={zone.id} label={zone.name}>
+          <optgroup key={zone.id} label={zone.name.ka}>
             {zone.places.map((place) => (
               <option key={place.id} value={place.id}>
-                {place.name}
+                {place.name.ka}
               </option>
             ))}
           </optgroup>
@@ -65,59 +50,92 @@ function PlaceOptions({ zones, lang }: { zones: PiercingZone[]; lang: Locale }) 
   );
 }
 
-const placeFields = "flex flex-wrap items-end gap-2.5";
-const nameField = "field h-[46px] min-w-0 flex-[1_1_150px] px-3.5";
-const noteField = "field h-[46px] min-w-0 flex-[2_1_220px] px-3.5";
-const priceField = "field h-[46px] min-w-0 flex-[0_1_130px] px-3.5";
+const input = "field h-[46px] min-w-0 px-3.5";
+/** two names side by side, then the price, then the buttons; they wrap on a phone */
+const row = "flex flex-wrap items-end gap-2.5";
+const nameCell = "min-w-0 flex-[1_1_150px]";
+const priceCell = "min-w-0 flex-[0_1_120px]";
 
-/** One line of a zone's price list: a place, its note and its price, editable in place. */
+/** One line of a zone's price list: a place's names, price and notes, editable in place. */
 function PlaceRow({ place, ...actions }: { place: PiercingPlace } & Actions) {
-  const [name, setName] = useState(place.name);
-  const [note, setNote] = useState(place.note);
+  const [nameKa, setNameKa] = useState(place.name.ka);
+  const [nameEn, setNameEn] = useState(place.name.en);
   const [price, setPrice] = useState(place.price);
+  const [noteKa, setNoteKa] = useState(place.note.ka);
+  const [noteEn, setNoteEn] = useState(place.note.en);
   const { busy, error, run } = useAction(actions);
-  const changed = name.trim() !== place.name || note.trim() !== place.note || price.trim() !== place.price;
+  const changed =
+    nameKa.trim() !== place.name.ka ||
+    nameEn.trim() !== place.name.en ||
+    price.trim() !== place.price ||
+    noteKa.trim() !== place.note.ka ||
+    noteEn.trim() !== place.note.en;
 
   return (
-    <li className="border-b border-cream/12 py-3 last:border-b-0">
+    <li className="border-b border-cream/12 py-3.5 last:border-b-0">
       <form
         onSubmit={(event) => {
           event.preventDefault();
-          void run(() => api(`/piercing/places/${place.id}`, json("PATCH", { name, note, price })));
+          void run(() =>
+            api(
+              `/piercing/places/${place.id}`,
+              json("PATCH", { name: { ka: nameKa, en: nameEn }, note: { ka: noteKa, en: noteEn }, price })
+            )
+          );
         }}
-        className={placeFields}
+        className="flex flex-col gap-2.5"
       >
-        <input
-          aria-label="ადგილის სახელი"
-          required
-          maxLength={60}
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className={nameField}
-        />
-        <input
-          aria-label="შენიშვნა"
-          maxLength={160}
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
-          placeholder="შენიშვნა (არასავალდებულო)"
-          className={noteField}
-        />
-        <input
-          aria-label="ფასი"
-          required
-          maxLength={40}
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
-          className={priceField}
-        />
-        <button type="submit" disabled={busy || !changed} className="btn btn-outline btn-sm disabled:opacity-40">
-          შენახვა
-        </button>
-        <ConfirmDelete
-          disabled={busy}
-          onConfirm={() => void run(() => api(`/piercing/places/${place.id}`, { method: "DELETE" }))}
-        />
+        <div className={row}>
+          <input
+            aria-label="ადგილის სახელი ქართულად"
+            required
+            maxLength={60}
+            value={nameKa}
+            onChange={(e) => setNameKa(e.target.value)}
+            className={`${input} ${nameCell}`}
+          />
+          <input
+            aria-label="ადგილის სახელი ინგლისურად"
+            required
+            maxLength={60}
+            value={nameEn}
+            onChange={(e) => setNameEn(e.target.value)}
+            className={`${input} ${nameCell}`}
+          />
+          <input
+            aria-label="ფასი"
+            required
+            maxLength={40}
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
+            className={`${input} ${priceCell}`}
+          />
+          <button type="submit" disabled={busy || !changed} className="btn btn-outline btn-sm disabled:opacity-40">
+            შენახვა
+          </button>
+          <ConfirmDelete
+            disabled={busy}
+            onConfirm={() => void run(() => api(`/piercing/places/${place.id}`, { method: "DELETE" }))}
+          />
+        </div>
+        <div className={row}>
+          <input
+            aria-label="შენიშვნა ქართულად"
+            maxLength={160}
+            value={noteKa}
+            onChange={(e) => setNoteKa(e.target.value)}
+            placeholder="შენიშვნა ქართულად"
+            className={`${input} ${nameCell} h-[40px] text-[14px]`}
+          />
+          <input
+            aria-label="შენიშვნა ინგლისურად"
+            maxLength={160}
+            value={noteEn}
+            onChange={(e) => setNoteEn(e.target.value)}
+            placeholder="Note in English"
+            className={`${input} ${nameCell} h-[40px] text-[14px]`}
+          />
+        </div>
       </form>
       {error && (
         <div className="mt-2.5">
@@ -128,24 +146,33 @@ function PlaceRow({ place, ...actions }: { place: PiercingPlace } & Actions) {
   );
 }
 
-/** One zone: its name, its places with their prices, and the form for adding a place. */
+/** One zone: its two names, its places with their prices, and the form for adding a place. */
 function ZoneCard({ zone, ...actions }: { zone: PiercingZone } & Actions) {
-  const [zoneName, setZoneName] = useState(zone.name);
-  const [name, setName] = useState("");
-  const [note, setNote] = useState("");
+  const [zoneKa, setZoneKa] = useState(zone.name.ka);
+  const [zoneEn, setZoneEn] = useState(zone.name.en);
+  const [nameKa, setNameKa] = useState("");
+  const [nameEn, setNameEn] = useState("");
   const [price, setPrice] = useState("");
+  const [noteKa, setNoteKa] = useState("");
+  const [noteEn, setNoteEn] = useState("");
   const rename = useAction(actions);
   const add = useAction(actions);
+  const renamed = zoneKa.trim() !== zone.name.ka || zoneEn.trim() !== zone.name.en;
 
   async function addPlace(event: FormEvent) {
     event.preventDefault();
     const added = await add.run(() =>
-      api(`/piercing/zones/${zone.id}/places`, json("POST", { name, note, price }))
+      api(
+        `/piercing/zones/${zone.id}/places`,
+        json("POST", { name: { ka: nameKa, en: nameEn }, note: { ka: noteKa, en: noteEn }, price })
+      )
     );
     if (added) {
-      setName("");
-      setNote("");
+      setNameKa("");
+      setNameEn("");
       setPrice("");
+      setNoteKa("");
+      setNoteEn("");
     }
   }
 
@@ -154,24 +181,29 @@ function ZoneCard({ zone, ...actions }: { zone: PiercingZone } & Actions) {
       <form
         onSubmit={(event) => {
           event.preventDefault();
-          void rename.run(() => api(`/piercing/zones/${zone.id}`, json("PATCH", { name: zoneName })));
+          void rename.run(() =>
+            api(`/piercing/zones/${zone.id}`, json("PATCH", { name: { ka: zoneKa, en: zoneEn } }))
+          );
         }}
-        className="flex flex-wrap items-center gap-2.5"
+        className={row}
       >
         <input
-          aria-label="ზონის სახელი"
+          aria-label="ზონის სახელი ქართულად"
           required
           maxLength={40}
-          value={zoneName}
-          onChange={(e) => setZoneName(e.target.value)}
-          className="field h-[46px] min-w-0 flex-[1_1_180px] px-3.5 text-[17px] font-medium"
+          value={zoneKa}
+          onChange={(e) => setZoneKa(e.target.value)}
+          className={`${input} ${nameCell} text-[17px] font-medium`}
         />
-        <LangBadge lang={zone.lang} />
-        <button
-          type="submit"
-          disabled={rename.busy || zoneName.trim() === zone.name}
-          className="btn btn-outline btn-sm disabled:opacity-40"
-        >
+        <input
+          aria-label="ზონის სახელი ინგლისურად"
+          required
+          maxLength={40}
+          value={zoneEn}
+          onChange={(e) => setZoneEn(e.target.value)}
+          className={`${input} ${nameCell} text-[17px] font-medium`}
+        />
+        <button type="submit" disabled={rename.busy || !renamed} className="btn btn-outline btn-sm disabled:opacity-40">
           შენახვა
         </button>
         <ConfirmDelete
@@ -196,7 +228,7 @@ function ZoneCard({ zone, ...actions }: { zone: PiercingZone } & Actions) {
           {/* the key includes the values, so a row starts afresh once its change is saved */}
           {zone.places.map((place) => (
             <PlaceRow
-              key={`${place.id}:${place.name}:${place.note}:${place.price}`}
+              key={`${place.id}:${place.name.ka}:${place.name.en}:${place.note.ka}:${place.note.en}:${place.price}`}
               place={place}
               {...actions}
             />
@@ -204,42 +236,64 @@ function ZoneCard({ zone, ...actions }: { zone: PiercingZone } & Actions) {
         </ul>
       )}
 
-      <form onSubmit={addPlace} className={`${placeFields} mt-4 border-t border-cream/12 pt-4`}>
-        <label className="min-w-0 flex-[1_1_150px]">
-          <span className="field-label mb-2">ახალი ადგილი *</span>
+      <form onSubmit={addPlace} className="mt-4 flex flex-col gap-2.5 border-t border-cream/12 pt-4">
+        <p className="field-label">ახალი ადგილი</p>
+        <div className={row}>
+          <label className={nameCell}>
+            <span className="mb-1.5 block text-[13px] leading-5 text-muted">ქართულად *</span>
+            <input
+              required
+              maxLength={60}
+              value={nameKa}
+              onChange={(e) => setNameKa(e.target.value)}
+              placeholder="მაგ.: წარბი"
+              className={`${input} w-full`}
+            />
+          </label>
+          <label className={nameCell}>
+            <span className="mb-1.5 block text-[13px] leading-5 text-muted">ინგლისურად *</span>
+            <input
+              required
+              maxLength={60}
+              value={nameEn}
+              onChange={(e) => setNameEn(e.target.value)}
+              placeholder="e.g. Eyebrow"
+              className={`${input} w-full`}
+            />
+          </label>
+          <label className={priceCell}>
+            <span className="mb-1.5 block text-[13px] leading-5 text-muted">ფასი *</span>
+            <input
+              required
+              maxLength={40}
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              placeholder="80 ₾"
+              className={`${input} w-full`}
+            />
+          </label>
+          <button type="submit" disabled={add.busy} className="btn btn-gold btn-sm h-[46px] disabled:opacity-60">
+            + ადგილის დამატება
+          </button>
+        </div>
+        <div className={row}>
           <input
-            required
-            maxLength={60}
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder={zone.lang === "ka" ? "მაგ.: წარბი" : "e.g. Eyebrow"}
-            className="field h-[46px] px-3.5"
-          />
-        </label>
-        <label className="min-w-0 flex-[2_1_220px]">
-          <span className="field-label mb-2">შენიშვნა</span>
-          <input
+            aria-label="ახალი ადგილის შენიშვნა ქართულად"
             maxLength={160}
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
-            placeholder="არასავალდებულო"
-            className="field h-[46px] px-3.5"
+            value={noteKa}
+            onChange={(e) => setNoteKa(e.target.value)}
+            placeholder="შენიშვნა ქართულად"
+            className={`${input} ${nameCell} h-[40px] text-[14px]`}
           />
-        </label>
-        <label className="min-w-0 flex-[0_1_130px]">
-          <span className="field-label mb-2">ფასი *</span>
           <input
-            required
-            maxLength={40}
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-            placeholder="80 ₾"
-            className="field h-[46px] px-3.5"
+            aria-label="ახალი ადგილის შენიშვნა ინგლისურად"
+            maxLength={160}
+            value={noteEn}
+            onChange={(e) => setNoteEn(e.target.value)}
+            placeholder="Note in English"
+            className={`${input} ${nameCell} h-[40px] text-[14px]`}
           />
-        </label>
-        <button type="submit" disabled={add.busy} className="btn btn-gold btn-sm h-[46px] disabled:opacity-60">
-          + ადგილის დამატება
-        </button>
+        </div>
       </form>
       {add.error && (
         <div className="mt-2.5">
@@ -250,103 +304,72 @@ function ZoneCard({ zone, ...actions }: { zone: PiercingZone } & Actions) {
   );
 }
 
-/** Zones and their price lists: add a zone (language first), then places inside it. */
+/** Zones and their price lists: add a zone, then places inside it. */
 function ZonesCard({ zones, ...actions }: { zones: PiercingZone[] } & Actions) {
-  /** whether the "new zone" form is open, and the language picked for it */
-  const [adding, setAdding] = useState(false);
-  const [lang, setLang] = useState<Locale | null>(null);
-  const [name, setName] = useState("");
-  const [show, setShow] = useState<Locale | "all">("all");
+  const [ka, setKa] = useState("");
+  const [en, setEn] = useState("");
   const { busy, error, run } = useAction(actions);
-
-  function close() {
-    setAdding(false);
-    setLang(null);
-    setName("");
-  }
 
   async function addZone(event: FormEvent) {
     event.preventDefault();
-    if (!lang) return;
-    if (await run(() => api("/piercing/zones", json("POST", { lang, name })))) close();
+    if (await run(() => api("/piercing/zones", json("POST", { name: { ka, en } })))) {
+      setKa("");
+      setEn("");
+    }
   }
-
-  const shown = zones.filter((zone) => show === "all" || zone.lang === show);
 
   return (
     <Card>
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <CardTitle>ზონები და ფასები</CardTitle>
-        {!adding && (
-          <button type="button" onClick={() => setAdding(true)} className="btn btn-gold btn-sm">
-            + ზონის დამატება
-          </button>
-        )}
-      </div>
+      <CardTitle>ზონები და ფასები</CardTitle>
       <Hint className="mt-1.5">
         ჯერ დაამატე ზონა (მაგ.: ყური, სახე), შემდეგ ზონის შიგნით — ადგილები თავისი ფასებით (მაგ.: წარბი,
-        ცხვირი, ტუჩი). საიტზე მარცხნივ ზონები ჩანს, მარჯვნივ კი არჩეული ზონის ადგილები და ფასები.
+        ცხვირი, ტუჩი). სახელებს წერ ორივე ენაზე: ქართული ჩანს საიტის ქართულ გვერდზე, ინგლისური —
+        ინგლისურზე; ფასი ორივეგან ერთია. საიტზე მარცხნივ ზონები ჩანს, მარჯვნივ კი არჩეული ზონის ადგილები
+        და ფასები.
       </Hint>
 
-      {adding && (
-        <div className="mt-5 rounded-[14px] border border-cream/16 bg-ink p-4 sm:p-5">
-          <p className="text-[17px] font-medium leading-6 text-cream">ახალი ზონა</p>
-          {!lang ? (
-            // adding starts with the language: the name is asked only once it is picked
-            <div className="mt-4">
-              <LanguagePick onPick={setLang} />
-            </div>
-          ) : (
-            <form onSubmit={addZone} className="mt-4 flex flex-col gap-4">
-              <ChosenLanguage lang={lang} onChange={() => setLang(null)} />
-              <label>
-                <span className="field-label mb-2">ზონის სახელი *</span>
-                <input
-                  required
-                  maxLength={40}
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder={lang === "ka" ? "მაგ.: სახე" : "e.g. Face"}
-                  className="field h-[46px] px-3.5"
-                />
-                <Hint className="mt-2">ჩაწერე ისე, როგორც {languageOf(lang).onSite} უნდა ეწეროს.</Hint>
-              </label>
-              {error && <Notice kind="error">{error}</Notice>}
-              <div className="flex flex-wrap gap-3">
-                <button type="submit" disabled={busy} className="btn btn-gold disabled:opacity-60">
-                  {busy ? "ინახება…" : "ზონის დამატება"}
-                </button>
-              </div>
-            </form>
-          )}
-          <button type="button" onClick={close} disabled={busy} className="btn btn-outline mt-4">
-            გაუქმება
-          </button>
+      <form onSubmit={addZone} className={`${row} mt-4`}>
+        <label className={nameCell}>
+          <span className="field-label mb-2">ახალი ზონა ქართულად *</span>
+          <input
+            required
+            maxLength={40}
+            value={ka}
+            onChange={(e) => setKa(e.target.value)}
+            placeholder="მაგ.: სახე"
+            className={`${input} w-full`}
+          />
+        </label>
+        <label className={nameCell}>
+          <span className="field-label mb-2">ინგლისურად *</span>
+          <input
+            required
+            maxLength={40}
+            value={en}
+            onChange={(e) => setEn(e.target.value)}
+            placeholder="e.g. Face"
+            className={`${input} w-full`}
+          />
+        </label>
+        <button type="submit" disabled={busy} className="btn btn-gold h-[46px] disabled:opacity-60">
+          + ზონის დამატება
+        </button>
+      </form>
+      {error && (
+        <div className="mt-3">
+          <Notice kind="error">{error}</Notice>
         </div>
       )}
 
       {zones.length === 0 ? (
         <Hint className="mt-4">ზონები ჯერ არ არის დამატებული.</Hint>
       ) : (
-        <>
-          <div className="mt-5">
-            <LanguageFilter
-              value={show}
-              onChange={setShow}
-              count={(key) => zones.filter((zone) => key === "all" || zone.lang === key).length}
-            />
-          </div>
-          {shown.length === 0 ? (
-            <Hint className="mt-4">ამ ენისთვის ზონები ჯერ არ არის დამატებული.</Hint>
-          ) : (
-            <ul className="mt-4 flex flex-col gap-3.5">
-              {/* the key includes the name, so the card starts afresh once a rename is saved */}
-              {shown.map((zone) => (
-                <ZoneCard key={`${zone.id}:${zone.name}`} zone={zone} {...actions} />
-              ))}
-            </ul>
-          )}
-        </>
+        <ul className="mt-5 flex flex-col gap-3.5">
+          {/* the key includes the names, so the card starts afresh once a rename is saved */}
+          {zones.map((zone) => (
+            <ZoneCard key={`${zone.id}:${zone.name.ka}:${zone.name.en}`} zone={zone} {...actions} />
+          ))}
+        </ul>
       )}
     </Card>
   );
@@ -360,8 +383,6 @@ function PiercingCard({
   ...actions
 }: { piercing: Piercing } & Pick<PanelProps, "zones" | "artists"> & Actions) {
   const { busy, error, run } = useAction(actions);
-  // a piercing can only belong to an artist added for the same language
-  const ownLanguage = artists.filter((artist) => artist.lang === piercing.lang);
   const change = (fields: { place?: string; artist?: string }) =>
     run(() => api(`/piercings/${piercing.id}`, json("PATCH", fields)));
 
@@ -375,7 +396,6 @@ function PiercingCard({
         className="relative block aspect-[3/4] overflow-hidden rounded-[10px] bg-surface"
       >
         <Thumb photo={piercing.image} />
-        <LangBadge lang={piercing.lang} short className="absolute left-2 top-2" />
       </a>
       <Select
         aria-label="ადგილი"
@@ -384,7 +404,7 @@ function PiercingCard({
         onChange={(e) => void change({ place: e.target.value })}
       >
         {!piercing.place && <option value="">— ადგილი —</option>}
-        <PlaceOptions zones={zones} lang={piercing.lang} />
+        <PlaceOptions zones={zones} />
       </Select>
       <Select
         aria-label="არტისტი"
@@ -393,9 +413,9 @@ function PiercingCard({
         onChange={(e) => void change({ artist: e.target.value })}
       >
         <option value="">— არტისტის გარეშე —</option>
-        {ownLanguage.map((artist) => (
+        {artists.map((artist) => (
           <option key={artist.id} value={artist.id}>
-            {artist.nickname}
+            {artist.nickname.ka}
           </option>
         ))}
       </Select>
@@ -411,11 +431,9 @@ function PiercingCard({
 /**
  * Piercing: the price list (zones, and places with prices inside them), and
  * the photos of piercings done at the studio, each tagged with a place and an
- * artist. Everything is added for one language and shows on that site.
+ * artist. Everything is added once and shows on both of the site's languages.
  */
 export function PiercingPanel({ zones, piercings, artists, reload, explain }: PanelProps) {
-  /** the language new photos are added for; null until it is picked */
-  const [lang, setLang] = useState<Locale | null>(null);
   const [files, setFiles] = useState<File[]>([]);
   const [place, setPlace] = useState("");
   const [artist, setArtist] = useState("");
@@ -423,27 +441,14 @@ export function PiercingPanel({ zones, piercings, artists, reload, explain }: Pa
   const [progress, setProgress] = useState("");
   const [error, setError] = useState("");
   const [done, setDone] = useState("");
-  /** which photos the grid shows: every language's or one's… */
-  const [showLang, setShowLang] = useState<Locale | "all">("all");
-  /** …and all of those, those attached to nobody, or one artist's */
+  /** which photos the grid shows: all, those attached to nobody, or one artist's */
   const [show, setShow] = useState("all");
   const picker = useRef<HTMLInputElement>(null);
 
   const hasPlaces = zones.some((zone) => zone.places.length > 0);
-  const langHasPlaces = lang ? zones.some((zone) => zone.lang === lang && zone.places.length > 0) : false;
-
-  /** Picks (or un-picks) the language for new photos and clears what depended on it. */
-  function chooseLang(next: Locale | null) {
-    setLang(next);
-    setPlace("");
-    setArtist("");
-    setError("");
-    setDone("");
-  }
 
   async function upload(event: FormEvent) {
     event.preventDefault();
-    if (!lang) return;
     setError("");
     setDone("");
     let sent = 0;
@@ -452,15 +457,13 @@ export function PiercingPanel({ zones, piercings, artists, reload, explain }: Pa
       for (const file of files) {
         setProgress(`${sent + 1} / ${files.length}`);
         const body = new FormData();
-        body.set("lang", lang);
         body.set("photo", file);
         body.set("place", place);
         body.set("artist", artist);
         await api("/piercings", form("POST", body));
         sent += 1;
       }
-      const { onSite, site } = languageOf(lang);
-      setDone(`${sent === 1 ? "პირსინგი დაემატა" : `დაემატა ${sent} პირსინგი`} და ჩანს ${onSite} (${site}).`);
+      setDone(sent === 1 ? "პირსინგი დაემატა." : `დაემატა ${sent} პირსინგი.`);
       setFiles([]);
       if (picker.current) picker.current.value = "";
     } catch (err) {
@@ -471,12 +474,11 @@ export function PiercingPanel({ zones, piercings, artists, reload, explain }: Pa
     await reload();
   }
 
-  const inLanguage = piercings.filter((piercing) => showLang === "all" || piercing.lang === showLang);
-  const shown = inLanguage.filter(
+  const shown = piercings.filter(
     (piercing) => show === "all" || (show === "none" ? !piercing.artist : piercing.artist?.id === show)
   );
-  // the artist filter offers only artists who have piercings the language filter lets through
-  const filterArtists = artists.filter((a) => inLanguage.some((piercing) => piercing.artist?.id === a.id));
+  // the artist filter offers only artists who have piercings
+  const piercers = artists.filter((a) => piercings.some((piercing) => piercing.artist?.id === a.id));
 
   return (
     <div className="flex flex-col gap-5">
@@ -486,86 +488,65 @@ export function PiercingPanel({ zones, piercings, artists, reload, explain }: Pa
         <CardTitle>პირსინგის ფოტოს დამატება</CardTitle>
         <Hint className="mt-1.5">
           სტუდიაში შესრულებული პირსინგების ფოტოები. თითოეულს მიუთითე ადგილი და არტისტი — ფოტო გამოჩნდება
-          პირსინგის გვერდზე და არტისტის პროფილზე.
+          პირსინგის გვერდზე და არტისტის პროფილზე, საიტის ორივე ენაზე.
         </Hint>
         {!hasPlaces ? (
           <Hint className="mt-3">
             ფოტოს დასამატებლად ჯერ ზემოთ დაამატე ერთი ზონა მაინც და მასში ერთი ადგილი.
           </Hint>
-        ) : !lang ? (
-          // adding starts with the language: the upload form opens only once it is picked
-          <div className="mt-4">
-            <LanguagePick onPick={chooseLang} />
-          </div>
         ) : (
           <form onSubmit={upload} className="mt-4 flex flex-col gap-4">
-            <ChosenLanguage lang={lang} onChange={progress ? undefined : () => chooseLang(null)} />
-
-            {!langHasPlaces ? (
-              <Hint>
-                ამ ენისთვის ({languageOf(lang).label}) ადგილები ჯერ არ არის. ჯერ ზემოთ დაამატე ზონა და
-                ადგილი ამავე ენაზე.
+            <label>
+              <span className="field-label mb-2">ფოტო *</span>
+              <input
+                ref={picker}
+                type="file"
+                accept={PHOTO_TYPES}
+                multiple
+                required
+                onChange={(e) => setFiles([...(e.target.files ?? [])])}
+                className="field px-3.5 py-2.5 file:mr-3.5 file:rounded-full file:border-0 file:bg-raised file:px-4 file:py-1.5 file:text-cream"
+              />
+              <Hint className="mt-2">
+                JPEG, PNG, WebP ან AVIF, თითო მაქსიმუმ 15 MB. რამდენიმე ფოტოს ერთად არჩევაც შეიძლება —
+                ყველას ქვემოთ არჩეული ადგილი და არტისტი მიენიჭება.
               </Hint>
-            ) : (
-              <>
-                <label>
-                  <span className="field-label mb-2">ფოტო *</span>
-                  <input
-                    ref={picker}
-                    type="file"
-                    accept={PHOTO_TYPES}
-                    multiple
-                    required
-                    onChange={(e) => setFiles([...(e.target.files ?? [])])}
-                    className="field px-3.5 py-2.5 file:mr-3.5 file:rounded-full file:border-0 file:bg-raised file:px-4 file:py-1.5 file:text-cream"
-                  />
-                  <Hint className="mt-2">
-                    JPEG, PNG, WebP ან AVIF, თითო მაქსიმუმ 15 MB. რამდენიმე ფოტოს ერთად არჩევაც შეიძლება —
-                    ყველას ქვემოთ არჩეული ადგილი და არტისტი მიენიჭება.
-                  </Hint>
-                </label>
+            </label>
 
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <label>
-                    <span className="field-label mb-2">ადგილი *</span>
-                    <Select required value={place} onChange={(e) => setPlace(e.target.value)}>
-                      <option value="" disabled>
-                        აირჩიე ადგილი
-                      </option>
-                      <PlaceOptions zones={zones} lang={lang} />
-                    </Select>
-                  </label>
-                  <label>
-                    <span className="field-label mb-2">არტისტი</span>
-                    <Select value={artist} onChange={(e) => setArtist(e.target.value)}>
-                      <option value="">— არტისტის გარეშე —</option>
-                      {artists
-                        .filter((a) => a.lang === lang)
-                        .map((a) => (
-                          <option key={a.id} value={a.id}>
-                            {a.nickname}
-                          </option>
-                        ))}
-                    </Select>
-                    <Hint className="mt-2">
-                      აქ მხოლოდ იმავე ენისთვის დამატებული არტისტები ჩანს. ახალ არტისტს ამატებ „არტისტები“
-                      ჩანართში.
-                    </Hint>
-                  </label>
-                </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label>
+                <span className="field-label mb-2">ადგილი *</span>
+                <Select required value={place} onChange={(e) => setPlace(e.target.value)}>
+                  <option value="" disabled>
+                    აირჩიე ადგილი
+                  </option>
+                  <PlaceOptions zones={zones} />
+                </Select>
+              </label>
+              <label>
+                <span className="field-label mb-2">არტისტი</span>
+                <Select value={artist} onChange={(e) => setArtist(e.target.value)}>
+                  <option value="">— არტისტის გარეშე —</option>
+                  {artists.map((a) => (
+                    <option key={a.id} value={a.id}>
+                      {a.nickname.ka}
+                    </option>
+                  ))}
+                </Select>
+                <Hint className="mt-2">ახალ არტისტს ამატებ „არტისტები“ ჩანართში.</Hint>
+              </label>
+            </div>
 
-                {error && <Notice kind="error">{error}</Notice>}
-                {done && <Notice kind="ok">{done}</Notice>}
+            {error && <Notice kind="error">{error}</Notice>}
+            {done && <Notice kind="ok">{done}</Notice>}
 
-                <button
-                  type="submit"
-                  disabled={Boolean(progress)}
-                  className="btn btn-gold self-start disabled:opacity-60"
-                >
-                  {progress ? `იტვირთება ${progress}…` : files.length > 1 ? `${files.length} ფოტოს ატვირთვა` : "ატვირთვა"}
-                </button>
-              </>
-            )}
+            <button
+              type="submit"
+              disabled={Boolean(progress)}
+              className="btn btn-gold self-start disabled:opacity-60"
+            >
+              {progress ? `იტვირთება ${progress}…` : files.length > 1 ? `${files.length} ფოტოს ატვირთვა` : "ატვირთვა"}
+            </button>
           </form>
         )}
       </Card>
@@ -580,30 +561,16 @@ export function PiercingPanel({ zones, piercings, artists, reload, explain }: Pa
               onChange={(e) => setShow(e.target.value)}
               className="w-full sm:w-[240px]"
             >
-              <option value="all">ყველა ({inLanguage.length})</option>
+              <option value="all">ყველა ({piercings.length})</option>
               <option value="none">არტისტის გარეშე</option>
-              {filterArtists.map((a) => (
+              {piercers.map((a) => (
                 <option key={a.id} value={a.id}>
-                  {a.nickname} ({languageOf(a.lang).short})
+                  {a.nickname.ka}
                 </option>
               ))}
             </Select>
           )}
         </div>
-
-        {piercings.length > 0 && (
-          <div className="mt-4">
-            <LanguageFilter
-              value={showLang}
-              onChange={(value) => {
-                setShowLang(value);
-                // an artist picked under the other language would leave the grid empty
-                setShow("all");
-              }}
-              count={(key) => piercings.filter((p) => key === "all" || p.lang === key).length}
-            />
-          </div>
-        )}
 
         {shown.length === 0 ? (
           <Hint className="mt-3">

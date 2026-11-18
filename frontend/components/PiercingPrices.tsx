@@ -1,15 +1,25 @@
 "use client";
 
 import { useState } from "react";
+import type { Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/dictionaries/en";
-import type { PiercingZone } from "@/lib/types";
+import { localized, type PiercingZone } from "@/lib/types";
 
 /**
  * Piercing zones beside the price list: the zones on the left, and on the
  * right the places of the picked zone with their prices. The first zone is
- * picked to begin with. Zones, places and prices come from the admin panel.
+ * picked to begin with. Zones, places and prices come from the admin panel,
+ * with their names in both languages; the page shows its own.
  */
-export function PiercingPrices({ t, zones }: { t: Dictionary["piercing"]; zones: PiercingZone[] }) {
+export function PiercingPrices({
+  lang,
+  t,
+  zones,
+}: {
+  lang: Locale;
+  t: Dictionary["piercing"];
+  zones: PiercingZone[];
+}) {
   const [picked, setPicked] = useState(zones[0]?.id);
   const zone = zones.find((z) => z.id === picked) ?? zones[0];
   if (!zone) return null;
@@ -32,7 +42,7 @@ export function PiercingPrices({ t, zones }: { t: Dictionary["piercing"]; zones:
                 on ? "bg-gold text-on-gold" : "text-gold hover:bg-gold/10"
               }`}
             >
-              {name}
+              {localized(name, lang)}
             </button>
           );
         })}
@@ -49,22 +59,27 @@ export function PiercingPrices({ t, zones }: { t: Dictionary["piercing"]; zones:
             </p>
           ) : (
             <ul className="border-t border-cream/18">
-              {zone.places.map((place) => (
-                <li
-                  key={place.id}
-                  className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 border-b border-cream/18 px-1 py-4"
-                >
-                  <div className="min-w-0">
-                    <h3 className="break-words text-[20px] font-medium leading-[26px] text-cream">
-                      {place.name}
-                    </h3>
-                    {place.note && (
-                      <p className="mt-[3px] text-[14.5px] font-light leading-5 text-muted">{place.note}</p>
-                    )}
-                  </div>
-                  <span className="whitespace-nowrap text-[16px] leading-[26px] text-cream">{place.price}</span>
-                </li>
-              ))}
+              {zone.places.map((place) => {
+                const note = localized(place.note, lang);
+                return (
+                  <li
+                    key={place.id}
+                    className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 border-b border-cream/18 px-1 py-4"
+                  >
+                    <div className="min-w-0">
+                      <h3 className="break-words text-[20px] font-medium leading-[26px] text-cream">
+                        {localized(place.name, lang)}
+                      </h3>
+                      {note && (
+                        <p className="mt-[3px] text-[14.5px] font-light leading-5 text-muted">{note}</p>
+                      )}
+                    </div>
+                    <span className="whitespace-nowrap text-[16px] leading-[26px] text-cream">
+                      {place.price}
+                    </span>
+                  </li>
+                );
+              })}
             </ul>
           )}
         </div>

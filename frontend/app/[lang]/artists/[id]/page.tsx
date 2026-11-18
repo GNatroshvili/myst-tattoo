@@ -35,23 +35,24 @@ export async function generateMetadata({
   const { lang, id } = await params;
   if (!hasLocale(lang)) return {};
   const t = dictionaryFor(lang).artist;
-  const artist = await getArtist(id, lang);
+  const artist = await getArtist(id);
   if (!artist) return { title: t.metaTitle, description: t.metaDescription };
   return {
-    title: artist.nickname,
-    description: artist.bio || t.metaDescription,
+    title: localized(artist.nickname, lang),
+    description: localized(artist.bio, lang) || t.metaDescription,
   };
 }
 
 export default async function ArtistPage({ params }: PageProps<"/[lang]/artists/[id]">) {
-  const { lang: site, id } = await params;
-  // an artist belongs to one language: the Georgian site only finds Georgian profiles
-  const artist = hasLocale(site) ? await getArtist(id, site) : null;
+  const { id } = await params;
+  const artist = await getArtist(id);
   if (!artist) notFound();
 
   const { lang, dict } = await getDictionary();
   const t = dict.artist;
-  const { bio } = artist;
+  // the same artist on both sites: the nickname and the bio in the page's language
+  const name = localized(artist.nickname, lang);
+  const bio = localized(artist.bio, lang);
   const tattoos = artist.tattoos ?? [];
   const piercings = artist.piercings ?? [];
   // A piercer's profile shows their piercings in place of the (empty) tattoo
@@ -78,7 +79,7 @@ export default async function ArtistPage({ params }: PageProps<"/[lang]/artists/
           <section className="flex flex-wrap items-center gap-x-16 gap-y-9 pt-[18px] lg:pl-5">
             <PhotoFrame
               ratio="3 / 4"
-              aria={artist.photo ? artist.nickname : dict.artists.photoAria}
+              aria={artist.photo ? name : dict.artists.photoAria}
               photo={artist.photo}
               size="full"
               label={displayCase(dict.artists.photoLabel, lang)}
@@ -89,7 +90,7 @@ export default async function ArtistPage({ params }: PageProps<"/[lang]/artists/
             <div className="min-w-0 flex-[1_1_420px]">
               <p className="caps eyebrow">{displayCase(t.eyebrow, lang)}</p>
               <h1 className="display mt-[22px] break-words text-[length:calc(clamp(44px,5.2vw,66px)*var(--display-scale))] leading-[1.02] tracking-[0.5px] text-cream">
-                {displayCase(artist.nickname, lang)}
+                {displayCase(name, lang)}
               </h1>
               {styles && (
                 <p className="caps mt-5 text-[17px] font-light leading-[22px] tracking-[5px] text-cream sm:tracking-[7px]">
@@ -168,9 +169,9 @@ export default async function ArtistPage({ params }: PageProps<"/[lang]/artists/
                     key={piercing.id}
                     ratio={photoRatio(piercing.image)}
                     photo={piercing.image}
-                    aria={piercingAlt(piercing, dict.piercing)}
-                    title={piercing.place?.name ?? ""}
-                    note={piercing.place?.zone?.name}
+                    aria={piercingAlt(piercing, dict.piercing, lang)}
+                    title={piercing.place ? localized(piercing.place.name, lang) : ""}
+                    note={piercing.place?.zone ? localized(piercing.place.zone.name, lang) : undefined}
                   />
                 ))}
               </div>

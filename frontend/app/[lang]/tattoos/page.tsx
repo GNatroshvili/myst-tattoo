@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: PageProps<"/[lang]/tattoos">)
 
 /** The gallery, with the tattoos read from the backend when the page is requested. */
 async function Gallery({ lang, t }: { lang: Locale; t: Dictionary["tattoos"] }) {
-  return <TattooGallery lang={lang} t={t} tattoos={await getTattoos(lang)} />;
+  return <TattooGallery lang={lang} t={t} tattoos={await getTattoos()} />;
 }
 
 /** Shown while the tattoos load: the filter bar's outline and a few empty tiles. */

@@ -19,30 +19,27 @@ export const notFound = (message = "Not found") => new HttpError(404, message);
 
 export const isId = (value) => typeof value === "string" && mongoose.isValidObjectId(value);
 
-/**
- * The site's two languages. Every artist and every tattoo belongs to exactly
- * one of them and shows only on that language's pages (/ka or /en).
- */
-export const LANGS = ["ka", "en"];
-
-/** The language a new record is for; it has to be chosen. */
-export function readLang(value) {
-  if (!LANGS.includes(value)) throw badRequest("Choose the language: ka or en", "bad_lang");
-  return value;
-}
-
-/** `?lang=` on a request for reading: a language, or `undefined` for every language. */
-export function queryLang(value) {
-  if (value === undefined || value === "") return undefined;
-  return readLang(value);
-}
-
 /** Trims a text field and checks its length; missing or non-text becomes "". */
 export function text(value, { field, max }) {
   // forms send line breaks as CR LF; keep plain LF
   const clean = typeof value === "string" ? value.replace(/\r\n?/g, "\n").trim() : "";
   if (clean.length > max) throw badRequest(`${field} is too long (max ${max} characters)`);
   return clean;
+}
+
+/**
+ * A text kept in both of the site's languages, sent as `{ en, ka }`. With
+ * `required`, neither may be empty; otherwise a missing one becomes "".
+ */
+export function bilingual(value, { field, max, required = false }) {
+  const both = {
+    en: text(value?.en, { field: `English ${field.toLowerCase()}`, max }),
+    ka: text(value?.ka, { field: `Georgian ${field.toLowerCase()}`, max }),
+  };
+  if (required && (!both.en || !both.ka)) {
+    throw badRequest(`${field} is needed in both languages`, "both_languages");
+  }
+  return both;
 }
 
 /**

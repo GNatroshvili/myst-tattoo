@@ -76,7 +76,7 @@ export function TattooGallery({ lang, t, tattoos }: Props) {
               </FilterChip>
               {artists.map((a) => (
                 <FilterChip key={a.id} on={artist === a.id} onPick={() => setArtist(a.id)}>
-                  {a.nickname}
+                  {localized(a.nickname, lang)}
                 </FilterChip>
               ))}
             </div>
@@ -112,7 +112,7 @@ export function TattooGallery({ lang, t, tattoos }: Props) {
             photo={tattoo.image}
             aria={`${t.modal.open}: ${tattooAlt(tattoo, t, lang)}`}
             title={tattoo.style ? localized(tattoo.style.name, lang) : ""}
-            note={tattoo.artist?.nickname}
+            note={tattoo.artist ? localized(tattoo.artist.nickname, lang) : undefined}
             onOpen={() => setOpen(position)}
           />
         ))}

@@ -1,29 +1,29 @@
 import mongoose from "mongoose";
-import { LANGS } from "../utils/http.js";
 import { imageSchema } from "./image.js";
 
 /**
- * An artist as one language's site shows them. The same person on both sites
- * is two records, one per language, each with its own nickname, bio and works.
+ * An artist. One record serves both sites: the nickname and the bio are kept
+ * in both languages, everything else is shared.
  */
 const artistSchema = new mongoose.Schema(
   {
-    /** which site shows this artist: "ka" or "en" */
-    lang: { type: String, enum: LANGS, required: true },
-    nickname: { type: String, required: true, trim: true, maxlength: 60 },
-    /** last part of the profile's address: /<lang>/artists/<slug> */
-    slug: { type: String, required: true },
+    /** as each site shows it: "ნიკა" on /ka, "Nika" on /en */
+    nickname: {
+      en: { type: String, required: true, trim: true, maxlength: 60 },
+      ka: { type: String, required: true, trim: true, maxlength: 60 },
+    },
+    /** last part of the profile's address on both sites: /artists/<slug> */
+    slug: { type: String, required: true, unique: true },
     /** the styles this artist works in */
     styles: [{ type: mongoose.Schema.Types.ObjectId, ref: "Style" }],
-    /** in the artist's language */
-    bio: { type: String, default: "", trim: true, maxlength: 1200 },
+    bio: {
+      en: { type: String, default: "", trim: true, maxlength: 1200 },
+      ka: { type: String, default: "", trim: true, maxlength: 1200 },
+    },
     instagramUrl: { type: String, default: "" },
     photo: { type: imageSchema, default: null },
   },
   { timestamps: true }
 );
-
-// a slug is unique within its language, so "ნინო" and "Nino" can both be /artists/nino
-artistSchema.index({ lang: 1, slug: 1 }, { unique: true });
 
 export const Artist = mongoose.model("Artist", artistSchema);
