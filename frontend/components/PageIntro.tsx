@@ -6,12 +6,14 @@ type Props = {
   eyebrow: string;
   title: string;
   subtitle: string;
-  lead: string;
+  /** short paragraph on the right; the piercing page has none */
+  lead?: string;
 };
 
 /**
- * Opening of an inner page (artists, tattoos): eyebrow, display title, spaced
- * subtitle and the gold star on the left, a short lead paragraph on the right.
+ * Opening of an inner page (artists, tattoos, piercing, blog): eyebrow, display
+ * title, spaced subtitle and the gold star on the left, and on most pages a
+ * short lead paragraph on the right.
  */
 export function PageIntro({ lang, eyebrow, title, subtitle, lead }: Props) {
   return (
@@ -33,7 +35,9 @@ export function PageIntro({ lang, eyebrow, title, subtitle, lead }: Props) {
         <StarRule className="-ml-1.5 mt-6" star="h-[30px] w-[30px]" />
       </div>
 
-      <p className="mb-1.5 flex-[0_1_380px] text-[18px] font-light leading-[26px] text-body">{lead}</p>
+      {lead && (
+        <p className="mb-1.5 flex-[0_1_380px] text-[18px] font-light leading-[26px] text-body">{lead}</p>
+      )}
     </section>
   );
 }

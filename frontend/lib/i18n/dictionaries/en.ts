@@ -193,6 +193,56 @@ export const en = {
     ctaTitleLine2: "you love?",
     ctaText: "Send us your idea and we'll agree the design, placement and size.",
   },
+  piercing: {
+    metaTitle: "Piercing",
+    metaDescription:
+      "Piercing at Myst Tattoo Studio in Tbilisi: zones, prices with standard titanium jewelry, and piercings done at the studio.",
+    eyebrow: "Myst / Piercing",
+    title: "Piercing",
+    subtitle: "In Tbilisi",
+    pricesAria: "Zones and prices",
+    zonesAria: "Piercing zones",
+    zones: {
+      ear: "Ear Zones",
+      face: "Face Zones",
+      body: "Body Zones",
+      microdermal: "Microdermal",
+      intimate: "Intimate",
+    },
+    priceNote: "Prices include standard titanium jewelry.",
+    placements: {
+      ear: "Ear",
+      nose: "Nose",
+      lip: "Lip",
+      eyebrow: "Eyebrow",
+      navel: "Navel",
+    },
+    /** Shown until the real price list and photos are added in lib/piercing.ts. */
+    placeholder: {
+      rowNote: "[Placements offered and jewellery options]",
+      price: "[PRICE]",
+      /** a row of a zone's own price list */
+      zonePlacement: {
+        ear: "[Ear placement]",
+        face: "[Face placement]",
+        body: "[Body placement]",
+        microdermal: "[Microdermal placement]",
+        intimate: "[Intimate placement]",
+      },
+      jewellery: "[Jewellery]",
+    },
+    worksTitle: "Our work",
+    worksLead: "Piercings done at the studio. Filter by placement.",
+    filterAria: "Filter by placement",
+    all: "All",
+    countOne: "Showing 1 piercing",
+    countMany: "Showing {count} piercings",
+    photoAria: "Photo placeholder",
+    photoLabel: "Piercing photo",
+    ctaTitleLine1: "Ready for a",
+    ctaTitleLine2: "new piercing?",
+    ctaText: "Tell us the placement you want and we'll agree a day and time.",
+  },
   blog: {
     metaTitle: "Blog",
     metaDescription:
