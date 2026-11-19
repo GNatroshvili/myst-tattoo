@@ -4,7 +4,7 @@ import { useState } from "react";
 import type { Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/dictionaries/en";
 import { tattooAlt } from "@/lib/tattoos";
-import { localized, photoRatio, type Style, type Tattoo } from "@/lib/types";
+import { localized, type Style, type Tattoo } from "@/lib/types";
 import { FilterChip } from "./FilterChip";
 import { WorkTile } from "./WorkTile";
 
@@ -50,11 +50,10 @@ export function ArtistWorks({ lang, t, tattoosCopy, tattoos }: Props) {
         {countLabel}
       </p>
 
-      <div className="mt-3.5 columns-[4_220px] gap-x-6">
+      <div className="work-grid mt-3.5">
         {shown.map((tattoo) => (
           <WorkTile
             key={tattoo.id}
-            ratio={photoRatio(tattoo.image)}
             photo={tattoo.image}
             aria={tattooAlt(tattoo, tattoosCopy, lang)}
             title={tattoo.style ? localized(tattoo.style.name, lang) : ""}

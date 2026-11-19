@@ -95,6 +95,3 @@ export function localized(value: Localized, lang: Locale) {
 export function instagramHandle(url: string) {
   return `@${url.replace(/\/+$/, "").split("/").pop() ?? ""}`;
 }
-
-/** A photo's shape as CSS `aspect-ratio`. */
-export const photoRatio = (photo: Photo) => `${photo.width} / ${photo.height}`;

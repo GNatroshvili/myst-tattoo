@@ -3,8 +3,6 @@ import { PhotoFrame } from "./PhotoFrame";
 import { TattooIcon } from "./ui/Icons";
 
 type Props = {
-  /** width / height of the photo, as CSS `aspect-ratio` */
-  ratio: string;
   /** what a screen reader announces: what the photo shows, or what picking it does */
   aria: string;
   /** the photo; without one the tile is a placeholder with `photoLabel` in it */
@@ -19,15 +17,16 @@ type Props = {
   onOpen?: () => void;
   /** when set, the photo is a link (the home page's picks open the gallery) */
   href?: string;
-  /** spacing around the tile; the default suits a masonry column */
-  className?: string;
   /** the placeholder's colouring; the piercing gallery uses "wine" */
   tone?: "dark" | "wine";
 };
 
-/** One piece in a gallery: the photo with a two-part caption under it. */
+/**
+ * One piece in a gallery: the photo with a two-part caption under it. Every
+ * tile is 3:4, whatever the photo's own shape; a photo of another shape is
+ * cropped to fit (the tattoo details window shows it whole).
+ */
 export function WorkTile({
-  ratio,
   aria,
   photo,
   photoLabel = "",
@@ -35,13 +34,12 @@ export function WorkTile({
   note,
   onOpen,
   href,
-  className = "mb-[26px] break-inside-avoid",
   tone = "dark",
 }: Props) {
   return (
-    <figure className={className}>
+    <figure>
       <PhotoFrame
-        ratio={ratio}
+        ratio="3 / 4"
         aria={aria}
         photo={photo}
         label={photoLabel}

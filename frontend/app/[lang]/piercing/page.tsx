@@ -66,13 +66,9 @@ async function Works({ lang, t }: Copy) {
 /** Shown while the photos load: a few empty tiles. */
 function WorksSkeleton() {
   return (
-    <div aria-hidden className="mt-[26px] animate-pulse columns-[4_220px] gap-x-6 pt-[78px]">
-      {["3 / 4", "1 / 1", "4 / 5", "3 / 4"].map((ratio, i) => (
-        <div
-          key={i}
-          style={{ aspectRatio: ratio }}
-          className="mb-[26px] break-inside-avoid rounded-[14px] border border-cream/10 bg-surface"
-        />
+    <div aria-hidden className="work-grid mt-[26px] animate-pulse pt-[78px]">
+      {Array.from({ length: 4 }).map((_, i) => (
+        <div key={i} className="aspect-[3/4] rounded-[14px] border border-cream/10 bg-surface" />
       ))}
     </div>
   );

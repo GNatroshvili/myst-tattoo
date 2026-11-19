@@ -4,7 +4,7 @@ import { useId, useState } from "react";
 import { displayCase, type Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/dictionaries/en";
 import { tattooAlt } from "@/lib/tattoos";
-import { localized, photoRatio, type ArtistBrief, type Style, type Tattoo } from "@/lib/types";
+import { localized, type ArtistBrief, type Style, type Tattoo } from "@/lib/types";
 import { EmptyNote } from "./EmptyNote";
 import { FilterChip } from "./FilterChip";
 import { TattooModal } from "./TattooModal";
@@ -104,11 +104,10 @@ export function TattooGallery({ lang, t, tattoos }: Props) {
         {countLabel}
       </p>
 
-      <section aria-label={t.galleryAria} className="mt-3.5 columns-[4_220px] gap-x-6">
+      <section aria-label={t.galleryAria} className="work-grid mt-3.5">
         {shown.map((tattoo, position) => (
           <WorkTile
             key={tattoo.id}
-            ratio={photoRatio(tattoo.image)}
             photo={tattoo.image}
             aria={`${t.modal.open}: ${tattooAlt(tattoo, t, lang)}`}
             title={tattoo.style ? localized(tattoo.style.name, lang) : ""}

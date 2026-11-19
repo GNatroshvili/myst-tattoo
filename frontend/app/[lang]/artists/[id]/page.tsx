@@ -20,7 +20,7 @@ import { getArtist } from "@/lib/api";
 import { dictionaryFor, getDictionary } from "@/lib/i18n";
 import { displayCase, hasLocale, localePath } from "@/lib/i18n/config";
 import { piercingAlt } from "@/lib/piercing";
-import { instagramHandle, localized, photoRatio } from "@/lib/types";
+import { instagramHandle, localized } from "@/lib/types";
 
 /**
  * The profile is read from the backend on every request, and the page waits
@@ -164,11 +164,10 @@ export default async function ArtistPage({ params }: PageProps<"/[lang]/artists/
                 {t.piercingsLead}
               </p>
 
-              <div className="mt-9 columns-[4_220px] gap-x-6">
+              <div className="work-grid mt-9">
                 {piercings.map((piercing) => (
                   <WorkTile
                     key={piercing.id}
-                    ratio={photoRatio(piercing.image)}
                     photo={piercing.image}
                     aria={piercingAlt(piercing, dict.piercing, lang)}
                     title={piercing.place ? localized(piercing.place.name, lang) : ""}

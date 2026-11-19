@@ -14,9 +14,7 @@ const PICKS = 4;
 
 type Props = { lang: Locale; dict: Dictionary };
 
-// two to a row on phones, then as many 226px tiles as fit
-const grid =
-  "mt-10 grid grid-cols-2 gap-x-4 gap-y-[30px] sm:grid-cols-[repeat(auto-fill,minmax(226px,1fr))] sm:gap-x-6";
+const grid = "work-grid mt-10";
 
 /**
  * A taste of the portfolio on the home page: the newest few tattoos. Each of
@@ -34,13 +32,11 @@ async function Featured({ lang, dict }: Props) {
         {tattoos.map((tattoo) => (
           <WorkTile
             key={tattoo.id}
-            ratio="3 / 4"
             photo={tattoo.image}
             aria={`${dict.featured.openGallery}: ${tattooAlt(tattoo, dict.tattoos, lang)}`}
             title={tattoo.style ? localized(tattoo.style.name, lang) : ""}
             note={tattoo.artist ? localized(tattoo.artist.nickname, lang) : undefined}
             href={gallery}
-            className=""
           />
         ))}
       </div>

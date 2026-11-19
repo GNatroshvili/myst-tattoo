@@ -209,6 +209,21 @@
     font-size: 15px;
   }
 
+  /* ----- gallery of works: tattoos, piercings, an artist's own ----- */
+  /* Every tile is the same size (see WorkTile): as many 226px columns as fit,
+     and two to a row on phones. */
+  .work-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 30px 16px;
+  }
+  @media (min-width: 640px) {
+    .work-grid {
+      grid-template-columns: repeat(auto-fill, minmax(226px, 1fr));
+      column-gap: 24px;
+    }
+  }
+
   /* ----- glowing panel: gift vouchers, closing call-to-action ----- */
   .voucher-panel {
     border: 1px solid rgba(235, 213, 205, 0.16);

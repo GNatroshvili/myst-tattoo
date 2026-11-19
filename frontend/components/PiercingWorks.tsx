@@ -4,7 +4,7 @@ import { useState } from "react";
 import type { Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/dictionaries/en";
 import { piercingAlt } from "@/lib/piercing";
-import { localized, photoRatio, type Piercing } from "@/lib/types";
+import { localized, type Piercing } from "@/lib/types";
 import { FilterChip } from "./FilterChip";
 import { WorkTile } from "./WorkTile";
 
@@ -53,11 +53,10 @@ export function PiercingWorks({
         {countLabel}
       </p>
 
-      <div className="mt-3.5 columns-[4_220px] gap-x-6">
+      <div className="work-grid mt-3.5">
         {shown.map((piercing) => (
           <WorkTile
             key={piercing.id}
-            ratio={photoRatio(piercing.image)}
             photo={piercing.image}
             aria={piercingAlt(piercing, t, lang)}
             title={piercing.place ? localized(piercing.place.name, lang) : ""}

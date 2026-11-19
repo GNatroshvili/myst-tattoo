@@ -29,13 +29,9 @@ function GallerySkeleton() {
   return (
     <div aria-hidden className="animate-pulse">
       <div className="mt-[52px] h-[146px] border-y border-cream/18" />
-      <div className="mt-[56px] columns-[4_220px] gap-x-6">
-        {["3 / 4", "1 / 1", "4 / 5", "3 / 4"].map((ratio, i) => (
-          <div
-            key={i}
-            style={{ aspectRatio: ratio }}
-            className="mb-[26px] break-inside-avoid rounded-[14px] border border-cream/10 bg-surface"
-          />
+      <div className="work-grid mt-[56px]">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="aspect-[3/4] rounded-[14px] border border-cream/10 bg-surface" />
         ))}
       </div>
     </div>
