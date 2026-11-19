@@ -48,8 +48,10 @@ still go to `backend/uploads/` and the database is the local MongoDB.
 4. In **Settings → Functions**, set the region to the one nearest the
    database (Frankfurt is `fra1`).
 5. Deploy, then open `https://<backend>.vercel.app/api/health`. It should say
-   `"db":"connected"` (reload once if it says `connecting`) and
-   `"photos":"blob"`.
+   `"db":"connected"` and `"photos":"blob"`. If the database cannot be reached
+   it says `"db":"unreachable"` with the reason in `dbProblem`: a wrong user
+   name or password, an address that is not valid, or no answer (Network
+   Access).
 
 ## 3. Site project
 

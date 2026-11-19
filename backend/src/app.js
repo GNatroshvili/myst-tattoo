@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
-import { ready } from "./config/db.js";
+import { dbProblem, ready } from "./config/db.js";
 import { env } from "./config/env.js";
 import api from "./routes/index.js";
 import { HttpError } from "./utils/http.js";
@@ -29,14 +29,20 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/uploads", express.static(env.uploadDir, { maxAge: "365d", immutable: true, index: false }));
 
 // --- Health check ---
-app.get("/api/health", (_req, res) => {
-  // starts connecting if nothing has yet; the answer does not wait for it
-  ready().catch(() => {});
-  const states = ["disconnected", "connected", "connecting", "disconnecting"];
+// Waits for the database (a few seconds at most) and reports what is true: on
+// Vercel the app is paused between requests, so a connection left to finish
+// "in the background" would never be seen finishing.
+app.get("/api/health", async (_req, res) => {
+  const problem = await ready().then(
+    () => null,
+    (err) => dbProblem(err)
+  );
   res.json({
     status: "ok",
     service: "myst-tattoo-backend",
-    db: states[mongoose.connection.readyState] ?? "unknown",
+    db: problem ? "unreachable" : mongoose.connection.readyState === 1 ? "connected" : "disconnected",
+    // why, in plain words, when the database cannot be reached
+    dbProblem: problem ?? undefined,
     photos: storage,
     uptime: Math.round(process.uptime()),
     timestamp: new Date().toISOString(),
@@ -49,8 +55,8 @@ app.get("/api/health", (_req, res) => {
 app.use("/api", async (_req, _res, next) => {
   try {
     await ready();
-  } catch {
-    throw new HttpError(503, "The database cannot be reached", "db_down");
+  } catch (err) {
+    throw new HttpError(503, `The database cannot be reached: ${dbProblem(err)}`, "db_down");
   }
   next();
 });

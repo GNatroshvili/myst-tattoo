@@ -18,9 +18,7 @@ const server = app.listen(env.port, () => {
 });
 
 // Connect to the database without blocking server start-up; requests wait for it.
-ready().catch((err) => {
-  console.error(`[db] could not connect to ${env.mongoUri}`);
-  console.error(`[db] ${err.message}`);
+ready().catch(() => {
   console.error("[db] the server keeps running and tries again on the next request.");
 });
 
