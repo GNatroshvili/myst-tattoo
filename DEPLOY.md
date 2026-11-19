@@ -38,8 +38,13 @@ still go to `backend/uploads/` and the database is the local MongoDB.
    | `SESSION_SECRET` | A long random string (see `backend/.env.example`) |
    | `CLIENT_ORIGIN` | The site's address, once you know it (step 4) |
 
-3. **Storage → Create → Blob**: create a store with **public** access and
-   connect it to this project. That adds `BLOB_READ_WRITE_TOKEN` for you.
+3. **Storage → Create → Blob**: create a store with **public** access, in the
+   same region as the database. Neither can be changed later. Then, on the
+   store's **Projects** tab, **Connect to Project** and choose this project.
+   Vercel adds the store's id (`BLOB_STORE_ID`) to the project, which is all
+   the backend needs there. Also tick **Add a read-write token env var to this
+   connection** if you plan to move existing photos from your machine (step 5):
+   that script needs `BLOB_READ_WRITE_TOKEN`.
 4. In **Settings → Functions**, set the region to the one nearest the
    database (Frankfurt is `fra1`).
 5. Deploy, then open `https://<backend>.vercel.app/api/health`. It should say
@@ -90,9 +95,11 @@ npm run db:copy          # copies the local database into the (empty) Atlas one
 npm run photos:to-blob   # uploads backend/uploads/ to Blob and updates the records
 ```
 
-`photos:to-blob` also needs `BLOB_READ_WRITE_TOKEN` in `.env`: copy it from
-the Blob store's page in Vercel (**.env.local** tab). Both scripts are safe to
-run again, and neither deletes anything locally.
+`photos:to-blob` also needs `BLOB_READ_WRITE_TOKEN` in `.env`. It exists only
+if you ticked the read-write token option when connecting the store (step 2);
+copy its value from the backend project's **Settings → Environment
+Variables**. Both scripts are safe to run again, and neither deletes anything
+locally.
 
 ## Good to know
 
