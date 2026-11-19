@@ -61,6 +61,15 @@ export function XIcon(props: IconProps) {
   );
 }
 
+/** Tick beside the chosen row of a drop-down. */
+export function CheckIcon(props: IconProps) {
+  return (
+    <svg {...outline} viewBox="0 0 16 16" strokeWidth={1.8} {...props}>
+      <path d="M3 8.5L6.5 12L13 4.5" />
+    </svg>
+  );
+}
+
 export function ChevronDownIcon(props: IconProps) {
   return (
     <svg {...outline} viewBox="0 0 12 8" strokeWidth={1.5} {...props}>

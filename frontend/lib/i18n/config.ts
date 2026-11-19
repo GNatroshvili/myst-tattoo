@@ -2,11 +2,8 @@
 export const locales = ["en", "ka"] as const;
 export type Locale = (typeof locales)[number];
 
-/** Used when a visitor's browser asks for neither language. */
+/** The language an address without one opens in. */
 export const defaultLocale: Locale = "en";
-
-/** Remembers the language a visitor picked with the switcher. */
-export const LOCALE_COOKIE = "NEXT_LOCALE";
 
 export const hasLocale = (value: string): value is Locale =>
   (locales as readonly string[]).includes(value);

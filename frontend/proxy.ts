@@ -1,31 +1,13 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { defaultLocale, hasLocale, LOCALE_COOKIE, locales, type Locale } from "@/lib/i18n/config";
+import { defaultLocale, locales } from "@/lib/i18n/config";
 
 /**
- * Picks a language for a visitor who arrived without one in the URL:
- * the one they chose with the switcher, else their browser's preference,
- * else the default.
+ * Every public page lives under /en or /ka. An address without a language is
+ * sent to the English one, always: neither the browser's own language nor an
+ * earlier choice is consulted, because the studio wants every visit to start
+ * in English. Georgian is one click away, in the switcher.
  */
-function pickLocale(request: NextRequest): Locale {
-  const saved = request.cookies.get(LOCALE_COOKIE)?.value;
-  if (saved && hasLocale(saved)) return saved;
-
-  const header = request.headers.get("accept-language") ?? "";
-  const preferred = header
-    .split(",")
-    .map((part) => {
-      const [tag, q] = part.trim().split(";q=");
-      return { base: tag.toLowerCase().split("-")[0], q: q ? Number(q) : 1 };
-    })
-    .filter((entry) => entry.base && !Number.isNaN(entry.q))
-    .sort((a, b) => b.q - a.q);
-
-  for (const { base } of preferred) if (hasLocale(base)) return base;
-  return defaultLocale;
-}
-
-/** Every public page lives under /en or /ka; anything else is redirected there. */
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const hasPrefix = locales.some(
@@ -34,7 +16,7 @@ export function proxy(request: NextRequest) {
   if (hasPrefix) return;
 
   const url = request.nextUrl.clone();
-  url.pathname = `/${pickLocale(request)}${pathname === "/" ? "" : pathname}`;
+  url.pathname = `/${defaultLocale}${pathname === "/" ? "" : pathname}`;
   return NextResponse.redirect(url);
 }
 

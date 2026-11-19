@@ -1,16 +1,12 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { LOCALE_COOKIE, localeLabels, locales, type Locale } from "@/lib/i18n/config";
-
-/** Saves the picked language for a year; proxy.ts reads it on visits to "/". */
-function remember(locale: Locale) {
-  document.cookie = `${LOCALE_COOKIE}=${locale}; path=/; max-age=31536000; samesite=lax`;
-}
+import { localeLabels, locales, type Locale } from "@/lib/i18n/config";
 
 /**
- * ENG / ქარ toggle. Each side links to the same page in that language and
- * remembers the choice, so a later visit to "/" opens in it.
+ * ENG / ქარ toggle. Each side links to the same page in that language. The
+ * choice is not remembered: an address without a language always opens in
+ * English (see proxy.ts).
  *
  * Plain links on purpose: changing language reloads the page, so the document
  * language, fonts and every piece of copy switch together.
@@ -44,7 +40,6 @@ export function LangSwitcher({
             title={localeLabels[locale].name}
             aria-label={localeLabels[locale].name}
             aria-current={active ? "true" : undefined}
-            onClick={() => remember(locale)}
             className={`flex h-full min-w-[42px] items-center justify-center rounded-full px-2.5 tracking-[0.6px] sm:px-3 transition-colors ${
               active ? "bg-raised text-gold" : "text-cream hover:text-gold"
             }`}

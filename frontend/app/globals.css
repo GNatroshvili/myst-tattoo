@@ -34,6 +34,9 @@
   html {
     scroll-behavior: smooth;
     background-color: var(--color-ink);
+    /* a dark site: where the browser draws something itself (a scrollbar it
+       will not let us style, a native control) it uses its dark version */
+    color-scheme: dark;
     /* multiplier for display headings; see the Georgian override below */
     --display-scale: 1;
   }
@@ -65,6 +68,40 @@
   :focus-visible {
     outline: 2px solid var(--color-gold);
     outline-offset: 2px;
+  }
+
+  /* Scrollbars, on the page and on anything that scrolls inside it: the day
+     picker's bar (drawn in the design) at page size. A slim warm-grey thumb
+     over whatever is behind it, lighter on hover, gold while it is dragged. */
+  ::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+  }
+  ::-webkit-scrollbar-track,
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    /* the see-through border keeps the thumb slimmer than its 12px lane */
+    border: 3px solid transparent;
+    border-radius: 999px;
+    background: #5a4a4e;
+    background-clip: padding-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: #7d686d;
+  }
+  ::-webkit-scrollbar-thumb:active {
+    background-color: var(--color-gold);
+  }
+  /* Firefox has no scrollbar pseudo-elements, so it gets the standard
+     properties. They are kept away from Chrome and Safari on purpose: when
+     these are set, Chrome ignores the rules above and draws its own bar. */
+  @supports not selector(::-webkit-scrollbar) {
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: #5a4a4e transparent;
+    }
   }
 }
 
@@ -351,6 +388,8 @@
     border-radius: 999px;
   }
   .days-scroll::-webkit-scrollbar-thumb {
+    /* the whole 6px, unlike the page's bar */
+    border: 0;
     background: #5a4a4e;
     border-radius: 999px;
   }
@@ -360,12 +399,9 @@
   .days-scroll::-webkit-scrollbar-thumb:active {
     background: var(--color-gold);
   }
-  /* Firefox has no scrollbar pseudo-elements, so it gets the standard
-     properties. They are kept away from Chrome and Safari on purpose: when
-     these are set, Chrome ignores the rules above and draws its own bar. */
+  /* Firefox: the standard properties (see the page's bar in the base layer) */
   @supports not selector(::-webkit-scrollbar) {
     .days-scroll {
-      scrollbar-width: thin;
       scrollbar-color: #5a4a4e #171113;
     }
   }

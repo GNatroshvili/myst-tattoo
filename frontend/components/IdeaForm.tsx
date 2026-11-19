@@ -4,7 +4,8 @@ import { useId, useState, type FormEvent } from "react";
 import type { DayOption } from "@/lib/dates";
 import type { Dictionary } from "@/lib/i18n/dictionaries/en";
 import { buildWhatsAppMessage, whatsappUrl } from "@/lib/whatsapp";
-import { ChevronDownIcon, WhatsAppIcon } from "./ui/Icons";
+import { ListSelect } from "./ListSelect";
+import { WhatsAppIcon } from "./ui/Icons";
 
 type Props = { days: DayOption[]; t: Dictionary["form"] };
 
@@ -43,25 +44,17 @@ export function IdeaForm({ days, t }: Props) {
         className="field h-[46px] px-3.5"
       />
 
-      <label htmlFor={`${id}-service`} className="field-label mt-3">
+      <label id={`${id}-service-label`} htmlFor={`${id}-service`} className="field-label mt-3">
         {t.service}
       </label>
-      <div className="relative">
-        <select
-          id={`${id}-service`}
-          name="service"
-          value={service}
-          onChange={(e) => setService(e.target.value)}
-          className="field h-[46px] pl-3.5 pr-10"
-        >
-          {t.services.map((s) => (
-            <option key={s} value={s}>
-              {s}
-            </option>
-          ))}
-        </select>
-        <ChevronDownIcon className="pointer-events-none absolute right-4 top-[19px] h-2 w-[11px] text-cream" />
-      </div>
+      <ListSelect
+        id={`${id}-service`}
+        labelId={`${id}-service-label`}
+        name="service"
+        value={service}
+        options={t.services}
+        onChange={setService}
+      />
 
       <label htmlFor={`${id}-idea`} className="field-label mt-3">
         {t.idea} <span className="text-[12px] font-light text-muted">{t.optional}</span>
