@@ -77,7 +77,9 @@ export default async function ArtistPage({ params }: PageProps<"/[lang]/artists/
             {t.back}
           </Link>
 
-          <section className="flex flex-wrap items-center gap-x-16 gap-y-9 pt-[18px] lg:pl-5">
+          {/* Side by side while both fit (from 898px); below that the photo
+              takes the full width of the page and shrinks with it, text under it. */}
+          <section className="flex flex-col gap-y-9 pt-[18px] min-[898px]:flex-row min-[898px]:items-center min-[898px]:gap-x-16 lg:pl-5">
             <PhotoFrame
               ratio="3 / 4"
               aria={artist.photo ? name : dict.artists.photoAria}
@@ -85,10 +87,10 @@ export default async function ArtistPage({ params }: PageProps<"/[lang]/artists/
               size="full"
               label={displayCase(dict.artists.photoLabel, lang)}
               icon={<PersonIcon strokeWidth={1.2} className="h-[52px] w-[52px] text-rose" />}
-              className="min-w-[240px] flex-[0_1_350px]"
+              className="w-full min-[898px]:w-auto min-[898px]:min-w-[240px] min-[898px]:flex-[0_1_350px]"
             />
 
-            <div className="min-w-0 flex-[1_1_420px]">
+            <div className="min-w-0 min-[898px]:flex-[1_1_420px]">
               <p className="caps eyebrow">{displayCase(t.eyebrow, lang)}</p>
               <h1 className="display mt-[22px] break-words text-[length:calc(clamp(44px,5.2vw,66px)*var(--display-scale))] leading-[1.02] tracking-[0.5px] text-cream">
                 {displayCase(name, lang)}
