@@ -1,3 +1,4 @@
+import { apiOrigin } from "./api-url";
 import type { Artist, Piercing, PiercingZone, Style, Tattoo } from "./types";
 
 /**
@@ -9,8 +10,8 @@ import type { Artist, Piercing, PiercingZone, Style, Tattoo } from "./types";
  * the pages show their "nothing here yet" states rather than an error.
  */
 
-/** The backend's address, without a slash at the end (see next.config.ts). */
-export const API_URL = (process.env.API_URL ?? "http://localhost:5000").trim().replace(/\/+$/, "");
+/** The backend's address: scheme and host, nothing after (see api-url.ts). */
+export const API_URL = apiOrigin();
 
 /** `null` means the record does not exist (or the backend is down). */
 async function get<T>(path: string): Promise<T | null> {

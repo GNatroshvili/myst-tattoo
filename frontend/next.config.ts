@@ -1,11 +1,11 @@
 import type { NextConfig } from "next";
 
-/**
- * Where the backend API runs; see .env.example. A slash left at the end is
- * dropped: it would turn every forwarded address into "//api/…", which the
- * backend's host answers with a redirect that sends the browser in circles.
- */
-const API_URL = (process.env.API_URL ?? "http://localhost:5000").trim().replace(/\/+$/, "");
+import { apiOrigin } from "./lib/api-url";
+
+/** Where the backend API runs; see .env.example. */
+const API_URL = apiOrigin();
+// shows in the build log, so a deployment says where it forwards to
+console.log(`[config] /api and /uploads are forwarded to ${API_URL}`);
 
 const nextConfig: NextConfig = {
   /* config options here */
