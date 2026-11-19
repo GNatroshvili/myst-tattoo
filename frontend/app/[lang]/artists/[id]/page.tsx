@@ -77,8 +77,11 @@ export default async function ArtistPage({ params }: PageProps<"/[lang]/artists/
             {t.back}
           </Link>
 
-          {/* Side by side while both fit (from 898px); below that the photo
-              takes the full width of the page and shrinks with it, text under it. */}
+          {/* Side by side while both fit (from 898px). Below that the photo is
+              centred above the text, as wide as the page allows while the
+              screen still shows it whole together with the name and styles
+              under it (the 400px are the header above and those lines below).
+              Never narrower than 240px, for phones held sideways. */}
           <section className="flex flex-col gap-y-9 pt-[18px] min-[898px]:flex-row min-[898px]:items-center min-[898px]:gap-x-16 lg:pl-5">
             <PhotoFrame
               ratio="3 / 4"
@@ -87,7 +90,7 @@ export default async function ArtistPage({ params }: PageProps<"/[lang]/artists/
               size="full"
               label={displayCase(dict.artists.photoLabel, lang)}
               icon={<PersonIcon strokeWidth={1.2} className="h-[52px] w-[52px] text-rose" />}
-              className="w-full min-[898px]:w-auto min-[898px]:min-w-[240px] min-[898px]:flex-[0_1_350px]"
+              className="mx-auto w-[min(100%,max(240px,(100svh_-_400px)_*_0.75))] min-[898px]:mx-0 min-[898px]:w-auto min-[898px]:min-w-[240px] min-[898px]:flex-[0_1_350px]"
             />
 
             <div className="min-w-0 min-[898px]:flex-[1_1_420px]">
