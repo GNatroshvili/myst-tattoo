@@ -33,6 +33,7 @@ the admin panel like any others; running the script again adds nothing twice.
 | `ADMIN_PASSWORD` | The one password that opens `/admin`. Sign-in is off while it is empty |
 | `SESSION_SECRET` | Long random string that signs the admin session cookie |
 | `UPLOAD_DIR` | Folder for uploaded photos (`uploads`) |
+| `BLOB_READ_WRITE_TOKEN` | A Vercel Blob store's token. When set, photos go to Blob instead of the folder |
 
 ## How it fits together
 
@@ -41,9 +42,19 @@ the admin panel like any others; running the script again adds nothing twice.
 - Signing in (`POST /api/auth/login`) sets an http-only cookie that lasts a
   week. Eight wrong passwords from one address lock sign-in for 15 minutes.
 - Reading is public. Every route that changes data needs the admin cookie.
-- A photo is stored as two WebP files in `UPLOAD_DIR`: the photo (at most
-  1600px) and a small copy for galleries (at most 640px). They are served
-  under `/uploads`. Back this folder up together with the database.
+- A photo is stored as two WebP files: the photo (at most 1600px) and a small
+  copy for galleries (at most 640px). They go to `UPLOAD_DIR` and are served
+  under `/uploads`; back this folder up together with the database. With a
+  Vercel Blob store configured they go there instead (`src/utils/storage.js`).
+- The database is connected on the first request and shared after that, so
+  the app also runs as a function with no start-up of its own.
+
+## Deploying
+
+The backend runs on Vercel as a function, with MongoDB Atlas and Vercel Blob in
+place of the local database and the uploads folder. See
+[../DEPLOY.md](../DEPLOY.md) for the steps, and for `npm run db:copy` and
+`npm run photos:to-blob`, which move existing data there.
 
 ## Languages
 
@@ -127,6 +138,6 @@ src/
   models/            # mongoose schemas: Style, Artist, Tattoo, PiercingZone, PiercingPlace, Piercing
   middleware/        # admin session (auth.js), photo upload (upload.js)
   utils/             # photo storage, slugs, input checks, API output, upgrading older records
-  scripts/seed.js    # starting styles
+  scripts/           # starting styles, demo data, moving data to Atlas and Blob
 uploads/             # uploaded photos (not in git)
 ```

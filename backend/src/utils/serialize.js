@@ -1,13 +1,16 @@
+import { fileUrl } from "./storage.js";
+
 /**
- * What the API sends for each record. Photos go out as addresses under
- * /uploads, which the server (and the site in front of it) serves as files.
+ * What the API sends for each record. Photos go out as addresses a browser
+ * can load: under /uploads for files on the server's disk (the site in front
+ * of it forwards those), or straight from Vercel Blob.
  */
 
 const image = (img) =>
   img
     ? {
-        full: `/uploads/${img.full}`,
-        thumb: `/uploads/${img.thumb}`,
+        full: fileUrl(img.full),
+        thumb: fileUrl(img.thumb),
         width: img.width,
         height: img.height,
       }

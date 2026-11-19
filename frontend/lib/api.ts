@@ -19,6 +19,10 @@ async function get<T>(path: string): Promise<T | null> {
     if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
     return (await res.json()) as T;
   } catch (err) {
+    // Not a failure: while the site is being built, Next ends a request-time
+    // read this way so the page keeps its loading state. It must travel on.
+    if ((err as { digest?: string } | null)?.digest === "HANGING_PROMISE_REJECTION") throw err;
+
     const reason = err instanceof Error ? err.message : String(err);
     // "fetch failed" is all Node says when nothing answers at API_URL
     const hint =

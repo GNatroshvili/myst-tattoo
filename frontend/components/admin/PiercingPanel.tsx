@@ -4,6 +4,7 @@ import { useRef, useState, type FormEvent } from "react";
 import type { Piercing, PiercingPlace, PiercingZone } from "@/lib/types";
 import type { PanelProps } from "./AdminApp";
 import { api, form, json } from "./api";
+import { shrinkPhoto } from "./shrink";
 import { Card, CardTitle, ConfirmDelete, Hint, Notice, PHOTO_TYPES, Select, Thumb } from "./ui";
 
 type Actions = Pick<PanelProps, "reload" | "explain">;
@@ -457,7 +458,7 @@ export function PiercingPanel({ zones, piercings, artists, reload, explain }: Pa
       for (const file of files) {
         setProgress(`${sent + 1} / ${files.length}`);
         const body = new FormData();
-        body.set("photo", file);
+        body.set("photo", await shrinkPhoto(file));
         body.set("place", place);
         body.set("artist", artist);
         await api("/piercings", form("POST", body));
@@ -508,7 +509,7 @@ export function PiercingPanel({ zones, piercings, artists, reload, explain }: Pa
                 className="field px-3.5 py-2.5 file:mr-3.5 file:rounded-full file:border-0 file:bg-raised file:px-4 file:py-1.5 file:text-cream"
               />
               <Hint className="mt-2">
-                JPEG, PNG, WebP ან AVIF, თითო მაქსიმუმ 15 MB. რამდენიმე ფოტოს ერთად არჩევაც შეიძლება —
+                JPEG, PNG, WebP ან AVIF. რამდენიმე ფოტოს ერთად არჩევაც შეიძლება —
                 ყველას ქვემოთ არჩეული ადგილი და არტისტი მიენიჭება.
               </Hint>
             </label>

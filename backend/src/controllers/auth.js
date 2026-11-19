@@ -9,7 +9,7 @@ import {
 } from "../middleware/auth.js";
 import { HttpError } from "../utils/http.js";
 
-export function login(req, res) {
+export async function login(req, res) {
   if (!loginConfigured()) {
     throw new HttpError(
       503,
@@ -18,10 +18,10 @@ export function login(req, res) {
     );
   }
   if (!passwordMatches(req.body?.password)) {
-    recordFailedLogin(req);
+    await recordFailedLogin(req);
     throw new HttpError(401, "Wrong password", "wrong_password");
   }
-  clearFailedLogins(req);
+  await clearFailedLogins(req);
   startSession(res);
   res.json({ admin: true });
 }

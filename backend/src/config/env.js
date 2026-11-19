@@ -10,6 +10,8 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..")
 export const env = {
   port: Number(process.env.PORT) || 5000,
   isProduction: process.env.NODE_ENV === "production",
+  /** Set by Vercel itself: the server runs there as a function, with no lasting disk. */
+  onVercel: Boolean(process.env.VERCEL),
   mongoUri: process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/myst-tattoo",
   clientOrigins: process.env.CLIENT_ORIGIN
     ? process.env.CLIENT_ORIGIN.split(",").map((s) => s.trim())
@@ -22,4 +24,9 @@ export const env = {
 
   /** Where uploaded photos are kept on disk. */
   uploadDir: path.resolve(root, process.env.UPLOAD_DIR || "uploads"),
+  /**
+   * Whether a Vercel Blob store is connected. Connecting one adds its
+   * credentials to the environment; photos then go there instead of the disk.
+   */
+  blobConfigured: Boolean(process.env.BLOB_READ_WRITE_TOKEN || process.env.BLOB_STORE_ID),
 };

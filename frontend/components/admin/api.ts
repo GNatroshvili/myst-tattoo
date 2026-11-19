@@ -27,6 +27,8 @@ export async function api<T = void>(path: string, init?: RequestInit): Promise<T
 
   const data = await res.json().catch(() => null);
   if (!res.ok) {
+    // the host itself turned the request away for its size, before the backend saw it
+    if (res.status === 413) throw new ApiError(413, "Request too large", "photo_too_large");
     // no JSON in a failed answer: the backend itself could not be reached
     if (!data) throw new ApiError(res.status, res.statusText, "offline");
     throw new ApiError(res.status, data.message ?? res.statusText, data.code, data.details);
@@ -66,10 +68,16 @@ export function errorText(err: unknown): string {
       return `ამ ზონის ადგილებს ${err.details?.piercings ?? "რამდენიმე"} პირსინგის ფოტო იყენებს. ჯერ ისინი სხვა ადგილზე გადაიტანე ან წაშალე.`;
     case "place_in_use":
       return `ამ ადგილს ${err.details?.piercings ?? "რამდენიმე"} პირსინგის ფოტო იყენებს. ჯერ ისინი სხვა ადგილზე გადაიტანე ან წაშალე.`;
+    case "db_down":
+      return "ბაზასთან დაკავშირება ვერ მოხერხდა. შეამოწმე MONGODB_URI და სცადე თავიდან.";
+    case "storage_not_configured":
+      return "ფოტოების საცავი არ არის გამართული: Vercel-ში ბექენდის პროექტს მიუერთე Blob store.";
+    case "storage_failed":
+      return `ფოტოების საცავმა ფაილი არ მიიღო. შეამოწმე, რომ Blob store საჯაროა (public) და პროექტს მიერთებულია. (${err.message})`;
     case "bad_photo":
       return "ფოტო ვერ წავიკითხეთ. გამოიყენე JPEG, PNG, WebP ან AVIF ფორმატი.";
     case "photo_too_large":
-      return "ფოტო ძალიან დიდია (მაქსიმუმ 15 MB).";
+      return "ფოტო ძალიან დიდია. სცადე უფრო პატარა ფაილი.";
     case "both_languages":
       return "სახელი ორივე ენაზე შეავსე: ქართულად და ინგლისურად.";
     case "bad_instagram":

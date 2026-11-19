@@ -7,6 +7,7 @@ import type { Artist, ArtistBrief, Photo } from "@/lib/types";
 import { PersonIcon } from "../ui/Icons";
 import type { PanelProps } from "./AdminApp";
 import { api, form } from "./api";
+import { shrinkPhoto } from "./shrink";
 import { Card, CardTitle, ConfirmDelete, Hint, Notice, PHOTO_TYPES, Thumb, usePreview } from "./ui";
 
 const chip = (on: boolean) =>
@@ -145,10 +146,10 @@ function ArtistForm({ artist, styles, tattoos, piercings, reload, explain, onDon
     body.set("instagramUrl", instagram);
     body.set("tattoos", JSON.stringify([...attached]));
     body.set("piercings", JSON.stringify([...pierced]));
-    if (photo) body.set("photo", photo);
-    else if (removePhoto) body.set("removePhoto", "true");
+    if (!photo && removePhoto) body.set("removePhoto", "true");
 
     try {
+      if (photo) body.set("photo", await shrinkPhoto(photo));
       await api(artist ? `/artists/${artist.id}` : "/artists", form(artist ? "PATCH" : "POST", body));
       await reload();
       onDone(artist ? "ცვლილებები შენახულია." : "არტისტი დაემატა და ჩანს საიტის ორივე ენაზე.");
@@ -279,7 +280,7 @@ function ArtistForm({ artist, styles, tattoos, piercings, reload, explain, onDon
                 }}
                 className="field px-3.5 py-2.5 file:mr-3.5 file:rounded-full file:border-0 file:bg-raised file:px-4 file:py-1.5 file:text-cream"
               />
-              <Hint>არასავალდებულო. JPEG, PNG, WebP ან AVIF, მაქსიმუმ 15 MB. საუკეთესოა ვერტიკალური ფოტო (3:4).</Hint>
+              <Hint>არასავალდებულო. JPEG, PNG, WebP ან AVIF. საუკეთესოა ვერტიკალური ფოტო (3:4).</Hint>
               {artist?.photo && !photo && (
                 <label className="inline-flex min-h-11 items-center gap-2.5 self-start text-[14.5px] text-cream">
                   <input

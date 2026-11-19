@@ -24,8 +24,9 @@ import { instagramHandle, localized, photoRatio } from "@/lib/types";
 
 /**
  * The profile is read from the backend on every request, and the page waits
- * for it rather than showing a shell first: that way an address with no artist
- * behind it gets a proper 404 instead of a placeholder.
+ * for it rather than showing a placeholder first. An address with no artist
+ * behind it shows the "not found" page; once built, the response has already
+ * begun by then, so it goes out as 200 marked "noindex" rather than as a 404.
  */
 export const instant = false;
 

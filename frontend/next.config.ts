@@ -10,9 +10,11 @@ const nextConfig: NextConfig = {
   images: {
     // 90 is used for the hero artwork, where the default 75 softens the petals
     qualities: [75, 90],
+    // uploaded photos, when the backend keeps them in Vercel Blob
+    remotePatterns: [{ protocol: "https", hostname: "*.public.blob.vercel-storage.com" }],
   },
   // The browser talks to the backend through the site's own address: the admin
-  // panel's requests (and its sign-in cookie) and every uploaded photo.
+  // panel's requests (and its sign-in cookie) and every photo kept on its disk.
   async rewrites() {
     return [
       { source: "/api/:path*", destination: `${API_URL}/api/:path*` },

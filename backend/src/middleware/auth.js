@@ -1,5 +1,6 @@
 import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 import { env } from "../config/env.js";
+import { LoginAttempt } from "../models/LoginAttempt.js";
 import { HttpError } from "../utils/http.js";
 
 /**
@@ -77,26 +78,34 @@ export function requireAdmin(req, _res, next) {
 
 const MAX_ATTEMPTS = 8;
 const WINDOW = 15 * 60 * 1000;
-const attempts = new Map(); // address → { count, resetAt }
+
+const address = (req) => req.ip ?? "unknown";
+
+/** The address's count of wrong tries, if its 15 minutes are still running. */
+const running = (req) => LoginAttempt.findOne({ _id: address(req), resetAt: { $gt: new Date() } });
 
 /** Stops password guessing: eight wrong tries from one address, then a 15-minute wait. */
-export function limitLogins(req, _res, next) {
-  const now = Date.now();
-  for (const [key, entry] of attempts) if (entry.resetAt <= now) attempts.delete(key);
-
-  const entry = attempts.get(req.ip);
+export async function limitLogins(req, _res, next) {
+  const entry = await running(req);
   if (entry && entry.count >= MAX_ATTEMPTS) {
     throw new HttpError(429, "Too many attempts. Try again in a few minutes.", "too_many_attempts");
   }
   next();
 }
 
-export function recordFailedLogin(req) {
-  const entry = attempts.get(req.ip) ?? { count: 0, resetAt: Date.now() + WINDOW };
-  entry.count += 1;
-  attempts.set(req.ip, entry);
+export async function recordFailedLogin(req) {
+  const entry = await running(req);
+  if (entry) {
+    await LoginAttempt.updateOne({ _id: entry._id }, { $inc: { count: 1 } });
+  } else {
+    await LoginAttempt.replaceOne(
+      { _id: address(req) },
+      { count: 1, resetAt: new Date(Date.now() + WINDOW) },
+      { upsert: true }
+    );
+  }
 }
 
-export function clearFailedLogins(req) {
-  attempts.delete(req.ip);
+export async function clearFailedLogins(req) {
+  await LoginAttempt.deleteOne({ _id: address(req) });
 }
