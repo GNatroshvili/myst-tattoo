@@ -6,10 +6,13 @@ import type { Dictionary } from "@/lib/i18n/dictionaries/en";
 import { localized, type PiercingZone } from "@/lib/types";
 
 /**
- * Piercing zones beside the price list: the zones on the left, and on the
- * right the places of the picked zone with their prices. The first zone is
+ * Piercing zones and the price list of the picked one. The first zone is
  * picked to begin with. Zones, places and prices come from the admin panel,
  * with their names in both languages; the page shows its own.
+ *
+ * From 918px, where both fit, the zones stand in a column on the left and the
+ * list on the right. Below that the zones lie in one row above the list, which
+ * takes the page's full width; a row too long for the screen scrolls sideways.
  */
 export function PiercingPrices({
   lang,
@@ -27,9 +30,17 @@ export function PiercingPrices({
   return (
     <section
       aria-label={t.pricesAria}
-      className="flex flex-wrap items-start justify-between gap-x-16 gap-y-8 pt-[30px] lg:pl-5"
+      className="flex flex-col gap-y-8 pt-[30px] min-[918px]:flex-row min-[918px]:items-start min-[918px]:justify-between min-[918px]:gap-x-16 lg:pl-5"
     >
-      <div role="group" aria-label={t.zonesAria} className="flex flex-none flex-col items-stretch gap-4 pt-1">
+      {/* The padding (undone by the margin) leaves room for a button's focus
+          ring, which a scrolling box would otherwise cut off. On phones the
+          buttons are a little tighter, so three Georgian names fit on 360px.
+          The row scrolls without showing a scrollbar. */}
+      <div
+        role="group"
+        aria-label={t.zonesAria}
+        className="-m-1 flex gap-3 overflow-x-auto p-1 [scrollbar-width:none] max-sm:gap-2.5 [&::-webkit-scrollbar]:hidden min-[918px]:m-0 min-[918px]:flex-none min-[918px]:flex-col min-[918px]:items-stretch min-[918px]:gap-4 min-[918px]:overflow-visible min-[918px]:p-0 min-[918px]:pt-1"
+      >
         {zones.map(({ id, name }) => {
           const on = id === zone.id;
           return (
@@ -38,7 +49,7 @@ export function PiercingPrices({
               type="button"
               aria-pressed={on}
               onClick={() => setPicked(id)}
-              className={`h-12 min-w-[190px] rounded-full border-[1.5px] border-gold px-7 text-left text-[18px] font-medium transition-colors ${
+              className={`h-12 shrink-0 whitespace-nowrap rounded-full border-[1.5px] border-gold px-5 text-left text-[17px] font-medium sm:px-7 sm:text-[18px] transition-colors min-[918px]:min-w-[190px] ${
                 on ? "bg-gold text-on-gold" : "text-gold hover:bg-gold/10"
               }`}
             >
@@ -48,7 +59,7 @@ export function PiercingPrices({
         })}
       </div>
 
-      <div className="min-w-0 flex-[0_1_600px]">
+      <div className="min-w-0 min-[918px]:flex-[0_1_600px]">
         <p className="mx-1 mb-[22px] text-[18px] font-light leading-[26px] text-cream lg:text-right">
           {t.priceNote}
         </p>
