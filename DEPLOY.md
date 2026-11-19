@@ -97,6 +97,16 @@ npm run db:copy          # copies the local database into the (empty) Atlas one
 npm run photos:to-blob   # uploads backend/uploads/ to Blob and updates the records
 ```
 
+**Photos added from your machine by mistake.** If records were created locally
+while `.env` pointed at Atlas (for example with `npm run seed:demo`), their
+photos are in `backend/uploads/` and the live site shows none of them. Send
+them through the site itself, which stores them in Blob. It asks for the
+site's admin password and needs no token:
+
+```bash
+npm run photos:to-site -- https://<site>
+```
+
 `photos:to-blob` also needs `BLOB_READ_WRITE_TOKEN` in `.env`. It exists only
 if you ticked the read-write token option when connecting the store (step 2);
 copy its value from the backend project's **Settings → Environment

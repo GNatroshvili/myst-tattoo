@@ -11,7 +11,8 @@
     "seed": "node src/scripts/seed.js",
     "seed:demo": "node src/scripts/seed-demo.js",
     "db:copy": "node src/scripts/copy-db.js",
-    "photos:to-blob": "node src/scripts/photos-to-blob.js"
+    "photos:to-blob": "node src/scripts/photos-to-blob.js",
+    "photos:to-site": "node src/scripts/photos-to-site.js"
   },
   "engines": {
     "node": ">=20"
