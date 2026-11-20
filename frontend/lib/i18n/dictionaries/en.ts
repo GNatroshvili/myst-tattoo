@@ -72,7 +72,7 @@ export const en = {
     aria: "Booking request",
     name: "Your name",
     service: "Service",
-    services: ["Tattoo", "Piercing", "Gift voucher", "Cover-up", "Consultation"],
+    services: ["Tattoo Consultation", "Piercing", "Gift Card"],
     idea: "Idea",
     optional: "(optional)",
     ideaPlaceholder: "e.g. moon and stars, fine line, wrist, ~5 cm",
