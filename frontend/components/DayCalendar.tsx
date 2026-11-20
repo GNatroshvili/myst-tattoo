@@ -10,14 +10,16 @@ type Props = {
   today: string;
   /** the last date that can be picked */
   max: string;
-  /** the picked date, when it was picked here; shown on the button in gold */
-  value: string | null;
-  /** what the button says when nothing is picked here */
+  /** every picked date: they show in gold, and picking one again un-picks it */
+  values: string[];
+  /** no more days can be picked: the ones not picked are dimmed */
+  full: boolean;
+  /** what the button says: its name, or the later dates picked here ("12 Jan 2027") */
   label: string;
-  /** what the button says for the picked date, e.g. "12 Jan 2027" */
-  valueLabel: string;
+  /** the button turns gold: a date past the row of days is picked */
+  active: boolean;
   names: CalendarNames;
-  copy: { title: string; previousMonth: string; nextMonth: string };
+  copy: { title: string; previousMonth: string; nextMonth: string; done: string };
   onPick: (iso: string) => void;
 };
 
@@ -37,14 +39,16 @@ const navButton =
  * A button that opens a month calendar, for a date further ahead than the row
  * of days beside it reaches. Drawn by the site, like the form's drop-down, so
  * it looks the same on every device: a dark panel, today ringed, the picked
- * day in gold, days that cannot be picked dimmed.
+ * days in gold, days that cannot be picked dimmed. It stays open while days
+ * are picked, so several can be chosen in one go; picking a gold one again
+ * un-picks it. "Done", Escape or a press elsewhere closes it.
  *
  * The mouse or a tap picks a day and the arrows above change the month. On
  * the keyboard the arrow keys move by a day or a week, Page Up and Page Down
  * by a month, Home and End to the ends of the week, Enter picks and Escape
- * closes. Clicking elsewhere closes it too.
+ * closes.
  */
-export function DayCalendar({ id, today, max, value, label, valueLabel, names, copy, onPick }: Props) {
+export function DayCalendar({ id, today, max, values, full, label, active, names, copy, onPick }: Props) {
   const [open, setOpen] = useState(false);
   /** the day the keyboard is on; the month shown is its month */
   const [cursor, setCursor] = useState(today);
@@ -72,7 +76,8 @@ export function DayCalendar({ id, today, max, value, label, valueLabel, names, c
 
   function show() {
     focusCursor.current = true;
-    setCursor(clamp(value ?? today, today, max));
+    // open on the latest picked day, which is the one most likely past the row of days
+    setCursor(clamp(values[values.length - 1] ?? today, today, max));
     setOpen(true);
   }
 
@@ -145,7 +150,7 @@ export function DayCalendar({ id, today, max, value, label, valueLabel, names, c
         aria-controls={open ? panelId : undefined}
         onClick={() => (open ? setOpen(false) : show())}
         className={`flex h-10 items-center gap-2 rounded-full border px-3.5 text-[13.5px] leading-none transition-colors ${
-          value
+          active
             ? "border-gold bg-raised text-gold"
             : open
               ? "border-cream/60 text-cream"
@@ -153,7 +158,7 @@ export function DayCalendar({ id, today, max, value, label, valueLabel, names, c
         }`}
       >
         <CalendarIcon className="h-[18px] w-[18px]" strokeWidth={1.8} />
-        {value ? valueLabel : label}
+        {label}
       </button>
 
       {open && (
@@ -199,8 +204,8 @@ export function DayCalendar({ id, today, max, value, label, valueLabel, names, c
 
           <div className="mt-1 grid grid-cols-7 gap-1">
             {days.map((iso, i) => {
-              const picked = iso === value;
-              const reachable = iso >= today && iso <= max;
+              const picked = values.includes(iso);
+              const reachable = iso >= today && iso <= max && (picked || !full);
               const dayOfMonth = Number(iso.slice(8));
               return (
                 <button
@@ -215,8 +220,9 @@ export function DayCalendar({ id, today, max, value, label, valueLabel, names, c
                   aria-pressed={picked}
                   aria-current={iso === today ? "date" : undefined}
                   onClick={() => {
+                    // the calendar stays open: more days may follow
+                    setCursor(iso);
                     onPick(iso);
-                    close();
                   }}
                   className={`flex aspect-square items-center justify-center rounded-[10px] border text-[14.5px] leading-none transition-colors disabled:pointer-events-none disabled:border-transparent disabled:text-faint/55 ${
                     picked
@@ -230,6 +236,12 @@ export function DayCalendar({ id, today, max, value, label, valueLabel, names, c
                 </button>
               );
             })}
+          </div>
+
+          <div className="mt-2 flex justify-end border-t border-cream/12 pt-3">
+            <button type="button" onClick={close} className="btn btn-outline-gold btn-sm">
+              {copy.done}
+            </button>
           </div>
         </div>
       )}

@@ -6,7 +6,7 @@ import type { Dictionary } from "@/lib/i18n/dictionaries/en";
 import { buildWhatsAppMessage, whatsappUrl } from "@/lib/whatsapp";
 import { DayCalendar } from "./DayCalendar";
 import { ListSelect } from "./ListSelect";
-import { WhatsAppIcon } from "./ui/Icons";
+import { WhatsAppIcon, XIcon } from "./ui/Icons";
 
 type Props = {
   /** the days offered in a row, today first */
@@ -18,6 +18,8 @@ type Props = {
 
 /** how far ahead the calendar reaches, in days */
 const CALENDAR_REACH = 365;
+/** how many days a visitor may offer */
+const MAX_DAYS = 3;
 
 const formShell =
   "flex min-w-0 flex-col gap-2 rounded-[18px] border border-cream/16 bg-surface px-5 pb-[30px] pt-[26px] sm:px-7";
@@ -28,22 +30,36 @@ export function IdeaForm({ days, names, t }: Props) {
   const [name, setName] = useState("");
   const [service, setService] = useState<string>(t.services[0]);
   const [idea, setIdea] = useState("");
-  /** the picked day: one of the row's, or a later one picked in the calendar */
-  const [day, setDay] = useState<DayOption | null>(null);
+  /** the picked days, earliest first: the row's own, or later ones picked in the calendar */
+  const [picked, setPicked] = useState<DayOption[]>([]);
   const [time, setTime] = useState<string | null>(null);
   const today = days[0].iso;
-  /** a day picked in the calendar that the row does not have */
-  const later = day && !days.some((d) => d.iso === day.iso) ? day : null;
+  const full = picked.length >= MAX_DAYS;
+  /** days picked in the calendar that the row does not have */
+  const later = picked.filter((day) => !days.some((d) => d.iso === day.iso));
+
+  /** Picks the day, or un-picks it if it was picked; with three picked already, a fourth is not taken. */
+  function toggle(day: DayOption) {
+    setPicked((list) => {
+      if (list.some((d) => d.iso === day.iso)) return list.filter((d) => d.iso !== day.iso);
+      if (list.length >= MAX_DAYS) return list;
+      return [...list, day].sort((a, b) => (a.iso < b.iso ? -1 : 1));
+    });
+  }
 
   /** A date from the calendar: the row's own day if it has it (brought into view), otherwise a later one. */
   function pickDate(iso: string) {
-    setDay(days.find((d) => d.iso === iso) ?? dayOption(iso, names, today, t));
+    toggle(days.find((d) => d.iso === iso) ?? dayOption(iso, names, today, t));
     document.getElementById(`${id}-day-${iso}`)?.scrollIntoView({ block: "nearest", inline: "center" });
   }
 
+  /** "12 Jan", with the year when it is not this one */
+  const shortDate = (day: DayOption) =>
+    `${day.day} ${day.month}${day.iso.slice(0, 4) === today.slice(0, 4) ? "" : ` ${day.iso.slice(0, 4)}`}`;
+
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const message = buildWhatsAppMessage({ name, service, idea, day, time }, t.message);
+    const message = buildWhatsAppMessage({ name, service, idea, days: picked, time }, t.message);
     window.open(whatsappUrl(message), "_blank", "noopener,noreferrer");
   }
 
@@ -91,41 +107,48 @@ export function IdeaForm({ days, names, t }: Props) {
       {/* The calendar's panel opens against this row, across the form on phones. */}
       <div className="relative mt-3 flex items-center justify-between gap-3">
         <div id={`${id}-day-label`} className="field-label">
-          {t.day}
+          {t.day} <span className="text-[12px] font-light text-muted">{t.dayLimit}</span>
         </div>
         <DayCalendar
           id={`${id}-calendar`}
           today={today}
           max={addDays(today, CALENDAR_REACH)}
-          value={later?.iso ?? null}
-          label={t.otherDate}
-          valueLabel={
-            later
-              ? `${later.day} ${later.month}${later.iso.slice(0, 4) === today.slice(0, 4) ? "" : ` ${later.iso.slice(0, 4)}`}`
-              : ""
+          values={picked.map((day) => day.iso)}
+          full={full}
+          // the button names the later dates picked: the first, and how many more
+          label={
+            later.length === 0
+              ? t.otherDate
+              : `${shortDate(later[0])}${later.length > 1 ? ` +${later.length - 1}` : ""}`
           }
+          active={later.length > 0}
           names={names}
           copy={t.calendar}
           onPick={pickDate}
         />
       </div>
       <div
-        role="radiogroup"
+        role="group"
         aria-labelledby={`${id}-day-label`}
         className="days-scroll flex gap-[9px] overflow-x-auto pb-2"
       >
         {days.map((d) => {
-          const active = d.iso === day?.iso;
+          const active = picked.some((day) => day.iso === d.iso);
+          // with three picked, the rest are dimmed: one has to be given up first
+          const closed = full && !active;
           return (
             <button
               key={d.iso}
               id={`${id}-day-${d.iso}`}
               type="button"
-              role="radio"
+              role="checkbox"
               aria-checked={active}
+              aria-disabled={closed}
               aria-label={`${d.label}, ${d.day} ${d.month}`}
-              onClick={() => setDay(active ? null : d)}
-              className="choice flex h-[62px] w-14 shrink-0 flex-col items-center justify-center"
+              onClick={() => toggle(d)}
+              className={`choice flex h-[62px] w-14 shrink-0 flex-col items-center justify-center ${
+                closed ? "cursor-default opacity-40 hover:border-cream/22" : ""
+              }`}
             >
               <span className="text-[10.5px] leading-[13px] text-muted">{d.label}</span>
               <span className="text-[17px] font-medium leading-[21px]">{d.day}</span>
@@ -134,6 +157,26 @@ export function IdeaForm({ days, names, t }: Props) {
           );
         })}
       </div>
+
+      {/* What is picked, in one place (the row scrolls, and later dates are not in it).
+          Pressing a day here un-picks it. */}
+      {picked.length > 0 && (
+        <ul className="flex flex-wrap gap-2 pt-1">
+          {picked.map((day) => (
+            <li key={day.iso}>
+              <button
+                type="button"
+                aria-label={t.removeDay.replace("{day}", day.long)}
+                onClick={() => toggle(day)}
+                className="flex h-9 items-center gap-2 rounded-full border border-gold/55 bg-raised pl-3.5 pr-2.5 text-[13.5px] leading-none text-cream transition-colors hover:border-gold"
+              >
+                {day.label}, {shortDate(day)}
+                <XIcon className="h-3 w-3 text-gold" />
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
 
       <div id={`${id}-time-label`} className="field-label mt-2.5">
         {t.time}

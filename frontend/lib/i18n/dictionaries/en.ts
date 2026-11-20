@@ -78,7 +78,11 @@ export const en = {
     idea: "Idea",
     optional: "(optional)",
     ideaPlaceholder: "e.g. moon and stars, fine line, wrist, ~5 cm",
-    day: "Preferred day",
+    day: "Preferred days",
+    /** beside the label: how many days may be picked */
+    dayLimit: "(up to 3)",
+    /** read out for a picked day's chip; pressing it un-picks the day */
+    removeDay: "Remove {day}",
     today: "Today",
     tomorrow: "Tomorrow",
     /** the button that opens the calendar, for a date past the row of days */
@@ -87,6 +91,8 @@ export const en = {
       title: "Choose a date",
       previousMonth: "Previous month",
       nextMonth: "Next month",
+      /** the button that closes the calendar */
+      done: "Done",
     },
     time: "Time of day",
     times: ["Morning", "Afternoon", "Evening"],
@@ -97,6 +103,8 @@ export const en = {
       name: "Name: {name}",
       idea: "Idea: {idea}",
       day: "Preferred day: {day}",
+      /** when more than one day is picked; {days} are separated by "; " */
+      days: "Preferred days: {days}",
       time: "Time of day: {time}",
     },
   },

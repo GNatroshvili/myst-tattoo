@@ -5,7 +5,8 @@ export type IdeaPayload = {
   name: string;
   service: string;
   idea?: string;
-  day?: DayOption | null;
+  /** the picked days, earliest first; none is fine */
+  days?: DayOption[];
   time?: string | null;
 };
 
@@ -15,6 +16,8 @@ export type MessageTemplates = {
   name: string;
   idea: string;
   day: string;
+  /** used instead of `day` when several days are picked */
+  days: string;
   time: string;
 };
 
@@ -28,7 +31,10 @@ export function buildWhatsAppMessage(p: IdeaPayload, t: MessageTemplates) {
     fill(t.name, { name: p.name.trim() || "-" }),
   ];
   if (p.idea?.trim()) lines.push(fill(t.idea, { idea: p.idea.trim() }));
-  if (p.day) lines.push(fill(t.day, { day: p.day.long }));
+  const days = p.days ?? [];
+  if (days.length === 1) lines.push(fill(t.day, { day: days[0].long }));
+  // the long forms have commas of their own, so the days are set apart by semicolons
+  if (days.length > 1) lines.push(fill(t.days, { days: days.map((day) => day.long).join("; ") }));
   if (p.time) lines.push(fill(t.time, { time: p.time }));
   return lines.join("\n");
 }
