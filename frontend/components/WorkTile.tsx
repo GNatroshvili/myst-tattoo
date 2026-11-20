@@ -24,7 +24,8 @@ type Props = {
 /**
  * One piece in a gallery: the photo with a two-part caption under it. Every
  * tile is 3:4, whatever the photo's own shape; a photo of another shape is
- * cropped to fit (the tattoo details window shows it whole).
+ * cropped to fit (the tattoo details window shows it whole). Under the mouse
+ * the whole tile grows a touch, over 0.2s.
  */
 export function WorkTile({
   aria,
@@ -37,7 +38,7 @@ export function WorkTile({
   tone = "dark",
 }: Props) {
   return (
-    <figure>
+    <figure className="transition-transform duration-200 hover:scale-[1.03]">
       <PhotoFrame
         ratio="3 / 4"
         aria={aria}

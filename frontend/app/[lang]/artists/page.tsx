@@ -41,7 +41,11 @@ async function ArtistsGrid({ lang, t }: { lang: Locale; t: Dictionary["artists"]
         const tags = artist.styles.map((style) => localized(style.name, lang));
         if (artist.piercingCount) tags.push(t.piercingTag);
         return (
-          <article key={artist.id} className="flex flex-col">
+          // like the gallery tiles, the card grows a touch under the mouse
+          <article
+            key={artist.id}
+            className="flex flex-col transition-transform duration-200 hover:scale-[1.03]"
+          >
             <PhotoFrame
               ratio="3 / 4"
               aria={`${t.openProfile}: ${name}`}
