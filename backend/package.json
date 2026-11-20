@@ -9,7 +9,8 @@
     "dev": "node --watch --env-file-if-exists=.env src/server.js",
     "start": "node src/server.js",
     "seed": "node src/scripts/seed.js",
-    "seed:demo": "node src/scripts/seed-demo.js",
+    "seed:demo": "node src/scripts/seed-demo.js && node src/scripts/seed-demo-blog.js",
+    "seed:demo:blog": "node src/scripts/seed-demo-blog.js",
     "db:copy": "node src/scripts/copy-db.js",
     "photos:to-blob": "node src/scripts/photos-to-blob.js",
     "photos:to-site": "node src/scripts/photos-to-site.js"

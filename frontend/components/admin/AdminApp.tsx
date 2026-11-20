@@ -2,9 +2,10 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import type { Artist, Piercing, PiercingZone, Style, Tattoo } from "@/lib/types";
+import type { Artist, BlogPost, BlogTopic, Piercing, PiercingZone, Style, Tattoo } from "@/lib/types";
 import { api, errorText, isSignedOut } from "./api";
 import { ArtistsPanel } from "./ArtistsPanel";
+import { BlogPanel } from "./BlogPanel";
 import { LoginForm } from "./LoginForm";
 import { PiercingPanel } from "./PiercingPanel";
 import { StylesPanel } from "./StylesPanel";
@@ -20,6 +21,10 @@ export type AdminData = {
   /** piercing zones, each with its places and prices */
   zones: PiercingZone[];
   styles: Style[];
+  /** blog articles, newest first */
+  posts: BlogPost[];
+  /** blog topics, each with how many articles it has */
+  topics: BlogTopic[];
 };
 
 /** What every screen gets: the data, a way to re-read it, and error handling. */
@@ -35,6 +40,7 @@ const tabs = [
   { key: "tattoos", label: "ტატუები" },
   { key: "piercings", label: "პირსინგი" },
   { key: "styles", label: "სტილები" },
+  { key: "posts", label: "ბლოგი" },
 ] as const;
 type Tab = (typeof tabs)[number]["key"];
 
@@ -52,14 +58,16 @@ export function AdminApp() {
 
   const reload = useCallback(async () => {
     try {
-      const [artists, tattoos, piercings, zones, styles] = await Promise.all([
+      const [artists, tattoos, piercings, zones, styles, posts, topics] = await Promise.all([
         api<Artist[]>("/artists"),
         api<Tattoo[]>("/tattoos"),
         api<Piercing[]>("/piercings"),
         api<PiercingZone[]>("/piercing/zones"),
         api<Style[]>("/styles"),
+        api<BlogPost[]>("/blog/posts"),
+        api<BlogTopic[]>("/blog/topics"),
       ]);
-      setData({ artists, tattoos, piercings, zones, styles });
+      setData({ artists, tattoos, piercings, zones, styles, posts, topics });
       setLoadError("");
     } catch (err) {
       setLoadError(errorText(err));
@@ -144,6 +152,7 @@ export function AdminApp() {
       {panel && tab === "tattoos" && <TattoosPanel {...panel} />}
       {panel && tab === "piercings" && <PiercingPanel {...panel} />}
       {panel && tab === "styles" && <StylesPanel {...panel} />}
+      {panel && tab === "posts" && <BlogPanel {...panel} />}
     </div>
   );
 }

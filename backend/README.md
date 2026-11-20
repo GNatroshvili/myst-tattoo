@@ -11,7 +11,7 @@ uploaded photos, and guards changes behind the admin sign-in. The site (`../fron
 cp .env.example .env   # then fill in ADMIN_PASSWORD and SESSION_SECRET
 npm install
 npm run seed           # optional, once: adds five starting tattoo styles
-npm run seed:demo      # optional: demo artists, tattoos and piercings
+npm run seed:demo      # optional: demo artists, tattoos, piercings and blog articles
 npm run dev            # http://localhost:5000
 ```
 
@@ -19,7 +19,8 @@ MongoDB must be running (`MONGODB_URI`, local by default).
 
 `npm run seed:demo` fills an empty site for trying things out: three tattoo
 artists with five tattoos each, one piercer with five piercings, and a
-piercing price list, all with their texts in both languages. The pictures are drawn by the script and
+piercing price list, and then six blog articles under four topics
+(`npm run seed:demo:blog` adds only those), all with their texts in both languages. The pictures are drawn by the script and
 marked "DEMO". The records are ordinary ones, so they are edited and deleted in
 the admin panel like any others; running the script again adds nothing twice.
 
@@ -117,6 +118,15 @@ The piercing page has a price list and a gallery:
 | POST | `/api/piercing/zones/:id/places` | yes | `{ name: { en, ka }, note: { en, ka }, price }` → the zone with its places |
 | PATCH | `/api/piercing/places/:id` | yes | Any of `name`, `note`, `price` |
 | DELETE | `/api/piercing/places/:id` | yes | Refused (409) while photos use the place |
+| GET | `/api/blog/topics` | | Blog topics in the order they were added, each with `postCount` |
+| POST | `/api/blog/topics` | yes | JSON: `name: { ka, en }` |
+| PATCH | `/api/blog/topics/:id` | yes | JSON: `name: { ka, en }` |
+| DELETE | `/api/blog/topics/:id` | yes | Refused (409) while articles use the topic |
+| GET | `/api/blog/posts` | | All articles, newest first |
+| GET | `/api/blog/posts/:key` | | One article by id or slug |
+| POST | `/api/blog/posts` | yes | Form: `titleKa`, `titleEn`, `bodyKa`, `bodyEn` (at least one), `topic`, `photo`. `createdAt` is the date the site shows |
+| PATCH | `/api/blog/posts/:key` | yes | Any of the same fields; the address and the date stay as they are |
+| DELETE | `/api/blog/posts/:key` | yes | Also deletes the image files |
 | GET | `/api/piercings` | | All piercing photos, newest first; `?limit=4` |
 | POST | `/api/piercings` | yes | Form: `photo`, `place`, `artist` (optional) |
 | PATCH | `/api/piercings/:id` | yes | `place`, `artist` ("" detaches), `photo` |
@@ -134,8 +144,8 @@ src/
   app.js             # express app, middleware, route mounting
   config/            # environment values, mongoose connection
   routes/index.js    # every route and who may call it
-  controllers/       # request handlers: auth, styles, artists, tattoos, piercing zones, piercings
-  models/            # mongoose schemas: Style, Artist, Tattoo, PiercingZone, PiercingPlace, Piercing
+  controllers/       # request handlers: auth, styles, artists, tattoos, piercing zones, piercings, blog topics, blog posts
+  models/            # mongoose schemas: Style, Artist, Tattoo, PiercingZone, PiercingPlace, Piercing, BlogTopic, BlogPost
   middleware/        # admin session (auth.js), photo upload (upload.js)
   utils/             # photo storage, slugs, input checks, API output, upgrading older records
   scripts/           # starting styles, demo data, moving data to Atlas and Blob

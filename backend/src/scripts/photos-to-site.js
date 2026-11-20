@@ -67,6 +67,7 @@ const kinds = [
   ["artists", (artist) => artist.photo],
   ["tattoos", (tattoo) => tattoo.image],
   ["piercings", (piercing) => piercing.image],
+  ["blog/posts", (post) => post.image],
 ];
 
 let sent = 0;

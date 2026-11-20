@@ -9,6 +9,7 @@ import { Style } from "../models/Style.js";
 import { Tattoo } from "../models/Tattoo.js";
 import { saveImage } from "../utils/images.js";
 import { uniqueSlug } from "../utils/slug.js";
+import { CREAM, EAR, GOLD, ROSE, hsl, picture, random, star } from "./demo-art.js";
 
 /**
  * Fills the database with demo content for trying the site and the admin
@@ -22,6 +23,9 @@ import { uniqueSlug } from "../utils/slug.js";
  *
  * Safe to run again: an artist, zone or place that already exists (same
  * English name) is left alone, with its works.
+ *
+ * The blog's demo articles are a script of their own (seed-demo-blog.js),
+ * which `npm run seed:demo` runs after this one.
  */
 
 /* ---------- what gets added ---------- */
@@ -117,10 +121,6 @@ const ZONES = [
 
 /* ---------- the pictures ---------- */
 
-const CREAM = "#ebd5cd";
-const ROSE = "#c0628f";
-const GOLD = "#f7d54a";
-
 /** Photo sizes in turn, so the galleries get portrait, square and 4:5 tiles. */
 const SIZES = [
   [900, 1200],
@@ -129,48 +129,6 @@ const SIZES = [
   [900, 1200],
   [960, 1200],
 ];
-
-/** Repeatable "random" numbers in 0..1, so a record always gets the same picture. */
-function random(seed) {
-  let s = (seed * 2654435761) >>> 0;
-  return () => {
-    s = (s * 1664525 + 1013904223) >>> 0;
-    return s / 2 ** 32;
-  };
-}
-
-/** hsl → "#rrggbb" (SVG renderers do not all read hsl()). */
-function hsl(h, s, l) {
-  const a = (s / 100) * Math.min(l / 100, 1 - l / 100);
-  const channel = (n) => {
-    const k = (n + h / 30) % 12;
-    const value = l / 100 - a * Math.max(-1, Math.min(k - 3, 9 - k, 1));
-    return Math.round(255 * value).toString(16).padStart(2, "0");
-  };
-  return `#${channel(0)}${channel(8)}${channel(4)}`;
-}
-
-/** A picture: dark ground tinted by `hue`, the drawing in the middle, "DEMO" in a corner. */
-function picture(width, height, hue, drawing) {
-  const scale = Math.min(width, height) / 760;
-  return Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
-  <defs>
-    <radialGradient id="ground" cx="50%" cy="40%" r="80%">
-      <stop offset="0" stop-color="${hsl(hue, 34, 22)}"/>
-      <stop offset="0.6" stop-color="${hsl(hue, 30, 11)}"/>
-      <stop offset="1" stop-color="#0b0809"/>
-    </radialGradient>
-  </defs>
-  <rect width="${width}" height="${height}" fill="url(#ground)"/>
-  <g transform="translate(${width / 2} ${height / 2}) scale(${scale})" fill="none" stroke="${CREAM}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
-    ${drawing}
-  </g>
-  <text x="${width - 30}" y="${height - 28}" text-anchor="end" font-family="Arial, Helvetica, sans-serif" font-size="${Math.round(22 * scale)}" letter-spacing="6" fill="${CREAM}" fill-opacity="0.45">DEMO</text>
-</svg>`);
-}
-
-const star = (x, y, r, fill = GOLD) =>
-  `<path d="M${x} ${y - r}Q${x} ${y} ${x + r} ${y}Q${x} ${y} ${x} ${y + r}Q${x} ${y} ${x - r} ${y}Q${x} ${y} ${x} ${y - r}Z" fill="${fill}" stroke="none"/>`;
 
 /** One drawing per tattoo style; `rnd` varies it from one tattoo to the next, `n` counts the artist's tattoos. */
 const TATTOO_ART = {
@@ -235,9 +193,6 @@ const TATTOO_ART = {
 
 const ring = (x, y, r) => `<circle cx="${x}" cy="${y}" r="${r}" stroke="${GOLD}" stroke-width="9"/>`;
 const stud = (x, y, r = 15) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${GOLD}" stroke="none"/>${star(x + r + 20, y - r - 16, 13, CREAM)}`;
-const EAR = `<path d="M50 -250C-130 -270 -190 -70 -125 70C-92 142 -104 214 -24 250C44 272 76 206 66 152C60 110 122 44 134 -64C143 -170 112 -238 50 -250Z"/>
-  <path d="M26 -172C-74 -184 -108 -46 -66 34C-44 76 -12 66 0 110" stroke-width="3"/>`;
-
 /** One drawing per place of the body: a few lines for the anatomy, the jewellery in gold. */
 const PIERCING_ART = {
   lobe: () => `${EAR}${stud(-8, 212)}`,

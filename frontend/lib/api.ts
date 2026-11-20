@@ -1,5 +1,5 @@
 import { apiOrigin } from "./api-url";
-import type { Artist, Piercing, PiercingZone, Style, Tattoo } from "./types";
+import type { Artist, BlogPost, BlogTopic, Piercing, PiercingZone, Style, Tattoo } from "./types";
 
 /**
  * Reads from the backend API. Server Components only: the browser reaches the
@@ -52,6 +52,15 @@ export const getStyles = async () => (await get<Style[]>("/styles")) ?? [];
 
 /** The piercing zones, each with its places and prices, in the order they were added. */
 export const getPiercingZones = async () => (await get<PiercingZone[]>("/piercing/zones")) ?? [];
+
+/** Every blog article, newest first. */
+export const getBlogPosts = async () => (await get<BlogPost[]>("/blog/posts")) ?? [];
+
+/** The blog's topics, in the order they were added, each with `postCount`. */
+export const getBlogTopics = async () => (await get<BlogTopic[]>("/blog/topics")) ?? [];
+
+/** One article by the slug in its address. */
+export const getBlogPost = (slug: string) => get<BlogPost>(`/blog/posts/${encodeURIComponent(slug)}`);
 
 /** Piercing photos, newest first. */
 export const getPiercings = async () => (await get<Piercing[]>("/piercings")) ?? [];

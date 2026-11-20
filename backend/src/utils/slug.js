@@ -18,10 +18,11 @@ export function slugify(value) {
 
 /**
  * A slug nobody else has: "nino", then "nino-2", "nino-3"…
- * `taken(slug)` says whether a slug is already in use.
+ * `taken(slug)` says whether a slug is already in use; `fallback` is used when
+ * nothing usable is left of `value`.
  */
-export async function uniqueSlug(value, taken) {
-  const base = slugify(value) || "artist";
+export async function uniqueSlug(value, taken, fallback = "artist") {
+  const base = slugify(value) || fallback;
   let slug = base;
   for (let n = 2; await taken(slug); n++) slug = `${base}-${n}`;
   return slug;

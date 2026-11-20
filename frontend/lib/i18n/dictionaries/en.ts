@@ -223,46 +223,21 @@ export const en = {
     lead: "Aftercare guides, studio news and the stories behind the work.",
     filterAria: "Filter by topic",
     all: "All",
-    topics: {
-      aftercare: "Aftercare",
-      tattoo: "Tattoo",
-      piercing: "Piercing",
-      studioNews: "Studio news",
-    },
-    imageAria: "Article image placeholder",
-    imageLabel: "Article image",
-    featured: "Featured",
-    /** Shown until the real articles are added in lib/blog.ts. */
-    placeholder: {
-      topic: "[Topic]",
-      featuredTitle: "[Featured article title]",
-      featuredExcerpt: "[Two or three sentences introducing the article and why it is worth reading.]",
-      date: "[Date]",
-      readTime: "[X] min read",
-      title: "[Article title]",
-      excerpt: "[One or two sentences that summarise the article.]",
-    },
+    /** over the newest article, shown large above the rest */
+    latest: "Latest",
+    /** {minutes} is a whole number */
+    readTime: "{minutes} min read",
     readArticle: "Read article",
     read: "Read",
     openArticle: "Open article",
     countOne: "Showing 1 article",
     countMany: "Showing {count} articles",
     articlesAria: "Articles",
+    emptyTitle: "Articles coming soon",
+    emptyText: "We're writing the first ones. Check back shortly.",
     /** One article's own page. */
     article: {
       back: "All articles",
-      photoAria: "Article photo placeholder",
-      photoLabel: "Blog photo",
-      /** Shown until the real articles are added in lib/blog.ts. */
-      placeholder: {
-        date: "[Date posted]",
-        titleLine1: "How to care for",
-        titleLine2: "a new tattoo",
-        paragraphs: [
-          "[Blog description — what this post is about. The text of the post goes here.]",
-          "[Second paragraph, if the post needs one.]",
-        ],
-      },
     },
     ctaTitleLine1: "Have a",
     ctaTitleLine2: "question?",

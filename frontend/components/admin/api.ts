@@ -68,6 +68,16 @@ export function errorText(err: unknown): string {
       return `ამ ზონის ადგილებს ${err.details?.piercings ?? "რამდენიმე"} პირსინგის ფოტო იყენებს. ჯერ ისინი სხვა ადგილზე გადაიტანე ან წაშალე.`;
     case "place_in_use":
       return `ამ ადგილს ${err.details?.piercings ?? "რამდენიმე"} პირსინგის ფოტო იყენებს. ჯერ ისინი სხვა ადგილზე გადაიტანე ან წაშალე.`;
+    case "topic_in_use":
+      return `ამ თემას ${err.details?.posts ?? "რამდენიმე"} სტატია იყენებს. ჯერ მათ შეუცვალე თემა.`;
+    case "title_both_languages":
+      return "სათაური ორივე ენაზე შეავსე: ქართულად და ინგლისურად.";
+    case "body_missing":
+      return "სტატიის ტექსტი ერთ ენაზე მაინც დაწერე.";
+    case "bad_topic":
+      return "აირჩიე სტატიის თემა.";
+    case "photo_required":
+      return "ატვირთე სტატიის სურათი.";
     case "db_down":
       return "ბაზასთან დაკავშირება ვერ მოხერხდა. შეამოწმე MONGODB_URI და სცადე თავიდან.";
     case "storage_not_configured":

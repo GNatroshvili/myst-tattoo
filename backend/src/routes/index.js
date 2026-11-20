@@ -1,6 +1,8 @@
 import { Router } from "express";
 import * as artists from "../controllers/artists.js";
 import * as auth from "../controllers/auth.js";
+import * as blogPosts from "../controllers/blogPosts.js";
+import * as blogTopics from "../controllers/blogTopics.js";
 import * as piercings from "../controllers/piercings.js";
 import * as piercingZones from "../controllers/piercingZones.js";
 import * as styles from "../controllers/styles.js";
@@ -49,5 +51,17 @@ api.get("/piercings", piercings.listPiercings);
 api.post("/piercings", requireAdmin, photoUpload, piercings.createPiercing);
 api.patch("/piercings/:id", requireAdmin, photoUpload, piercings.updatePiercing);
 api.delete("/piercings/:id", requireAdmin, piercings.deletePiercing);
+
+// the blog: topics, and the articles filed under them.
+// `:key` is an article's id or the slug from its address
+api.get("/blog/topics", blogTopics.listTopics);
+api.post("/blog/topics", requireAdmin, blogTopics.createTopic);
+api.patch("/blog/topics/:id", requireAdmin, blogTopics.updateTopic);
+api.delete("/blog/topics/:id", requireAdmin, blogTopics.deleteTopic);
+api.get("/blog/posts", blogPosts.listPosts);
+api.get("/blog/posts/:key", blogPosts.getPost);
+api.post("/blog/posts", requireAdmin, photoUpload, blogPosts.createPost);
+api.patch("/blog/posts/:key", requireAdmin, photoUpload, blogPosts.updatePost);
+api.delete("/blog/posts/:key", requireAdmin, blogPosts.deletePost);
 
 export default api;

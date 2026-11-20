@@ -73,6 +73,30 @@ export type Piercing = {
   createdAt: string;
 };
 
+/** What a blog article is about ("Tattoo care", "Studio news"). */
+export type BlogTopic = {
+  id: string;
+  name: Localized;
+  /** how many articles are filed under it (comes with the list of topics) */
+  postCount?: number;
+};
+
+/** A blog article. One record serves both sites. */
+export type BlogPost = {
+  id: string;
+  /** last part of the article's address: /blog/<slug> */
+  slug: string;
+  title: Localized;
+  /** null only if the topic was deleted from under it */
+  topic: BlogTopic | null;
+  /** the article's text; "" in a language that has none, and the page then shows the other one */
+  body: Localized;
+  image: Photo;
+  /** when the article was added: the date and time the site shows */
+  createdAt: string;
+  updatedAt: string;
+};
+
 /** An artist. One record serves both sites: the nickname and the bio are in both languages. */
 export type Artist = ArtistBrief & {
   styles: Style[];

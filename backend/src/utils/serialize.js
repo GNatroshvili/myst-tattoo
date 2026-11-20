@@ -74,6 +74,26 @@ export const piercing = (doc) => ({
   createdAt: doc.createdAt,
 });
 
+/** A blog topic; `extra` carries how many articles it has, where that is known. */
+export const blogTopic = (doc, extra = {}) => ({
+  id: String(doc._id),
+  name: both(doc.name),
+  ...extra,
+});
+
+export const blogPost = (doc) => ({
+  id: String(doc._id),
+  slug: doc.slug,
+  title: both(doc.title),
+  /** null only if the topic was deleted from under it */
+  topic: doc.topic && doc.topic.name ? blogTopic(doc.topic) : null,
+  body: both(doc.body),
+  image: image(doc.image),
+  /** when the article was added: the date and time the site shows */
+  createdAt: doc.createdAt,
+  updatedAt: doc.updatedAt,
+});
+
 export const tattoo = (doc) => ({
   id: String(doc._id),
   image: image(doc.image),
