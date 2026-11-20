@@ -1,29 +1,48 @@
 "use client";
 
 import { useId, useState, type FormEvent } from "react";
-import type { DayOption } from "@/lib/dates";
+import { addDays, dayOption, type CalendarNames, type DayOption } from "@/lib/dates";
 import type { Dictionary } from "@/lib/i18n/dictionaries/en";
 import { buildWhatsAppMessage, whatsappUrl } from "@/lib/whatsapp";
+import { DayCalendar } from "./DayCalendar";
 import { ListSelect } from "./ListSelect";
 import { WhatsAppIcon } from "./ui/Icons";
 
-type Props = { days: DayOption[]; t: Dictionary["form"] };
+type Props = {
+  /** the days offered in a row, today first */
+  days: DayOption[];
+  /** month and weekday names in the page's language, for the calendar */
+  names: CalendarNames;
+  t: Dictionary["form"];
+};
+
+/** how far ahead the calendar reaches, in days */
+const CALENDAR_REACH = 365;
 
 const formShell =
   "flex min-w-0 flex-col gap-2 rounded-[18px] border border-cream/16 bg-surface px-5 pb-[30px] pt-[26px] sm:px-7";
 
-export function IdeaForm({ days, t }: Props) {
+export function IdeaForm({ days, names, t }: Props) {
   // unique per instance: a hidden copy of the page can share the document
   const id = useId();
   const [name, setName] = useState("");
   const [service, setService] = useState<string>(t.services[0]);
   const [idea, setIdea] = useState("");
-  const [dayIso, setDayIso] = useState<string | null>(null);
+  /** the picked day: one of the row's, or a later one picked in the calendar */
+  const [day, setDay] = useState<DayOption | null>(null);
   const [time, setTime] = useState<string | null>(null);
+  const today = days[0].iso;
+  /** a day picked in the calendar that the row does not have */
+  const later = day && !days.some((d) => d.iso === day.iso) ? day : null;
+
+  /** A date from the calendar: the row's own day if it has it (brought into view), otherwise a later one. */
+  function pickDate(iso: string) {
+    setDay(days.find((d) => d.iso === iso) ?? dayOption(iso, names, today, t));
+    document.getElementById(`${id}-day-${iso}`)?.scrollIntoView({ block: "nearest", inline: "center" });
+  }
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const day = days.find((d) => d.iso === dayIso) ?? null;
     const message = buildWhatsAppMessage({ name, service, idea, day, time }, t.message);
     window.open(whatsappUrl(message), "_blank", "noopener,noreferrer");
   }
@@ -69,8 +88,26 @@ export function IdeaForm({ days, t }: Props) {
         className="field h-[76px] min-h-[76px] resize-y px-3.5 py-3 font-light leading-[21px]"
       />
 
-      <div id={`${id}-day-label`} className="field-label mt-3">
-        {t.day}
+      {/* The calendar's panel opens against this row, across the form on phones. */}
+      <div className="relative mt-3 flex items-center justify-between gap-3">
+        <div id={`${id}-day-label`} className="field-label">
+          {t.day}
+        </div>
+        <DayCalendar
+          id={`${id}-calendar`}
+          today={today}
+          max={addDays(today, CALENDAR_REACH)}
+          value={later?.iso ?? null}
+          label={t.otherDate}
+          valueLabel={
+            later
+              ? `${later.day} ${later.month}${later.iso.slice(0, 4) === today.slice(0, 4) ? "" : ` ${later.iso.slice(0, 4)}`}`
+              : ""
+          }
+          names={names}
+          copy={t.calendar}
+          onPick={pickDate}
+        />
       </div>
       <div
         role="radiogroup"
@@ -78,15 +115,16 @@ export function IdeaForm({ days, t }: Props) {
         className="days-scroll flex gap-[9px] overflow-x-auto pb-2"
       >
         {days.map((d) => {
-          const active = d.iso === dayIso;
+          const active = d.iso === day?.iso;
           return (
             <button
               key={d.iso}
+              id={`${id}-day-${d.iso}`}
               type="button"
               role="radio"
               aria-checked={active}
               aria-label={`${d.label}, ${d.day} ${d.month}`}
-              onClick={() => setDayIso(active ? null : d.iso)}
+              onClick={() => setDay(active ? null : d)}
               className="choice flex h-[62px] w-14 shrink-0 flex-col items-center justify-center"
             >
               <span className="text-[10.5px] leading-[13px] text-muted">{d.label}</span>

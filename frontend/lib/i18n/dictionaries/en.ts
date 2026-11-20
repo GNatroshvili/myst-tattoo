@@ -81,6 +81,13 @@ export const en = {
     day: "Preferred day",
     today: "Today",
     tomorrow: "Tomorrow",
+    /** the button that opens the calendar, for a date past the row of days */
+    otherDate: "Later date",
+    calendar: {
+      title: "Choose a date",
+      previousMonth: "Previous month",
+      nextMonth: "Next month",
+    },
     time: "Time of day",
     times: ["Morning", "Afternoon", "Evening"],
     submit: "Send on WhatsApp",

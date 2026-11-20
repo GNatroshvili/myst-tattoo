@@ -83,6 +83,12 @@ export const ka: Dictionary = {
     day: "სასურველი დღე",
     today: "დღეს",
     tomorrow: "ხვალ",
+    otherDate: "სხვა თარიღი",
+    calendar: {
+      title: "აირჩიე თარიღი",
+      previousMonth: "წინა თვე",
+      nextMonth: "შემდეგი თვე",
+    },
     time: "დღის მონაკვეთი",
     times: ["დილა", "შუადღე", "საღამო"],
     submit: "გაგზავნა WhatsApp-ით",

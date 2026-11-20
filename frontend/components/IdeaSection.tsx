@@ -1,6 +1,6 @@
 import { Suspense, useId } from "react";
 import { connection } from "next/server";
-import { getUpcomingDays } from "@/lib/dates";
+import { getCalendarNames, getUpcomingDays } from "@/lib/dates";
 import { displayCase, localeTags, type Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/dictionaries/en";
 import { instagramDmUrl, site } from "@/lib/site";
@@ -10,15 +10,20 @@ import { SectionDivider } from "./SectionDivider";
 
 type FormCopy = Dictionary["form"];
 
+/** How many days the form offers in a row, starting with today; the calendar reaches further. */
+const DAYS_AHEAD = 30;
+
 /** Day pills depend on "today", so this part renders at request time. */
 async function IdeaFormWithDays({ lang, t }: { lang: Locale; t: FormCopy }) {
   await connection();
-  const days = getUpcomingDays(14, site.timeZone, {
-    intl: localeTags[lang].intl,
+  const intl = localeTags[lang].intl;
+  const days = getUpcomingDays(DAYS_AHEAD, site.timeZone, {
+    intl,
     today: t.today,
     tomorrow: t.tomorrow,
   });
-  return <IdeaForm days={days} t={t} />;
+  // month and weekday names come from the server: not every browser knows the Georgian ones
+  return <IdeaForm days={days} names={getCalendarNames(intl)} t={t} />;
 }
 
 export function IdeaSection({ lang, dict }: { lang: Locale; dict: Dictionary }) {
