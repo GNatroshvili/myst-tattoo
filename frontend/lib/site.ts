@@ -26,7 +26,8 @@ export const site = {
   /** international format, digits only, e.g. 995599210185 */
   whatsappNumber: whatsappNumber(process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || WHATSAPP_NUMBER),
   instagram: [
-    { handle: "@mysttattoo", url: "https://instagram.com/mysttattoo" },
+    // the studio's own account comes first: the "Instagram DM" button writes to it
+    { handle: "@myst.tattoostudio", url: "https://www.instagram.com/myst.tattoostudio/" },
     { handle: "@myst.piercings", url: "https://instagram.com/myst.piercings" },
   ],
   timeZone: "Asia/Tbilisi",
@@ -41,6 +42,12 @@ export const nav = [
   { key: "blog", href: "/blog" },
 ] as const;
 
+/**
+ * The address that opens a private chat with the account: in the app on a
+ * phone, on instagram.com otherwise (after signing in, if the visitor is not).
+ * It is where Instagram's short ig.me links lead; the short domain itself does
+ * not open for everyone, so the button goes to instagram.com directly.
+ */
 export function instagramDmUrl(handle: string) {
-  return `https://ig.me/m/${handle.replace(/^@/, "")}`;
+  return `https://www.instagram.com/m/${handle.replace(/^@/, "")}`;
 }
