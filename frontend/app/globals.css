@@ -282,9 +282,8 @@
 
   /* Hover (on the card, or on the "Get a Voucher" button beside it): the card
      straightens from -14deg to -6deg and lifts clear of the panel edge, and a
-     rose glow gathers around it. Hovering the card itself also sets off the
-     lightning drawn by VoucherCard.tsx. Shown to everyone, including visitors
-     whose system asks for reduced motion: the studio wants it on. */
+     rose glow gathers around it. Shown to everyone, including visitors whose
+     system asks for reduced motion: the studio wants it on. */
   .voucher-tilt:hover .voucher-card,
   .voucher-panel:has(.btn:hover, .btn:focus-visible) .voucher-card {
     transform: translateY(-2px) rotate(8deg);
@@ -293,25 +292,6 @@
       0 22px 60px rgba(0, 0, 0, 0.55),
       0 14px 54px rgba(192, 98, 143, 0.55),
       0 0 40px rgba(214, 120, 165, 0.4);
-  }
-
-  /* the card lit by the strike: a rose wash with a bright rim. VoucherCard.tsx
-     drives its opacity frame by frame while the bolts are on screen. */
-  .voucher-flash {
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    pointer-events: none;
-    opacity: 0;
-    background: radial-gradient(
-      120% 120% at 50% 50%,
-      rgba(255, 226, 236, 0.3),
-      rgba(226, 130, 175, 0.14) 55%,
-      rgba(192, 98, 143, 0) 100%
-    );
-    box-shadow:
-      inset 0 0 22px rgba(250, 205, 222, 0.85),
-      inset 0 0 2px rgba(255, 255, 255, 0.9);
   }
 
   /* ----- form ----- */

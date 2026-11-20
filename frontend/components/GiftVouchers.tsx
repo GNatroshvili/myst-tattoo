@@ -27,8 +27,7 @@ export function GiftVouchers({ lang, t }: { lang: Locale; t: Dictionary["voucher
         <p className="mt-4 text-[18px] font-light leading-[26px] text-body">{t.text}</p>
       </div>
 
-      {/* the voucher itself: a dark card with the studio mark, tilted; hovering
-          it sets off a lightning strike across the panel */}
+      {/* the voucher itself: a dark card with the studio mark, tilted */}
       <VoucherCard />
 
       <Link
