@@ -1,8 +1,7 @@
-import Image from "next/image";
 import Link from "next/link";
-import lily from "@/public/images/hero-lily.jpg";
 import { displayCase, localePath, type Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/dictionaries/en";
+import { HeroLily } from "./HeroLily";
 import { StarRule } from "./StarRule";
 import { ArrowUpRightIcon } from "./ui/Icons";
 
@@ -45,19 +44,10 @@ export function Hero({ lang, dict }: { lang: Locale; dict: Dictionary }) {
         </div>
       </div>
 
-      {/* The artwork is painted on black: `lighten` drops that black into the
-          page, the mask softens its left and right edges, and on wide screens
-          it reaches past the column into the gutter, as in the design. */}
+      {/* the artwork; on wide screens it reaches past the column into the
+          gutter, as in the design */}
       <div className="mt-6 flex min-w-0 justify-center lg:-mb-[30px] lg:-mr-[30px] lg:-mt-[50px] lg:flex-[1_1_440px] lg:justify-end">
-        <Image
-          src={lily}
-          alt={t.lilyAlt}
-          preload
-          quality={90}
-          sizes="(min-width: 1280px) 596px, (min-width: 1024px) 50vw, (min-width: 640px) 560px, 100vw"
-          className="block h-auto w-full max-w-[560px] select-none mix-blend-lighten [mask-image:linear-gradient(90deg,transparent_0%,#000_9%,#000_93%,transparent_100%)] lg:max-w-[640px]"
-          draggable={false}
-        />
+        <HeroLily alt={t.lilyAlt} />
       </div>
     </section>
   );
