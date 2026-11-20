@@ -1,7 +1,7 @@
 /** English copy. `ka.ts` must mirror this shape exactly (it is typed against it). */
 export const en = {
   meta: {
-    title: "Myst Tattoo Studio — Tattoos & Piercings in Tbilisi",
+    title: "Myst Tattoo Studio - Tattoos & Piercings in Tbilisi",
     description:
       "Myst Tattoo Studio — a creative space in Tbilisi for self-expression, unique ideas and high-quality body art. Tattoos, piercings and gift vouchers.",
     ogDescription: "A creative space for self-expression, unique ideas and high-quality body art.",
@@ -49,6 +49,8 @@ export const en = {
     title: "Featured projects",
     viewAll: "View all tattoos",
     openGallery: "Open tattoo gallery",
+    previous: "Previous projects",
+    next: "Next projects",
   },
   vouchers: {
     titleLine1: "Gift",

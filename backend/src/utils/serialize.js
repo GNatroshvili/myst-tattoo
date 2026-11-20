@@ -79,5 +79,7 @@ export const tattoo = (doc) => ({
   image: image(doc.image),
   style: style(doc.style),
   artist: artistBrief(doc.artist),
+  /** shown in the home page's "Featured projects" */
+  featured: Boolean(doc.featured),
   createdAt: doc.createdAt,
 });

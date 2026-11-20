@@ -38,6 +38,8 @@ export type Tattoo = {
   style: Style | null;
   /** null until the tattoo is attached to an artist */
   artist: ArtistBrief | null;
+  /** picked in the admin panel for the home page's "Featured projects" */
+  featured: boolean;
   createdAt: string;
 };
 

@@ -106,9 +106,9 @@ The piercing page has a price list and a gallery:
 | POST | `/api/artists` | yes | Form: `nicknameKa`, `nicknameEn`, `bioKa`, `bioEn`, `styles`, `instagramUrl`, `photo`, `tattoos`, `piercings` |
 | PATCH | `/api/artists/:key` | yes | Same fields, only those sent change; `removePhoto=true` drops the photo |
 | DELETE | `/api/artists/:key` | yes | Their tattoos and piercings stay, attached to nobody |
-| GET | `/api/tattoos` | | All tattoos, newest first; `?limit=4` |
-| POST | `/api/tattoos` | yes | Form: `photo`, `style`, `artist` (optional) |
-| PATCH | `/api/tattoos/:id` | yes | `style`, `artist` ("" detaches), `photo` |
+| GET | `/api/tattoos` | | All tattoos, newest first; `?featured=1` only those picked for the home page; `?limit=4` |
+| POST | `/api/tattoos` | yes | Form: `photo`, `style`, `artist` (optional), `featured` (optional, `true`/`false`) |
+| PATCH | `/api/tattoos/:id` | yes | `style`, `artist` ("" detaches), `featured`, `photo` |
 | DELETE | `/api/tattoos/:id` | yes | Also deletes the photo files |
 | GET | `/api/piercing/zones` | | All zones, each with its `places` (name, note, price) |
 | POST | `/api/piercing/zones` | yes | `{ name: { en, ka } }` |

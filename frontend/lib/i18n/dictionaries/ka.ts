@@ -3,7 +3,7 @@ import type { Dictionary } from "./en";
 /** Georgian copy. */
 export const ka: Dictionary = {
   meta: {
-    title: "Myst Tattoo Studio — ტატუ და პირსინგი თბილისში",
+    title: "Myst Tattoo Studio - ტატუ და პირსინგი თბილისში",
     description:
       "Myst Tattoo Studio — შემოქმედებითი სივრცე თბილისში თვითგამოხატვის, უნიკალური იდეებისა და მაღალი ხარისხის ბოდი-არტისთვის. ტატუ, პირსინგი და სასაჩუქრე ვაუჩერები.",
     ogDescription:
@@ -51,6 +51,8 @@ export const ka: Dictionary = {
     title: "რჩეული პროექტები",
     viewAll: "ყველა ტატუს ნახვა",
     openGallery: "ტატუების გალერეის გახსნა",
+    previous: "წინა პროექტები",
+    next: "შემდეგი პროექტები",
   },
   vouchers: {
     titleLine1: "სასაჩუქრე",

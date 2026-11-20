@@ -43,6 +43,17 @@ export function bilingual(value, { field, max, required = false }) {
 }
 
 /**
+ * A yes/no field: true or false as JSON, or "true" / "false" (also "1" / "0",
+ * "on" / "") as a form sends them. Returns `undefined` when it was not sent.
+ */
+export function flag(value, field) {
+  if (value === undefined) return undefined;
+  if (value === true || value === "true" || value === "1" || value === "on") return true;
+  if (value === false || value === "false" || value === "0" || value === "") return false;
+  throw badRequest(`${field} must be true or false`);
+}
+
+/**
  * A list sent in a form: a JSON array in one field ('["a","b"]'), or the field
  * repeated once per item (which arrives as an array, or as a plain string when
  * there is only one). An empty field is an empty list.

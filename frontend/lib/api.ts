@@ -42,9 +42,11 @@ export const getArtists = async () => (await get<Artist[]>("/artists")) ?? [];
 /** One artist by the slug in their profile's address, with their `tattoos` and `piercings`. */
 export const getArtist = (slug: string) => get<Artist>(`/artists/${encodeURIComponent(slug)}`);
 
-/** Tattoos, newest first; `limit` keeps only the first few. */
-export const getTattoos = async (limit?: number) =>
-  (await get<Tattoo[]>(limit ? `/tattoos?limit=${limit}` : "/tattoos")) ?? [];
+/** Every tattoo, newest first. */
+export const getTattoos = async () => (await get<Tattoo[]>("/tattoos")) ?? [];
+
+/** The tattoos picked in the admin panel for the home page, newest first. */
+export const getFeaturedTattoos = async () => (await get<Tattoo[]>("/tattoos?featured=1")) ?? [];
 
 export const getStyles = async () => (await get<Style[]>("/styles")) ?? [];
 

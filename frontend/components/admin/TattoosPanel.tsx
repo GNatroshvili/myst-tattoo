@@ -5,9 +5,13 @@ import type { Tattoo } from "@/lib/types";
 import type { PanelProps } from "./AdminApp";
 import { api, form, json } from "./api";
 import { shrinkPhoto } from "./shrink";
+import { StarIcon } from "../ui/Icons";
 import { Card, CardTitle, ConfirmDelete, Hint, Notice, PHOTO_TYPES, Select, Thumb } from "./ui";
 
-/** One tattoo in the grid: its photo, with its style and artist changeable in place. */
+/**
+ * One tattoo in the grid: its photo, with its style, its artist and whether
+ * the home page features it, all changeable in place.
+ */
 function TattooCard({
   tattoo,
   styles,
@@ -29,7 +33,7 @@ function TattooCard({
     }
     setBusy(false);
   }
-  const change = (fields: { style?: string; artist?: string }) =>
+  const change = (fields: { style?: string; artist?: string; featured?: boolean }) =>
     run(() => api(`/tattoos/${tattoo.id}`, json("PATCH", fields)));
 
   return (
@@ -42,7 +46,18 @@ function TattooCard({
         className="relative block aspect-[3/4] overflow-hidden rounded-[10px] bg-surface"
       >
         <Thumb photo={tattoo.image} />
+        {tattoo.featured && (
+          <span className="absolute left-2 top-2 flex h-7 items-center gap-1.5 rounded-full bg-gold px-2.5 text-[12px] font-medium leading-none text-on-gold">
+            <StarIcon className="h-3 w-3" />
+            რჩეული
+          </span>
+        )}
       </a>
+      <FeaturedCheck
+        checked={tattoo.featured}
+        disabled={busy}
+        onChange={(featured) => void change({ featured })}
+      />
       <Select
         aria-label="სტილი"
         disabled={busy}
@@ -75,19 +90,45 @@ function TattooCard({
   );
 }
 
+/** The tick that puts a tattoo into the home page's "Featured projects". */
+function FeaturedCheck({
+  checked,
+  disabled,
+  onChange,
+}: {
+  checked: boolean;
+  disabled?: boolean;
+  onChange: (checked: boolean) => void;
+}) {
+  return (
+    <label className="flex min-h-11 cursor-pointer items-center gap-2.5 px-1 text-[14.5px] leading-5 text-cream">
+      <input
+        type="checkbox"
+        checked={checked}
+        disabled={disabled}
+        onChange={(e) => onChange(e.target.checked)}
+        className="h-[18px] w-[18px] shrink-0 accent-gold disabled:opacity-60"
+      />
+      რჩეული (მთავარ გვერდზე)
+    </label>
+  );
+}
+
 /**
- * Tattoos: upload photos, tag each with a style and an artist, and manage the
- * gallery. A tattoo is added once and shows on both of the site's languages.
+ * Tattoos: upload photos, tag each with a style and an artist, pick the ones
+ * the home page features, and manage the gallery. A tattoo is added once and
+ * shows on both of the site's languages.
  */
 export function TattoosPanel({ tattoos, styles, artists, reload, explain }: PanelProps) {
   const [files, setFiles] = useState<File[]>([]);
   const [style, setStyle] = useState("");
   const [artist, setArtist] = useState("");
+  const [featured, setFeatured] = useState(false);
   /** "2 / 5" while photos are going up */
   const [progress, setProgress] = useState("");
   const [error, setError] = useState("");
   const [done, setDone] = useState("");
-  /** which tattoos the grid shows: all, those attached to nobody, or one artist's */
+  /** which tattoos the grid shows: all, the featured, those attached to nobody, or one artist's */
   const [show, setShow] = useState("all");
   const picker = useRef<HTMLInputElement>(null);
 
@@ -104,6 +145,7 @@ export function TattoosPanel({ tattoos, styles, artists, reload, explain }: Pane
         body.set("photo", await shrinkPhoto(file));
         body.set("style", style);
         body.set("artist", artist);
+        body.set("featured", String(featured));
         await api("/tattoos", form("POST", body));
         sent += 1;
       }
@@ -118,9 +160,12 @@ export function TattoosPanel({ tattoos, styles, artists, reload, explain }: Pane
     await reload();
   }
 
-  const shown = tattoos.filter(
-    (tattoo) => show === "all" || (show === "none" ? !tattoo.artist : tattoo.artist?.id === show)
-  );
+  const featuredCount = tattoos.filter((tattoo) => tattoo.featured).length;
+  const shown = tattoos.filter((tattoo) => {
+    if (show === "all") return true;
+    if (show === "featured") return tattoo.featured;
+    return show === "none" ? !tattoo.artist : tattoo.artist?.id === show;
+  });
 
   return (
     <div className="flex flex-col gap-5">
@@ -177,6 +222,8 @@ export function TattoosPanel({ tattoos, styles, artists, reload, explain }: Pane
               </label>
             </div>
 
+            <FeaturedCheck checked={featured} onChange={setFeatured} />
+
             {error && <Notice kind="error">{error}</Notice>}
             {done && <Notice kind="ok">{done}</Notice>}
 
@@ -193,6 +240,7 @@ export function TattoosPanel({ tattoos, styles, artists, reload, explain }: Pane
           {tattoos.length > 0 && (
             <Select aria-label="რომელი ტატუები ჩანს" value={show} onChange={(e) => setShow(e.target.value)} className="w-full sm:w-[240px]">
               <option value="all">ყველა ({tattoos.length})</option>
+              <option value="featured">რჩეულები ({featuredCount})</option>
               <option value="none">არტისტის გარეშე</option>
               {artists.map((a) => (
                 <option key={a.id} value={a.id}>
@@ -202,6 +250,14 @@ export function TattoosPanel({ tattoos, styles, artists, reload, explain }: Pane
             </Select>
           )}
         </div>
+
+        {tattoos.length > 0 && (
+          <Hint className="mt-2">
+            „რჩეულად“ მონიშნული ტატუები მთავარი გვერდის „რჩეული პროექტები“ სექციაში ჩანს. ახლა
+            მონიშნულია {featuredCount}
+            {featuredCount === 0 ? " — სანამ ერთს მაინც არ მონიშნავ, ეს სექცია მთავარ გვერდზე არ გამოჩნდება." : "."}
+          </Hint>
+        )}
 
         {shown.length === 0 ? (
           <Hint className="mt-3">
