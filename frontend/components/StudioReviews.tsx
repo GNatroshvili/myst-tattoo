@@ -3,6 +3,7 @@ import { getPlace, type PlaceReview } from "@/lib/google-place";
 import { displayCase, localeTags, type Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/dictionaries/en";
 import { FeaturedSlider } from "./FeaturedSlider";
+import { ReviewCount } from "./ReviewCount";
 import { StarRule } from "./StarRule";
 import { StudioMap } from "./StudioMap";
 import { ArrowRightIcon, ArrowUpRightIcon, MapPinIcon, RatingStarIcon } from "./ui/Icons";
@@ -121,7 +122,8 @@ export async function StudioReviews({ lang, dict }: { lang: Locale; dict: Dictio
 function Section({ lang, t, place }: { lang: Locale; t: Copy; place: NonNullable<Awaited<ReturnType<typeof getPlace>>> }) {
   const titleId = useId();
   const { rating, ratingCount, reviews, links } = place;
-  const number = new Intl.NumberFormat(localeTags[lang].intl);
+  // "{count} reviews": the number is a part of its own, because it counts up
+  const [beforeCount, afterCount = ""] = t.countMany.split("{count}");
   const rated = typeof rating === "number" && rating > 0;
   // always one decimal, the way Google Maps writes it: "5.0", "4.7"
   const average = rated ? rating.toFixed(1) : "";
@@ -173,7 +175,15 @@ function Section({ lang, t, place }: { lang: Locale; t: Copy; place: NonNullable
               <p className="mt-3 text-[15px] font-light leading-[22px] text-body">
                 {typeof ratingCount === "number" && (
                   <>
-                    {(ratingCount === 1 ? t.countOne : t.countMany).replace("{count}", number.format(ratingCount))}
+                    {ratingCount === 1 ? (
+                      t.countOne
+                    ) : (
+                      <>
+                        {beforeCount}
+                        <ReviewCount count={ratingCount} locale={localeTags[lang].intl} />
+                        {afterCount}
+                      </>
+                    )}
                     {" · "}
                   </>
                 )}

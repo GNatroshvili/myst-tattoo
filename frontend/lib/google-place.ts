@@ -92,6 +92,9 @@ const FIELDS = [
  */
 const FRESH_FOR = 6 * 60 * 60;
 
+/** How soon Google is asked again while it sends a rating without any reviews. */
+const WAITING_FOR = 60 * 60;
+
 /** Google's address; another one can be set for tests. */
 const API = (process.env.GOOGLE_PLACES_API_URL || "https://places.googleapis.com/v1").replace(/\/+$/, "");
 
@@ -172,6 +175,19 @@ async function fetchPlace(placeId: string, lang: Locale): Promise<Place | null> 
 
   const place = toPlace((await res.json()) as ApiPlace, placeId);
   if (!place.name) return fail("the answer has no place name");
+
+  // Ratings but not one review: Google is holding the reviews back, as it does
+  // from a key made before its project had billing (a "Maps Demo Key"). The
+  // rest of the answer is good, so it is shown, and Google is asked again
+  // within the hour so the reviews appear soon after it starts sending them.
+  if (place.reviews.length === 0 && (place.ratingCount ?? 0) > 0) {
+    console.warn(
+      `[google] Place Details gave a rating (${place.ratingCount} ratings) but no reviews. ` +
+        "Google leaves reviews out for a key made without billing; see .env.example.",
+    );
+    cacheLife({ stale: 300, revalidate: WAITING_FOR, expire: 24 * 60 * 60 });
+    return place;
+  }
 
   cacheLife({ stale: 300, revalidate: FRESH_FOR, expire: 24 * 60 * 60 });
   return place;
