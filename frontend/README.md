@@ -24,12 +24,15 @@ components/
   HeroLily.tsx        # lily artwork (public/images/hero-lily.webp) via next/image
   QuickLinks.tsx      # Tattoos / Piercing / Our Artists / Why Myst
   GiftVouchers.tsx    # voucher banner
+  StudioReviews.tsx   # Google rating, reviews and the map's frame (server)
+  StudioMap.tsx       # the Google map itself, loaded when scrolled to (client)
   IdeaSection.tsx     # "Tell us your idea" layout (server)
   IdeaForm.tsx        # booking form -> WhatsApp deep link (client)
   Footer.tsx
   ui/Icons.tsx
 lib/
   site.ts             # studio details, nav, services
+  google-place.ts     # the studio on Google Maps: rating, reviews, coordinates (Places API)
   dates.ts            # upcoming days in the studio's time zone
   whatsapp.ts         # message + wa.me URL builders
 ```

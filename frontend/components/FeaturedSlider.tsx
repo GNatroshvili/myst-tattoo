@@ -4,12 +4,12 @@ import { useEffect, useRef, useState, type PointerEvent, type ReactNode } from "
 import { ArrowLeftIcon, ArrowRightIcon } from "./ui/Icons";
 
 /**
- * One row of featured tattoos that scrolls sideways, for when there are more
- * than fit. It moves three ways: the round arrows at its sides (a screenful
+ * One row of tiles that scrolls sideways, for when there are more than fit:
+ * the featured tattoos, the reviews from Google Maps. It moves three ways: the round arrows at its sides (a screenful
  * at a time), dragging with the mouse, and the usual swipe or trackpad
  * scroll. However it is moved, it comes to rest with a tile at the left edge.
  *
- * `children` are the slides, each already sized by FeaturedWorks.
+ * `children` are the slides, each already sized by whoever fills the row.
  */
 
 const arrow =
@@ -22,8 +22,14 @@ export function FeaturedSlider({
   children,
   previous,
   next,
+  arrows = "inside",
 }: {
   children: ReactNode;
+  /**
+   * Where the round arrows sit: over the tiles' edges ("inside", fine on
+   * photos), or half out in the page's margin ("edge"), clear of a card's text.
+   */
+  arrows?: "inside" | "edge";
   /** what a screen reader calls the two arrows */
   previous: string;
   next: string;
@@ -139,10 +145,10 @@ export function FeaturedSlider({
         {children}
       </div>
 
-      <button type="button" aria-label={previous} disabled={atStart} onClick={() => page(-1)} className={`${arrow} left-2`}>
+      <button type="button" aria-label={previous} disabled={atStart} onClick={() => page(-1)} className={`${arrow} ${arrows === "edge" ? "-left-[22px]" : "left-2"}`}>
         <ArrowLeftIcon className="h-3 w-[18px]" />
       </button>
-      <button type="button" aria-label={next} disabled={atEnd} onClick={() => page(1)} className={`${arrow} right-2`}>
+      <button type="button" aria-label={next} disabled={atEnd} onClick={() => page(1)} className={`${arrow} ${arrows === "edge" ? "-right-[22px]" : "right-2"}`}>
         <ArrowRightIcon className="h-3 w-[18px]" />
       </button>
     </div>

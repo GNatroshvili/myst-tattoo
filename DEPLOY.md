@@ -63,8 +63,16 @@ still go to `backend/uploads/` and the database is the local MongoDB.
    | --- | --- |
    | `API_URL` | The backend's production address, e.g. `https://<backend>.vercel.app` (no trailing slash) |
    | `NEXT_PUBLIC_WHATSAPP_NUMBER` | The studio's WhatsApp number, digits only |
+   | `GOOGLE_PLACES_API_KEY` | Optional. Google key for the Places API (New): the rating and reviews on the home page |
+   | `GOOGLE_PLACE_ID` | Optional. The studio's place ID on Google Maps |
+   | `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` | Optional. Google key for the Maps JavaScript API: the map on the home page |
+   | `NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID` | Optional. A map ID styled in Google Cloud; without it the map uses the site's built-in dark style |
 
 3. Deploy. The admin panel is at `https://<site>/admin`.
+
+The four Google settings are explained in `frontend/.env.example`. Without
+them the home page has no "Reviews & Location" section. The two `NEXT_PUBLIC_`
+ones are read when the site is built, so redeploy after changing them.
 
 `API_URL` is read when the site is built, so redeploy the site after changing
 it. Use the backend's production address: its preview deployments are behind

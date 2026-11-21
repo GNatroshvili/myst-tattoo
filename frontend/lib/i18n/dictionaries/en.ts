@@ -58,6 +58,29 @@ export const en = {
     text: "A meaningful gift for someone special.",
     cta: "Get a Voucher",
   },
+  /** The studio on Google Maps: a map, its rating and reviews (home page). */
+  reviews: {
+    eyebrow: "Myst / On Google Maps",
+    title: "Reviews & Location",
+    allReviews: "All reviews",
+    ratingLabel: "Guest rating",
+    /** read out for a row of stars; {rating} is "5" or "4.8" */
+    stars: "Rated {rating} out of 5",
+    countOne: "1 review",
+    countMany: "{count} reviews",
+    directions: "Get directions",
+    writeReview: "Write a review",
+    mapAria: "Map: where the studio is",
+    openMap: "Open in Google Maps",
+    zoomIn: "Zoom in",
+    zoomOut: "Zoom out",
+    readOnGoogle: "Read on Google Maps",
+    translated: "Translated by Google",
+    previous: "Previous reviews",
+    next: "Next reviews",
+    /** under the reviews; "Google Maps" follows it */
+    sourceNote: "The most relevant reviews, as chosen by",
+  },
   idea: {
     title: "Tell us your idea",
     lead: "Fill in the form and a ready-made WhatsApp message opens. We'll reply to agree the details.",

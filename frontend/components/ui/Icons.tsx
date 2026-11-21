@@ -21,6 +21,15 @@ export function StarIcon(props: IconProps) {
   );
 }
 
+/** Five-point star, filled: one point of a rating out of five. */
+export function RatingStarIcon(props: IconProps) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden {...props}>
+      <path d="M10 1.6l2.47 5.3 5.78.72-4.26 3.98 1.1 5.74L10 14.5l-5.09 2.84 1.1-5.74L1.75 7.62l5.78-.72L10 1.6Z" />
+    </svg>
+  );
+}
+
 /** Diagonal arrow inside the gold buttons. */
 export function ArrowUpRightIcon(props: IconProps) {
   return (
