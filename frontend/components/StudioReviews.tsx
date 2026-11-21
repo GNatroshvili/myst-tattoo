@@ -172,7 +172,8 @@ function Section({ lang, t, place }: { lang: Locale; t: Copy; place: NonNullable
                 <span className="display text-[64px] leading-none text-cream">{average}</span>
                 <Stars rating={rating} label={t.stars.replace("{rating}", average)} className="h-[22px] w-[22px]" />
               </p>
-              <p className="mt-3 text-[15px] font-light leading-[22px] text-body">
+              {/* the count stands out: it is the point of the line */}
+              <p className="mt-2 text-[16px] font-light leading-9 text-body">
                 {typeof ratingCount === "number" && (
                   <>
                     {ratingCount === 1 ? (
@@ -180,7 +181,11 @@ function Section({ lang, t, place }: { lang: Locale; t: Copy; place: NonNullable
                     ) : (
                       <>
                         {beforeCount}
-                        <ReviewCount count={ratingCount} locale={localeTags[lang].intl} />
+                        <ReviewCount
+                          count={ratingCount}
+                          locale={localeTags[lang].intl}
+                          className="text-[30px] font-normal leading-none text-cream"
+                        />
                         {afterCount}
                       </>
                     )}

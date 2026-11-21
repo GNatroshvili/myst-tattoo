@@ -22,7 +22,7 @@ const DURATION = 3000;
  * the plus appears as it lands. Plays once, and for everyone: the studio wants
  * its motion shown even where the system asks for less.
  */
-export function ReviewCount({ count, locale }: { count: number; locale: string }) {
+export function ReviewCount({ count, locale, className = "" }: { count: number; locale: string; className?: string }) {
   const { value, plus } = roundedCount(count);
   const numberRef = useRef<HTMLSpanElement>(null);
   const plusRef = useRef<HTMLSpanElement>(null);
@@ -74,7 +74,7 @@ export function ReviewCount({ count, locale }: { count: number; locale: string }
         {final}
         {plus ? "+" : ""}
       </span>
-      <span aria-hidden className="tabular-nums">
+      <span aria-hidden className={`tabular-nums ${className}`}>
         <span ref={numberRef}>{final}</span>
         {plus && (
           <span ref={plusRef} className="transition-opacity duration-300">
