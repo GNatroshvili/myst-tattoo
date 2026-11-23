@@ -97,6 +97,21 @@ export type BlogPost = {
   updatedAt: string;
 };
 
+/** One of the course's photos; `id` is what the admin panel orders and removes them by. */
+export type CoursePhoto = Photo & { id: string };
+
+/** The studio's tattoo course, as the /course page shows it. One record serves both sites. */
+export type Course = {
+  title: Localized;
+  /** what the course is; "" in a language that has none, and the page then shows the other one */
+  body: Localized;
+  /** in the order the page shows them: the first is the large one */
+  photos: CoursePhoto[];
+  /** when the course was posted: the date the site shows */
+  createdAt: string;
+  updatedAt: string;
+};
+
 /** An artist. One record serves both sites: the nickname and the bio are in both languages. */
 export type Artist = ArtistBrief & {
   styles: Style[];

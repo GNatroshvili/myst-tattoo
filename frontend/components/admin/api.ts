@@ -37,7 +37,7 @@ export async function api<T = void>(path: string, init?: RequestInit): Promise<T
 }
 
 /** Request options for sending JSON. */
-export const json = (method: "POST" | "PATCH", body: unknown): RequestInit => ({
+export const json = (method: "POST" | "PATCH" | "PUT", body: unknown): RequestInit => ({
   method,
   headers: { "content-type": "application/json" },
   body: JSON.stringify(body),
@@ -78,6 +78,16 @@ export function errorText(err: unknown): string {
       return "აირჩიე სტატიის თემა.";
     case "photo_required":
       return "ატვირთე სტატიის სურათი.";
+    case "course_body_missing":
+      return "კურსის ტექსტი ერთ ენაზე მაინც დაწერე.";
+    case "course_missing":
+      return "ჯერ კურსის სათაური და ტექსტი შეინახე, ფოტოები მერე დაემატება.";
+    case "too_many_photos":
+      return `კურსს მაქსიმუმ ${err.details?.max ?? 4} ფოტო შეიძლება ჰქონდეს.`;
+    case "photo_missing":
+      return "აირჩიე ფოტო.";
+    case "bad_photos":
+      return "კურსის ფოტოები სხვაგან შეიცვალა. გადატვირთე გვერდი და სცადე თავიდან.";
     case "db_down":
       return "ბაზასთან დაკავშირება ვერ მოხერხდა. შეამოწმე MONGODB_URI და სცადე თავიდან.";
     case "storage_not_configured":

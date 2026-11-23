@@ -2,10 +2,11 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import type { Artist, BlogPost, BlogTopic, Piercing, PiercingZone, Style, Tattoo } from "@/lib/types";
-import { api, errorText, isSignedOut } from "./api";
+import type { Artist, BlogPost, BlogTopic, Course, Piercing, PiercingZone, Style, Tattoo } from "@/lib/types";
+import { ApiError, api, errorText, isSignedOut } from "./api";
 import { ArtistsPanel } from "./ArtistsPanel";
 import { BlogPanel } from "./BlogPanel";
+import { CoursePanel } from "./CoursePanel";
 import { LoginForm } from "./LoginForm";
 import { PiercingPanel } from "./PiercingPanel";
 import { StylesPanel } from "./StylesPanel";
@@ -25,6 +26,8 @@ export type AdminData = {
   posts: BlogPost[];
   /** blog topics, each with how many articles it has */
   topics: BlogTopic[];
+  /** the tattoo course; null while none is posted */
+  course: Course | null;
 };
 
 /** What every screen gets: the data, a way to re-read it, and error handling. */
@@ -41,6 +44,7 @@ const tabs = [
   { key: "piercings", label: "პირსინგი" },
   { key: "styles", label: "სტილები" },
   { key: "posts", label: "ბლოგი" },
+  { key: "course", label: "კურსი" },
 ] as const;
 type Tab = (typeof tabs)[number]["key"];
 
@@ -58,7 +62,7 @@ export function AdminApp() {
 
   const reload = useCallback(async () => {
     try {
-      const [artists, tattoos, piercings, zones, styles, posts, topics] = await Promise.all([
+      const [artists, tattoos, piercings, zones, styles, posts, topics, course] = await Promise.all([
         api<Artist[]>("/artists"),
         api<Tattoo[]>("/tattoos"),
         api<Piercing[]>("/piercings"),
@@ -66,8 +70,13 @@ export function AdminApp() {
         api<Style[]>("/styles"),
         api<BlogPost[]>("/blog/posts"),
         api<BlogTopic[]>("/blog/topics"),
+        // "not found" is an answer here: no course has been posted
+        api<Course>("/course").catch((err) => {
+          if (err instanceof ApiError && err.status === 404) return null;
+          throw err;
+        }),
       ]);
-      setData({ artists, tattoos, piercings, zones, styles, posts, topics });
+      setData({ artists, tattoos, piercings, zones, styles, posts, topics, course });
       setLoadError("");
     } catch (err) {
       setLoadError(errorText(err));
@@ -140,7 +149,8 @@ export function AdminApp() {
             }`}
           >
             {label}
-            {data && <span className="ml-2 text-muted">{data[key].length}</span>}
+            {/* how many there are; the course is one thing, not a list */}
+            {data && key !== "course" && <span className="ml-2 text-muted">{data[key].length}</span>}
           </button>
         ))}
       </nav>
@@ -153,6 +163,7 @@ export function AdminApp() {
       {panel && tab === "piercings" && <PiercingPanel {...panel} />}
       {panel && tab === "styles" && <StylesPanel {...panel} />}
       {panel && tab === "posts" && <BlogPanel {...panel} />}
+      {panel && tab === "course" && <CoursePanel {...panel} />}
     </div>
   );
 }

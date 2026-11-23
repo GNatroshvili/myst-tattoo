@@ -3,6 +3,7 @@ import * as artists from "../controllers/artists.js";
 import * as auth from "../controllers/auth.js";
 import * as blogPosts from "../controllers/blogPosts.js";
 import * as blogTopics from "../controllers/blogTopics.js";
+import * as course from "../controllers/course.js";
 import * as piercings from "../controllers/piercings.js";
 import * as piercingZones from "../controllers/piercingZones.js";
 import * as styles from "../controllers/styles.js";
@@ -63,5 +64,12 @@ api.get("/blog/posts/:key", blogPosts.getPost);
 api.post("/blog/posts", requireAdmin, photoUpload, blogPosts.createPost);
 api.patch("/blog/posts/:key", requireAdmin, photoUpload, blogPosts.updatePost);
 api.delete("/blog/posts/:key", requireAdmin, blogPosts.deletePost);
+
+// the tattoo course: one record at most, shown on the site's /course page.
+// Its title and text are saved as JSON; its photos are added one at a time.
+api.get("/course", course.getCourse);
+api.put("/course", requireAdmin, course.saveCourse);
+api.post("/course/photos", requireAdmin, photoUpload, course.addPhoto);
+api.delete("/course", requireAdmin, course.deleteCourse);
 
 export default api;

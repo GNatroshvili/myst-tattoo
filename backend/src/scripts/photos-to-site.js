@@ -2,6 +2,7 @@ import "dotenv/config";
 import path from "node:path";
 import readline from "node:readline";
 import { env } from "../config/env.js";
+import { PHOTOS_MAX as COURSE_PHOTOS_MAX } from "../models/Course.js";
 import { readDiskFile } from "../utils/storage.js";
 
 /**
@@ -93,10 +94,45 @@ for (const [kind, photoOf] of kinds) {
     process.stdout.write(`\r[photos] sent ${sent}`);
   }
 }
+
+// The course keeps a list of photos, and a photo in it cannot be replaced in
+// place: the photo is added again (the site stores that copy) and then takes
+// the old one's place in the order, which drops the old one.
+/** The course as the site has it; null while none is posted, or on a site from before there were courses. */
+const readCourse = () =>
+  call("GET", "/course").catch((err) => (/ 404 /.test(err.message) ? null : Promise.reject(err)));
+/** Sets which of the course's photos stay, and in what order. */
+const keepPhotos = (course, ids) => call("PUT", "/course", { title: course.title, body: course.body, photos: ids });
+
+let course = await readCourse();
+for (const old of course?.photos ?? []) {
+  if (!local(old)) continue;
+
+  const name = path.basename(old.full);
+  let file;
+  try {
+    file = await readDiskFile(name);
+  } catch {
+    console.warn(`[photos] course photo ${old.id}: ${name} is not in ${env.uploadDir}, skipped`);
+    missing += 1;
+    continue;
+  }
+  const before = course.photos.map((photo) => photo.id);
+  // a full course has no room for the copy until the old one is out
+  if (before.length >= COURSE_PHOTOS_MAX) {
+    course = await keepPhotos(course, before.filter((id) => id !== old.id));
+  }
+  const body = new FormData();
+  body.set("photo", new Blob([file], { type: "image/webp" }), name);
+  const added = (await call("POST", "/course/photos", body)).photos.at(-1);
+  course = await keepPhotos(course, before.map((id) => (id === old.id ? added.id : id)));
+  sent += 1;
+  process.stdout.write(`\r[photos] sent ${sent}`);
+}
 if (sent > 0) process.stdout.write("\n");
 
 // what the site says now
-let left = 0;
+let left = ((await readCourse())?.photos ?? []).filter(local).length;
 for (const [kind, photoOf] of kinds) {
   left += (await call("GET", `/${kind}`)).filter((record) => local(photoOf(record))).length;
 }

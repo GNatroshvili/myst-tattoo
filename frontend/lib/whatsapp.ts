@@ -39,6 +39,23 @@ export function buildWhatsAppMessage(p: IdeaPayload, t: MessageTemplates) {
   return lines.join("\n");
 }
 
+/** One template per line of the course sign-up message. */
+export type CourseMessageTemplates = {
+  greeting: string;
+  name: string;
+  note: string;
+};
+
+/** The pre-filled text of a course sign-up: which course, who is asking, and their question if any. */
+export function buildCourseMessage(
+  p: { course: string; name: string; note?: string },
+  t: CourseMessageTemplates
+) {
+  const lines = [fill(t.greeting, { course: p.course }), fill(t.name, { name: p.name.trim() || "-" })];
+  if (p.note?.trim()) lines.push(fill(t.note, { note: p.note.trim() }));
+  return lines.join("\n");
+}
+
 export function whatsappUrl(message?: string) {
   const base = `https://wa.me/${site.whatsappNumber}`;
   return message ? `${base}?text=${encodeURIComponent(message)}` : base;

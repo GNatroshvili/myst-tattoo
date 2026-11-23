@@ -22,6 +22,7 @@ export const en = {
     artists: "Artists",
     tattoos: "Tattoos",
     piercing: "Piercing",
+    course: "Course",
     blog: "Blog",
   },
   langSwitcher: {
@@ -281,6 +282,42 @@ export const en = {
     ctaTitleLine2: "question?",
     ctaText: "Didn't find the answer here? Write to us and we'll help.",
     cta: "Contact Us",
+  },
+  /** The tattoo course's page. Its title, text and photos come from the admin panel. */
+  course: {
+    metaTitle: "Tattoo Course",
+    metaDescription:
+      "Learn tattooing at Myst Tattoo Studio in Tbilisi: what the course covers, how it runs and how to sign up.",
+    eyebrow: "Myst / Course",
+    /** before the date the course was posted: "Posted: 23 November 2026" */
+    published: "Posted",
+    about: "About the course",
+    photosAria: "Course photos",
+    /** read out for a photo; {number} counts from 1 */
+    photoAria: "Course photo {number}",
+    emptyTitle: "Course coming soon",
+    emptyText: "We're preparing the next tattoo course. Write to us and we'll tell you when sign-up opens.",
+    emptyCta: "Contact Us",
+    /** The sign-up card: a short form that opens a ready-made WhatsApp message. */
+    signup: {
+      aria: "Course sign-up",
+      label: "Sign-up & questions",
+      titleLine1: "Join the",
+      titleLine2: "course",
+      text: "Fill in the form and a ready-made WhatsApp message opens. We'll reply and agree the details.",
+      name: "Your name",
+      note: "Question",
+      optional: "(optional)",
+      notePlaceholder: "e.g. when does the next group start?",
+      submit: "Send on WhatsApp",
+      instagramDm: "Instagram DM",
+      /** Lines of the pre-filled WhatsApp message; {placeholders} are filled in. */
+      message: {
+        greeting: "Hi Myst! I'd like to join the tattoo course: {course}.",
+        name: "Name: {name}",
+        note: "Question: {note}",
+      },
+    },
   },
   footer: {
     city: "Tbilisi, Georgia",

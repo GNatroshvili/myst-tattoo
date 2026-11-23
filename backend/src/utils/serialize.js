@@ -94,6 +94,17 @@ export const blogPost = (doc) => ({
   updatedAt: doc.updatedAt,
 });
 
+/** The tattoo course; each photo carries its id, which the admin panel orders and removes them by. */
+export const course = (doc) => ({
+  title: both(doc.title),
+  body: both(doc.body),
+  /** in the order the page shows them: the first is the large one */
+  photos: doc.photos.map((photo) => ({ id: String(photo._id), ...image(photo) })),
+  /** when the course was posted: the date the site shows */
+  createdAt: doc.createdAt,
+  updatedAt: doc.updatedAt,
+});
+
 export const tattoo = (doc) => ({
   id: String(doc._id),
   image: image(doc.image),

@@ -17,6 +17,7 @@ app/
   layout.tsx          # fonts (Cormorant Garamond + Inter), metadata
   page.tsx            # home page composition
   not-found.tsx       # styled 404
+  [lang]/course/      # the tattoo course: title, date, photos and text from the admin panel
   globals.css         # design tokens (@theme) + component classes
 components/
   Header.tsx          # nav + mobile menu (client)
@@ -28,6 +29,7 @@ components/
   StudioMap.tsx       # the Google map itself, loaded when scrolled to (client)
   IdeaSection.tsx     # "Tell us your idea" layout (server)
   IdeaForm.tsx        # booking form -> WhatsApp deep link (client)
+  CourseSignup.tsx    # the /course page's sign-up card -> WhatsApp deep link (client)
   Footer.tsx
   ui/Icons.tsx
 lib/

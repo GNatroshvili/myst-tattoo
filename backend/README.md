@@ -11,7 +11,7 @@ uploaded photos, and guards changes behind the admin sign-in. The site (`../fron
 cp .env.example .env   # then fill in ADMIN_PASSWORD and SESSION_SECRET
 npm install
 npm run seed           # optional, once: adds five starting tattoo styles
-npm run seed:demo      # optional: demo artists, tattoos, piercings and blog articles
+npm run seed:demo      # optional: demo artists, tattoos, piercings, blog articles and a course
 npm run dev            # http://localhost:5000
 ```
 
@@ -20,7 +20,8 @@ MongoDB must be running (`MONGODB_URI`, local by default).
 `npm run seed:demo` fills an empty site for trying things out: three tattoo
 artists with five tattoos each, one piercer with five piercings, and a
 piercing price list, and then six blog articles under four topics
-(`npm run seed:demo:blog` adds only those), all with their texts in both languages. The pictures are drawn by the script and
+(`npm run seed:demo:blog` adds only those), and last a tattoo course with four photos
+(`npm run seed:demo:course` adds only that), all with their texts in both languages. The pictures are drawn by the script and
 marked "DEMO". The records are ordinary ones, so they are edited and deleted in
 the admin panel like any others; running the script again adds nothing twice.
 
@@ -127,6 +128,10 @@ The piercing page has a price list and a gallery:
 | POST | `/api/blog/posts` | yes | Form: `titleKa`, `titleEn`, `bodyKa`, `bodyEn` (at least one), `topic`, `photo`. `createdAt` is the date the site shows |
 | PATCH | `/api/blog/posts/:key` | yes | Any of the same fields; the address and the date stay as they are |
 | DELETE | `/api/blog/posts/:key` | yes | Also deletes the image files |
+| GET | `/api/course` | | The tattoo course (title, text, photos, `createdAt`); 404 while none is posted |
+| PUT | `/api/course` | yes | JSON: `title: { ka, en }`, `body: { ka, en }` (at least one), optional `photos`: ids of the photos to keep, in order. Posts the course or changes it; the date stays |
+| POST | `/api/course/photos` | yes | Form: `photo`. Adds one photo (four at most) to the end |
+| DELETE | `/api/course` | yes | Takes the course off the site and deletes its photo files |
 | GET | `/api/piercings` | | All piercing photos, newest first; `?limit=4` |
 | POST | `/api/piercings` | yes | Form: `photo`, `place`, `artist` (optional) |
 | PATCH | `/api/piercings/:id` | yes | `place`, `artist` ("" detaches), `photo` |
@@ -144,8 +149,8 @@ src/
   app.js             # express app, middleware, route mounting
   config/            # environment values, mongoose connection
   routes/index.js    # every route and who may call it
-  controllers/       # request handlers: auth, styles, artists, tattoos, piercing zones, piercings, blog topics, blog posts
-  models/            # mongoose schemas: Style, Artist, Tattoo, PiercingZone, PiercingPlace, Piercing, BlogTopic, BlogPost
+  controllers/       # request handlers: auth, styles, artists, tattoos, piercing zones, piercings, blog topics, blog posts, the course
+  models/            # mongoose schemas: Style, Artist, Tattoo, PiercingZone, PiercingPlace, Piercing, BlogTopic, BlogPost, Course
   middleware/        # admin session (auth.js), photo upload (upload.js)
   utils/             # photo storage, slugs, input checks, API output, upgrading older records
   scripts/           # starting styles, demo data, moving data to Atlas and Blob

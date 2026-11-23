@@ -4,6 +4,7 @@ import { connectDB, disconnectDB } from "../config/db.js";
 import { env } from "../config/env.js";
 import { Artist } from "../models/Artist.js";
 import { BlogPost } from "../models/BlogPost.js";
+import { Course } from "../models/Course.js";
 import { Piercing } from "../models/Piercing.js";
 import { Tattoo } from "../models/Tattoo.js";
 import { isDiskRef, readDiskFile, storage, storeFile } from "../utils/storage.js";
@@ -46,6 +47,29 @@ for (const [model, field] of [[Artist, "photo"], [Tattoo, "image"], [Piercing, "
     }
     if (Object.keys(set).length > 0) {
       await model.updateOne({ _id: doc._id }, { $set: set });
+      moved += 1;
+    }
+  }
+}
+
+// the course keeps several photos in a list, each moved the same way
+for await (const course of Course.find()) {
+  for (const [i, photo] of course.photos.entries()) {
+    const set = {};
+    try {
+      for (const size of ["full", "thumb"]) {
+        if (!isDiskRef(photo[size])) continue;
+        const name = path.basename(photo[size]);
+        set[`photos.${i}.${size}`] = await storeFile(name, await readDiskFile(name), "image/webp");
+      }
+    } catch (err) {
+      if (err.code !== "ENOENT") throw err;
+      console.warn(`[photos] Course photo ${photo._id}: its file is not in ${env.uploadDir}, left as is`);
+      missing += 1;
+      continue;
+    }
+    if (Object.keys(set).length > 0) {
+      await Course.updateOne({ _id: course._id }, { $set: set });
       moved += 1;
     }
   }

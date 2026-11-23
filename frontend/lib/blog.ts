@@ -36,16 +36,24 @@ const months: Record<Locale, string[]> = {
   ],
 };
 
+/** A moment as the studio's clock shows it, in parts: day, month, year, hour, minute. */
+const clockParts = (iso: string) =>
+  Object.fromEntries(clock.formatToParts(new Date(iso)).map((part) => [part.type, part.value]));
+
+/** The day something was added: "20 November 2026" or "20 ნოემბერი 2026". */
+export function postDay(iso: string, lang: Locale) {
+  const parts = clockParts(iso);
+  // the day without a leading zero: "6 November", not "06 November"
+  return `${Number(parts.day)} ${months[lang][Number(parts.month) - 1]} ${parts.year}`;
+}
+
 /**
  * When an article was added, to the minute, on the studio's clock:
  * "20 November 2026, 14:05" or "20 ნოემბერი 2026, 14:05".
  */
 export function postDate(iso: string, lang: Locale) {
-  const parts = Object.fromEntries(
-    clock.formatToParts(new Date(iso)).map((part) => [part.type, part.value])
-  );
-  // the day without a leading zero: "6 November", not "06 November"
-  return `${Number(parts.day)} ${months[lang][Number(parts.month) - 1]} ${parts.year}, ${parts.hour}:${parts.minute}`;
+  const parts = clockParts(iso);
+  return `${postDay(iso, lang)}, ${parts.hour}:${parts.minute}`;
 }
 
 /** The article's text in the page's language, or in the other one when that is all there is. */
