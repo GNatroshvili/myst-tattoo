@@ -4,7 +4,7 @@
  * Everything a visitor reads lives in lib/i18n/dictionaries instead.
  */
 /** The studio's WhatsApp number, used when NEXT_PUBLIC_WHATSAPP_NUMBER is not set. */
-const WHATSAPP_NUMBER = "995599210185";
+const WHATSAPP_NUMBER = "995505052449";
 
 /**
  * A number as wa.me links need it: digits only, with the country code. Spaces,
@@ -23,7 +23,7 @@ function whatsappNumber(value: string) {
 export const site = {
   name: "Myst Tattoo Studio",
   shortName: "Myst",
-  /** international format, digits only, e.g. 995599210185 */
+  /** international format, digits only, e.g. 995505052449 */
   whatsappNumber: whatsappNumber(process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || WHATSAPP_NUMBER),
   instagram: [
     // the studio's own account comes first: the "Instagram DM" button writes to it
