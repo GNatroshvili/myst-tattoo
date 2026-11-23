@@ -92,7 +92,10 @@ function Review({ review, t }: { review: PlaceReview; t: Copy }) {
         </div>
       </header>
 
-      <p className="mt-4 line-clamp-6 whitespace-pre-line text-[15px] font-light leading-[23px] text-body">{review.text}</p>
+      {/* a review may be in another language than the page: named for screen readers */}
+      <p lang={review.lang} className="mt-4 line-clamp-6 whitespace-pre-line text-[15px] font-light leading-[23px] text-body">
+        {review.text}
+      </p>
 
       {/* pushed to the bottom, so the links of a row of cards line up */}
       <footer className="mt-auto flex flex-col items-start gap-1.5 pt-5 text-[13px] leading-[18px]">
@@ -110,7 +113,7 @@ function Review({ review, t }: { review: PlaceReview; t: Copy }) {
 /**
  * Where the studio is and what its guests say: a Google map beside the
  * studio's rating on Google Maps, and under them the reviews Google picks to
- * show (five at most). Everything is read from Google (see lib/google-place);
+ * show (five in each language it is asked in). Everything is read from Google (see lib/google-place);
  * the section is left out while that is not set up or cannot be reached.
  */
 export async function StudioReviews({ lang, dict }: { lang: Locale; dict: Dictionary }) {
