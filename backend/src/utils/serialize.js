@@ -105,6 +105,13 @@ export const course = (doc) => ({
   updatedAt: doc.updatedAt,
 });
 
+/** One of the home page's frequently asked questions. */
+export const faq = (doc) => ({
+  id: String(doc._id),
+  question: both(doc.question),
+  answer: both(doc.answer),
+});
+
 export const tattoo = (doc) => ({
   id: String(doc._id),
   image: image(doc.image),

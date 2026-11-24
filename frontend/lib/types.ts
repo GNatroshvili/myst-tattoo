@@ -112,6 +112,14 @@ export type Course = {
   updatedAt: string;
 };
 
+/** One of the home page's frequently asked questions. One record serves both sites. */
+export type Faq = {
+  id: string;
+  question: Localized;
+  /** "" in a language that has none, and the page then shows the other one */
+  answer: Localized;
+};
+
 /** An artist. One record serves both sites: the nickname and the bio are in both languages. */
 export type Artist = ArtistBrief & {
   styles: Style[];

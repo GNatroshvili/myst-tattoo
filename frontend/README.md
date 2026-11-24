@@ -27,6 +27,8 @@ components/
   GiftVouchers.tsx    # voucher banner
   StudioReviews.tsx   # Google rating, reviews and the map's frame (server)
   StudioMap.tsx       # the Google map itself, loaded when scrolled to (client)
+  Faq.tsx             # frequently asked questions from the admin panel; left out while there are none (server)
+  FaqList.tsx         # the questions, each opening its answer (client)
   IdeaSection.tsx     # "Tell us your idea" layout (server)
   IdeaForm.tsx        # booking form -> WhatsApp deep link (client)
   CourseSignup.tsx    # the /course page's sign-up card -> WhatsApp deep link (client)

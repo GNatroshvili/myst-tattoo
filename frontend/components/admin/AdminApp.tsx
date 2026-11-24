@@ -2,11 +2,12 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import type { Artist, BlogPost, BlogTopic, Course, Piercing, PiercingZone, Style, Tattoo } from "@/lib/types";
+import type { Artist, BlogPost, BlogTopic, Course, Faq, Piercing, PiercingZone, Style, Tattoo } from "@/lib/types";
 import { ApiError, api, errorText, isSignedOut } from "./api";
 import { ArtistsPanel } from "./ArtistsPanel";
 import { BlogPanel } from "./BlogPanel";
 import { CoursePanel } from "./CoursePanel";
+import { FaqPanel } from "./FaqPanel";
 import { LoginForm } from "./LoginForm";
 import { PiercingPanel } from "./PiercingPanel";
 import { StylesPanel } from "./StylesPanel";
@@ -28,6 +29,8 @@ export type AdminData = {
   topics: BlogTopic[];
   /** the tattoo course; null while none is posted */
   course: Course | null;
+  /** the home page's frequently asked questions, in the order the site shows them */
+  faqs: Faq[];
 };
 
 /** What every screen gets: the data, a way to re-read it, and error handling. */
@@ -45,6 +48,7 @@ const tabs = [
   { key: "styles", label: "სტილები" },
   { key: "posts", label: "ბლოგი" },
   { key: "course", label: "კურსი" },
+  { key: "faqs", label: "კითხვები" },
 ] as const;
 type Tab = (typeof tabs)[number]["key"];
 
@@ -62,7 +66,7 @@ export function AdminApp() {
 
   const reload = useCallback(async () => {
     try {
-      const [artists, tattoos, piercings, zones, styles, posts, topics, course] = await Promise.all([
+      const [artists, tattoos, piercings, zones, styles, posts, topics, course, faqs] = await Promise.all([
         api<Artist[]>("/artists"),
         api<Tattoo[]>("/tattoos"),
         api<Piercing[]>("/piercings"),
@@ -75,8 +79,9 @@ export function AdminApp() {
           if (err instanceof ApiError && err.status === 404) return null;
           throw err;
         }),
+        api<Faq[]>("/faqs"),
       ]);
-      setData({ artists, tattoos, piercings, zones, styles, posts, topics, course });
+      setData({ artists, tattoos, piercings, zones, styles, posts, topics, course, faqs });
       setLoadError("");
     } catch (err) {
       setLoadError(errorText(err));
@@ -164,6 +169,7 @@ export function AdminApp() {
       {panel && tab === "styles" && <StylesPanel {...panel} />}
       {panel && tab === "posts" && <BlogPanel {...panel} />}
       {panel && tab === "course" && <CoursePanel {...panel} />}
+      {panel && tab === "faqs" && <FaqPanel {...panel} />}
     </div>
   );
 }

@@ -88,6 +88,12 @@ export function errorText(err: unknown): string {
       return "აირჩიე ფოტო.";
     case "bad_photos":
       return "კურსის ფოტოები სხვაგან შეიცვალა. გადატვირთე გვერდი და სცადე თავიდან.";
+    case "question_both_languages":
+      return "კითხვა ორივე ენაზე შეავსე: ქართულად და ინგლისურად.";
+    case "answer_missing":
+      return "პასუხი ერთ ენაზე მაინც დაწერე.";
+    case "bad_order":
+      return "კითხვების სია სხვაგან შეიცვალა. სია განახლდა: სცადე თავიდან.";
     case "db_down":
       return "ბაზასთან დაკავშირება ვერ მოხერხდა. შეამოწმე MONGODB_URI და სცადე თავიდან.";
     case "storage_not_configured":

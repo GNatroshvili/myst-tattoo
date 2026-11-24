@@ -4,6 +4,7 @@ import * as auth from "../controllers/auth.js";
 import * as blogPosts from "../controllers/blogPosts.js";
 import * as blogTopics from "../controllers/blogTopics.js";
 import * as course from "../controllers/course.js";
+import * as faqs from "../controllers/faqs.js";
 import * as piercings from "../controllers/piercings.js";
 import * as piercingZones from "../controllers/piercingZones.js";
 import * as styles from "../controllers/styles.js";
@@ -71,5 +72,12 @@ api.get("/course", course.getCourse);
 api.put("/course", requireAdmin, course.saveCourse);
 api.post("/course/photos", requireAdmin, photoUpload, course.addPhoto);
 api.delete("/course", requireAdmin, course.deleteCourse);
+
+// the home page's frequently asked questions, in the order the admin panel gives them
+api.get("/faqs", faqs.listFaqs);
+api.post("/faqs", requireAdmin, faqs.createFaq);
+api.put("/faqs/order", requireAdmin, faqs.orderFaqs);
+api.patch("/faqs/:id", requireAdmin, faqs.updateFaq);
+api.delete("/faqs/:id", requireAdmin, faqs.deleteFaq);
 
 export default api;

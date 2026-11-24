@@ -1,5 +1,5 @@
 import { apiOrigin } from "./api-url";
-import type { Artist, BlogPost, BlogTopic, Course, Piercing, PiercingZone, Style, Tattoo } from "./types";
+import type { Artist, BlogPost, BlogTopic, Course, Faq, Piercing, PiercingZone, Style, Tattoo } from "./types";
 
 /**
  * Reads from the backend API. Server Components only: the browser reaches the
@@ -64,6 +64,9 @@ export const getBlogPost = (slug: string) => get<BlogPost>(`/blog/posts/${encode
 
 /** The tattoo course; `null` while none has been posted. */
 export const getCourse = () => get<Course>("/course");
+
+/** The home page's frequently asked questions, in the order the admin panel puts them in. */
+export const getFaqs = async () => (await get<Faq[]>("/faqs")) ?? [];
 
 /** Piercing photos, newest first. */
 export const getPiercings = async () => (await get<Piercing[]>("/piercings")) ?? [];

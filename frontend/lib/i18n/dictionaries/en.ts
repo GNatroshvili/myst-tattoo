@@ -82,6 +82,13 @@ export const en = {
     /** under the reviews; "Google Maps" follows it */
     sourceNote: "The most relevant reviews, as chosen by",
   },
+  /** Frequently asked questions (home page). The questions and answers come from the admin panel. */
+  faq: {
+    eyebrow: "Myst / FAQ",
+    title: "Frequently asked questions",
+    lead: "Short answers to what we're asked most often. Something else on your mind? Write to us.",
+    ask: "Ask on WhatsApp",
+  },
   idea: {
     title: "Tell us your idea",
     lead: "Fill in the form and a ready-made WhatsApp message opens. We'll reply to agree the details.",

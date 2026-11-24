@@ -1,7 +1,8 @@
 # Myst Tattoo - Backend
 
 Express + MongoDB (Mongoose) API. It keeps the studio's artists, tattoos,
-tattoo styles, the piercing price list and piercing photos, stores the
+tattoo styles, the piercing price list and piercing photos, the blog, the
+course and the home page's frequently asked questions, stores the
 uploaded photos, and guards changes behind the admin sign-in. The site (`../frontend`) reads from it and hosts the admin panel at
 `/admin`.
 
@@ -132,6 +133,11 @@ The piercing page has a price list and a gallery:
 | PUT | `/api/course` | yes | JSON: `title: { ka, en }`, `body: { ka, en }` (at least one), optional `photos`: ids of the photos to keep, in order. Posts the course or changes it; the date stays |
 | POST | `/api/course/photos` | yes | Form: `photo`. Adds one photo (four at most) to the end |
 | DELETE | `/api/course` | yes | Takes the course off the site and deletes its photo files |
+| GET | `/api/faqs` | | The home page's frequently asked questions, in the order the site shows them |
+| POST | `/api/faqs` | yes | JSON: `question: { ka, en }`, `answer: { ka, en }` (at least one). Goes to the end of the list |
+| PATCH | `/api/faqs/:id` | yes | The same fields |
+| PUT | `/api/faqs/order` | yes | JSON: `ids`: every question's id once, first to last. Refused (400) if one is missing |
+| DELETE | `/api/faqs/:id` | yes | |
 | GET | `/api/piercings` | | All piercing photos, newest first; `?limit=4` |
 | POST | `/api/piercings` | yes | Form: `photo`, `place`, `artist` (optional) |
 | PATCH | `/api/piercings/:id` | yes | `place`, `artist` ("" detaches), `photo` |
@@ -149,8 +155,8 @@ src/
   app.js             # express app, middleware, route mounting
   config/            # environment values, mongoose connection
   routes/index.js    # every route and who may call it
-  controllers/       # request handlers: auth, styles, artists, tattoos, piercing zones, piercings, blog topics, blog posts, the course
-  models/            # mongoose schemas: Style, Artist, Tattoo, PiercingZone, PiercingPlace, Piercing, BlogTopic, BlogPost, Course
+  controllers/       # request handlers: auth, styles, artists, tattoos, piercing zones, piercings, blog topics, blog posts, the course, the FAQ
+  models/            # mongoose schemas: Style, Artist, Tattoo, PiercingZone, PiercingPlace, Piercing, BlogTopic, BlogPost, Course, Faq
   middleware/        # admin session (auth.js), photo upload (upload.js)
   utils/             # photo storage, slugs, input checks, API output, upgrading older records
   scripts/           # starting styles, demo data, moving data to Atlas and Blob
