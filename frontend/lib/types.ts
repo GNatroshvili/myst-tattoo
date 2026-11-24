@@ -120,6 +120,14 @@ export type Faq = {
   answer: Localized;
 };
 
+/** The privacy policy's text as saved in the admin panel. One record serves both sites. */
+export type PrivacyPolicy = {
+  /** "" in a language that has none, and the page then shows the other one */
+  body: Localized;
+  /** when the text was last saved: the "last updated" date the site shows */
+  updatedAt: string;
+};
+
 /** An artist. One record serves both sites: the nickname and the bio are in both languages. */
 export type Artist = ArtistBrief & {
   styles: Style[];

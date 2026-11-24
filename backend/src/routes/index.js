@@ -7,6 +7,7 @@ import * as course from "../controllers/course.js";
 import * as faqs from "../controllers/faqs.js";
 import * as piercings from "../controllers/piercings.js";
 import * as piercingZones from "../controllers/piercingZones.js";
+import * as privacy from "../controllers/privacy.js";
 import * as styles from "../controllers/styles.js";
 import * as tattoos from "../controllers/tattoos.js";
 import { limitLogins, requireAdmin } from "../middleware/auth.js";
@@ -79,5 +80,11 @@ api.post("/faqs", requireAdmin, faqs.createFaq);
 api.put("/faqs/order", requireAdmin, faqs.orderFaqs);
 api.patch("/faqs/:id", requireAdmin, faqs.updateFaq);
 api.delete("/faqs/:id", requireAdmin, faqs.deleteFaq);
+
+// the privacy policy's text, shown on the site's /privacy page: one record at
+// most. While there is none the page shows the standard text the site carries.
+api.get("/privacy", privacy.getPrivacy);
+api.put("/privacy", requireAdmin, privacy.savePrivacy);
+api.delete("/privacy", requireAdmin, privacy.deletePrivacy);
 
 export default api;

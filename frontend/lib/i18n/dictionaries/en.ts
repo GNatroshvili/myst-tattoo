@@ -326,11 +326,27 @@ export const en = {
       },
     },
   },
+  /** The privacy policy's page. Its text comes from the admin panel, or is the standard one in lib/privacy.ts. */
+  privacy: {
+    metaTitle: "Privacy Policy",
+    metaDescription:
+      "How the website of Myst Tattoo Studio in Tbilisi treats your data: the Google map, the reviews from Google Maps and the booking form.",
+    eyebrow: "Myst / Privacy",
+    title: "Privacy Policy",
+    /** before the date the text was last saved: "Last updated: 24 November 2026" */
+    updated: "Last updated",
+    /** over the list of the text's sections */
+    contents: "On this page",
+    contactTitle: "A question about your data?",
+    whatsapp: "WhatsApp",
+    instagramDm: "Instagram DM",
+  },
   footer: {
     city: "Tbilisi, Georgia",
     follow: "Follow us",
     question: "Have a question?",
     contact: "Contact us",
+    privacy: "Privacy Policy",
   },
   notFound: {
     title: "Page not found",

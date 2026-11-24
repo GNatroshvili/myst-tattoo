@@ -112,6 +112,13 @@ export const faq = (doc) => ({
   answer: both(doc.answer),
 });
 
+/** The privacy policy's text as the admin panel saved it. */
+export const privacy = (doc) => ({
+  body: both(doc.body),
+  /** when the text was last saved: the "last updated" date the site shows */
+  updatedAt: doc.updatedAt,
+});
+
 export const tattoo = (doc) => ({
   id: String(doc._id),
   image: image(doc.image),

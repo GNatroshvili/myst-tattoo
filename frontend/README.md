@@ -18,6 +18,7 @@ app/
   page.tsx            # home page composition
   not-found.tsx       # styled 404
   [lang]/course/      # the tattoo course: title, date, photos and text from the admin panel
+  [lang]/privacy/     # the privacy policy: the admin panel's text, or the standard one in lib/privacy.ts
   globals.css         # design tokens (@theme) + component classes
 components/
   Header.tsx          # nav + mobile menu (client)
@@ -37,6 +38,7 @@ components/
 lib/
   site.ts             # studio details, nav, services
   google-place.ts     # the studio on Google Maps: rating, reviews, coordinates (Places API)
+  privacy.ts          # the privacy policy's standard text, and how its text becomes headings and paragraphs
   dates.ts            # upcoming days in the studio's time zone
   whatsapp.ts         # message + wa.me URL builders
 ```

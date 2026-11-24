@@ -2,7 +2,18 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import type { Artist, BlogPost, BlogTopic, Course, Faq, Piercing, PiercingZone, Style, Tattoo } from "@/lib/types";
+import type {
+  Artist,
+  BlogPost,
+  BlogTopic,
+  Course,
+  Faq,
+  Piercing,
+  PiercingZone,
+  PrivacyPolicy,
+  Style,
+  Tattoo,
+} from "@/lib/types";
 import { ApiError, api, errorText, isSignedOut } from "./api";
 import { ArtistsPanel } from "./ArtistsPanel";
 import { BlogPanel } from "./BlogPanel";
@@ -10,6 +21,7 @@ import { CoursePanel } from "./CoursePanel";
 import { FaqPanel } from "./FaqPanel";
 import { LoginForm } from "./LoginForm";
 import { PiercingPanel } from "./PiercingPanel";
+import { PrivacyPanel } from "./PrivacyPanel";
 import { StylesPanel } from "./StylesPanel";
 import { TattoosPanel } from "./TattoosPanel";
 import { Notice } from "./ui";
@@ -31,6 +43,8 @@ export type AdminData = {
   course: Course | null;
   /** the home page's frequently asked questions, in the order the site shows them */
   faqs: Faq[];
+  /** the privacy policy's text; null while the site shows its standard one */
+  privacy: PrivacyPolicy | null;
 };
 
 /** What every screen gets: the data, a way to re-read it, and error handling. */
@@ -41,6 +55,12 @@ export type PanelProps = AdminData & {
   explain: (err: unknown) => string;
 };
 
+/** For the records there is one of at most: "not found" means there is none, anything else is a failure. */
+function missing(err: unknown) {
+  if (err instanceof ApiError && err.status === 404) return null;
+  throw err;
+}
+
 const tabs = [
   { key: "artists", label: "არტისტები" },
   { key: "tattoos", label: "ტატუები" },
@@ -49,6 +69,7 @@ const tabs = [
   { key: "posts", label: "ბლოგი" },
   { key: "course", label: "კურსი" },
   { key: "faqs", label: "კითხვები" },
+  { key: "privacy", label: "კონფიდენციალურობა" },
 ] as const;
 type Tab = (typeof tabs)[number]["key"];
 
@@ -66,7 +87,7 @@ export function AdminApp() {
 
   const reload = useCallback(async () => {
     try {
-      const [artists, tattoos, piercings, zones, styles, posts, topics, course, faqs] = await Promise.all([
+      const [artists, tattoos, piercings, zones, styles, posts, topics, course, faqs, privacy] = await Promise.all([
         api<Artist[]>("/artists"),
         api<Tattoo[]>("/tattoos"),
         api<Piercing[]>("/piercings"),
@@ -75,13 +96,12 @@ export function AdminApp() {
         api<BlogPost[]>("/blog/posts"),
         api<BlogTopic[]>("/blog/topics"),
         // "not found" is an answer here: no course has been posted
-        api<Course>("/course").catch((err) => {
-          if (err instanceof ApiError && err.status === 404) return null;
-          throw err;
-        }),
+        api<Course>("/course").catch(missing),
         api<Faq[]>("/faqs"),
+        // and here: no text has been saved, the site shows its standard one
+        api<PrivacyPolicy>("/privacy").catch(missing),
       ]);
-      setData({ artists, tattoos, piercings, zones, styles, posts, topics, course, faqs });
+      setData({ artists, tattoos, piercings, zones, styles, posts, topics, course, faqs, privacy });
       setLoadError("");
     } catch (err) {
       setLoadError(errorText(err));
@@ -154,8 +174,10 @@ export function AdminApp() {
             }`}
           >
             {label}
-            {/* how many there are; the course is one thing, not a list */}
-            {data && key !== "course" && <span className="ml-2 text-muted">{data[key].length}</span>}
+            {/* how many there are; the course and the policy are one thing each, not lists */}
+            {data && key !== "course" && key !== "privacy" && (
+              <span className="ml-2 text-muted">{data[key].length}</span>
+            )}
           </button>
         ))}
       </nav>
@@ -170,6 +192,7 @@ export function AdminApp() {
       {panel && tab === "posts" && <BlogPanel {...panel} />}
       {panel && tab === "course" && <CoursePanel {...panel} />}
       {panel && tab === "faqs" && <FaqPanel {...panel} />}
+      {panel && tab === "privacy" && <PrivacyPanel {...panel} />}
     </div>
   );
 }

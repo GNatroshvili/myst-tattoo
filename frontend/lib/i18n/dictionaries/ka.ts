@@ -299,11 +299,24 @@ export const ka: Dictionary = {
       },
     },
   },
+  privacy: {
+    metaTitle: "კონფიდენციალურობის პოლიტიკა",
+    metaDescription:
+      "როგორ ეპყრობა Myst Tattoo Studio-ს ვებსაიტი შენს მონაცემებს: Google-ის რუკა, შეფასებები Google Maps-იდან და ჯავშნის ფორმა.",
+    eyebrow: "Myst / კონფიდენციალურობა",
+    title: "კონფიდენციალურობის პოლიტიკა",
+    updated: "ბოლო განახლება",
+    contents: "ამ გვერდზე",
+    contactTitle: "გაქვს შეკითხვა შენს მონაცემებზე?",
+    whatsapp: "WhatsApp",
+    instagramDm: "Instagram DM",
+  },
   footer: {
     city: "თბილისი, საქართველო",
     follow: "გამოგვყევი",
     question: "გაქვს შეკითხვა?",
     contact: "დაგვიკავშირდი",
+    privacy: "კონფიდენციალურობის პოლიტიკა",
   },
   notFound: {
     title: "გვერდი ვერ მოიძებნა",
