@@ -69,12 +69,16 @@ const kinds = [
   ["tattoos", (tattoo) => tattoo.image],
   ["piercings", (piercing) => piercing.image],
   ["blog/posts", (post) => post.image],
+  ["about/sections", (section) => section.image],
 ];
+/** Every record of a kind; none on a site from before that kind existed. */
+const listOf = (kind) =>
+  call("GET", `/${kind}`).catch((err) => (/ 404 /.test(err.message) ? [] : Promise.reject(err)));
 
 let sent = 0;
 let missing = 0;
 for (const [kind, photoOf] of kinds) {
-  for (const record of await call("GET", `/${kind}`)) {
+  for (const record of await listOf(kind)) {
     const image = photoOf(record);
     if (!local(image)) continue;
 
@@ -134,7 +138,7 @@ if (sent > 0) process.stdout.write("\n");
 // what the site says now
 let left = ((await readCourse())?.photos ?? []).filter(local).length;
 for (const [kind, photoOf] of kinds) {
-  left += (await call("GET", `/${kind}`)).filter((record) => local(photoOf(record))).length;
+  left += (await listOf(kind)).filter((record) => local(photoOf(record))).length;
 }
 console.log(
   `[photos] sent ${sent} photo(s) to ${site}` +

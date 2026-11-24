@@ -2,7 +2,8 @@
 
 Express + MongoDB (Mongoose) API. It keeps the studio's artists, tattoos,
 tattoo styles, the piercing price list and piercing photos, the blog, the
-course, the home page's frequently asked questions and the privacy policy's text, stores the
+course, the sections of the "About us" page, the home page's frequently asked questions and the
+privacy policy's text, stores the
 uploaded photos, and guards changes behind the admin sign-in. The site (`../frontend`) reads from it and hosts the admin panel at
 `/admin`.
 
@@ -12,7 +13,7 @@ uploaded photos, and guards changes behind the admin sign-in. The site (`../fron
 cp .env.example .env   # then fill in ADMIN_PASSWORD and SESSION_SECRET
 npm install
 npm run seed           # optional, once: adds five starting tattoo styles
-npm run seed:demo      # optional: demo artists, tattoos, piercings, blog articles and a course
+npm run seed:demo      # optional: demo artists, tattoos, piercings, blog articles, a course and the about page
 npm run dev            # http://localhost:5000
 ```
 
@@ -21,8 +22,9 @@ MongoDB must be running (`MONGODB_URI`, local by default).
 `npm run seed:demo` fills an empty site for trying things out: three tattoo
 artists with five tattoos each, one piercer with five piercings, and a
 piercing price list, and then six blog articles under four topics
-(`npm run seed:demo:blog` adds only those), and last a tattoo course with four photos
-(`npm run seed:demo:course` adds only that), all with their texts in both languages. The pictures are drawn by the script and
+(`npm run seed:demo:blog` adds only those), then a tattoo course with four photos
+(`npm run seed:demo:course` adds only that), and last three sections of the "About us" page
+(`npm run seed:demo:about` adds only those), all with their texts in both languages. The pictures are drawn by the script and
 marked "DEMO". The records are ordinary ones, so they are edited and deleted in
 the admin panel like any others; running the script again adds nothing twice.
 
@@ -138,6 +140,11 @@ The piercing page has a price list and a gallery:
 | PATCH | `/api/faqs/:id` | yes | The same fields |
 | PUT | `/api/faqs/order` | yes | JSON: `ids`: every question's id once, first to last. Refused (400) if one is missing |
 | DELETE | `/api/faqs/:id` | yes | |
+| GET | `/api/about/sections` | | The /about page's sections (photo, title, text), in the order the page shows them |
+| POST | `/api/about/sections` | yes | Form: `photo`, `titleKa`, `titleEn` (both optional), `bodyKa`, `bodyEn` (at least one). Goes to the end of the page |
+| PATCH | `/api/about/sections/:id` | yes | Any of the same fields; a new `photo` replaces the old one |
+| PUT | `/api/about/sections/order` | yes | JSON: `ids`: every section's id once, first to last. Refused (400) if one is missing |
+| DELETE | `/api/about/sections/:id` | yes | Also deletes the photo files |
 | GET | `/api/privacy` | | The privacy policy's text as saved in the admin panel (`body`, `updatedAt`); 404 while none is saved, and the site then shows its standard text |
 | PUT | `/api/privacy` | yes | JSON: `body: { ka, en }` (at least one). An empty line separates paragraphs; a line that begins with `#` is a heading |
 | DELETE | `/api/privacy` | yes | Drops the saved text: the page goes back to the standard one |
@@ -158,8 +165,8 @@ src/
   app.js             # express app, middleware, route mounting
   config/            # environment values, mongoose connection
   routes/index.js    # every route and who may call it
-  controllers/       # request handlers: auth, styles, artists, tattoos, piercing zones, piercings, blog topics, blog posts, the course, the FAQ, the privacy policy
-  models/            # mongoose schemas: Style, Artist, Tattoo, PiercingZone, PiercingPlace, Piercing, BlogTopic, BlogPost, Course, Faq, Privacy
+  controllers/       # request handlers: auth, styles, artists, tattoos, piercing zones, piercings, blog topics, blog posts, the course, the about page's sections, the FAQ, the privacy policy
+  models/            # mongoose schemas: Style, Artist, Tattoo, PiercingZone, PiercingPlace, Piercing, BlogTopic, BlogPost, Course, AboutSection, Faq, Privacy
   middleware/        # admin session (auth.js), photo upload (upload.js)
   utils/             # photo storage, slugs, input checks, API output, upgrading older records
   scripts/           # starting styles, demo data, moving data to Atlas and Blob

@@ -112,6 +112,14 @@ export const faq = (doc) => ({
   answer: both(doc.answer),
 });
 
+/** One section of the /about page: a photo, a title ("" where it has none) and a text. */
+export const aboutSection = (doc) => ({
+  id: String(doc._id),
+  title: both(doc.title),
+  body: both(doc.body),
+  image: image(doc.image),
+});
+
 /** The privacy policy's text as the admin panel saved it. */
 export const privacy = (doc) => ({
   body: both(doc.body),

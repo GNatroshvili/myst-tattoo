@@ -33,9 +33,13 @@ export function Header({ lang, nav: t, common, switcherLabel }: Props) {
 
         <nav
           aria-label={t.mainAria}
-          className={`hidden items-center text-[16px] lg:flex ${
-            // Georgian labels are longer, so they sit a little closer together
-            lang === "ka" ? "gap-x-6 xl:gap-x-9" : "gap-x-8 xl:gap-x-[46px]"
+          className={`hidden items-center lg:flex ${
+            // Georgian labels are longer, so they sit a little closer together;
+            // on the narrowest screens that show this menu they are also a touch
+            // smaller, or the row would not fit beside the "Book" button
+            lang === "ka"
+              ? "gap-x-3.5 text-[15px] min-[1120px]:gap-x-6 min-[1120px]:text-[16px] xl:gap-x-9"
+              : "gap-x-8 text-[16px] xl:gap-x-[46px]"
           }`}
         >
           {items.map((item) => {

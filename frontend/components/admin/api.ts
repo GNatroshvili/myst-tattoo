@@ -92,6 +92,10 @@ export function errorText(err: unknown): string {
       return "კითხვა ორივე ენაზე შეავსე: ქართულად და ინგლისურად.";
     case "answer_missing":
       return "პასუხი ერთ ენაზე მაინც დაწერე.";
+    case "about_body_missing":
+      return "სექციის ტექსტი ერთ ენაზე მაინც დაწერე.";
+    case "about_bad_order":
+      return "სექციების სია სხვაგან შეიცვალა. სია განახლდა: სცადე თავიდან.";
     case "privacy_body_missing":
       return "პოლიტიკის ტექსტი ერთ ენაზე მაინც დაწერე.";
     case "bad_order":

@@ -1,5 +1,5 @@
 /**
- * The drawing kit of the demo scripts (seed-demo.js, seed-demo-blog.js):
+ * The drawing kit of the demo scripts (seed-demo.js, seed-demo-blog.js, seed-demo-course.js, seed-demo-about.js):
  * simple line art on a dark tinted ground, marked "DEMO". Not real work.
  */
 
