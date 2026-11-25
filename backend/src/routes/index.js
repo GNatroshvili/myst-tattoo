@@ -9,6 +9,7 @@ import * as faqs from "../controllers/faqs.js";
 import * as piercings from "../controllers/piercings.js";
 import * as piercingZones from "../controllers/piercingZones.js";
 import * as privacy from "../controllers/privacy.js";
+import * as stats from "../controllers/stats.js";
 import * as styles from "../controllers/styles.js";
 import * as tattoos from "../controllers/tattoos.js";
 import { limitLogins, requireAdmin } from "../middleware/auth.js";
@@ -74,6 +75,14 @@ api.get("/course", course.getCourse);
 api.put("/course", requireAdmin, course.saveCourse);
 api.post("/course/photos", requireAdmin, photoUpload, course.addPhoto);
 api.delete("/course", requireAdmin, course.deleteCourse);
+
+// the figures the home page shows about the studio ("700+ reviews on Google"),
+// four at most, in the order the admin panel gives them
+api.get("/stats", stats.listStats);
+api.post("/stats", requireAdmin, stats.createStat);
+api.put("/stats/order", requireAdmin, stats.orderStats);
+api.patch("/stats/:id", requireAdmin, stats.updateStat);
+api.delete("/stats/:id", requireAdmin, stats.deleteStat);
 
 // the home page's frequently asked questions, in the order the admin panel gives them
 api.get("/faqs", faqs.listFaqs);

@@ -135,6 +135,11 @@ The piercing page has a price list and a gallery:
 | PUT | `/api/course` | yes | JSON: `title: { ka, en }`, `body: { ka, en }` (at least one), optional `photos`: ids of the photos to keep, in order. Posts the course or changes it; the date stays |
 | POST | `/api/course/photos` | yes | Form: `photo`. Adds one photo (four at most) to the end |
 | DELETE | `/api/course` | yes | Takes the course off the site and deletes its photo files |
+| GET | `/api/stats` | | The figures the home page shows about the studio, in the order the site shows them |
+| POST | `/api/stats` | yes | JSON: `value` (the figure as the site shows it: "700+"), `label: { ka, en }`. Goes to the end of the row; refused (409) once there are four |
+| PATCH | `/api/stats/:id` | yes | The same fields |
+| PUT | `/api/stats/order` | yes | JSON: `ids`: every figure's id once, first to last. Refused (400) if one is missing |
+| DELETE | `/api/stats/:id` | yes | |
 | GET | `/api/faqs` | | The home page's frequently asked questions, in the order the site shows them |
 | POST | `/api/faqs` | yes | JSON: `question: { ka, en }`, `answer: { ka, en }` (at least one). Goes to the end of the list |
 | PATCH | `/api/faqs/:id` | yes | The same fields |
@@ -165,8 +170,8 @@ src/
   app.js             # express app, middleware, route mounting
   config/            # environment values, mongoose connection
   routes/index.js    # every route and who may call it
-  controllers/       # request handlers: auth, styles, artists, tattoos, piercing zones, piercings, blog topics, blog posts, the course, the about page's sections, the FAQ, the privacy policy
-  models/            # mongoose schemas: Style, Artist, Tattoo, PiercingZone, PiercingPlace, Piercing, BlogTopic, BlogPost, Course, AboutSection, Faq, Privacy
+  controllers/       # request handlers: auth, styles, artists, tattoos, piercing zones, piercings, blog topics, blog posts, the course, the about page's sections, the home page's figures, the FAQ, the privacy policy
+  models/            # mongoose schemas: Style, Artist, Tattoo, PiercingZone, PiercingPlace, Piercing, BlogTopic, BlogPost, Course, AboutSection, Stat, Faq, Privacy
   middleware/        # admin session (auth.js), photo upload (upload.js)
   utils/             # photo storage, slugs, input checks, API output, upgrading older records
   scripts/           # starting styles, demo data, moving data to Atlas and Blob

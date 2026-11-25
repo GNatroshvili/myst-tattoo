@@ -8,6 +8,7 @@ import { Hero } from "@/components/Hero";
 import { IdeaSection } from "@/components/IdeaSection";
 import { QuickLinks } from "@/components/QuickLinks";
 import { StudioReviews } from "@/components/StudioReviews";
+import { StudioStats } from "@/components/StudioStats";
 import { getDictionary } from "@/lib/i18n";
 
 export default async function HomePage() {
@@ -21,6 +22,7 @@ export default async function HomePage() {
         <main>
           <Hero lang={lang} dict={dict} />
           <QuickLinks lang={lang} t={dict.quickLinks} />
+          <StudioStats lang={lang} dict={dict} />
           <FeaturedWorks lang={lang} dict={dict} />
           <GiftVouchers lang={lang} t={dict.vouchers} />
           <StudioReviews lang={lang} dict={dict} />

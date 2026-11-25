@@ -105,6 +105,13 @@ export const course = (doc) => ({
   updatedAt: doc.updatedAt,
 });
 
+/** One of the figures the home page shows about the studio: the figure and the line under it. */
+export const stat = (doc) => ({
+  id: String(doc._id),
+  value: doc.value,
+  label: both(doc.label),
+});
+
 /** One of the home page's frequently asked questions. */
 export const faq = (doc) => ({
   id: String(doc._id),

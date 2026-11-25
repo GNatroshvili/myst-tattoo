@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useMemo } from "react";
+import { useCountUp } from "./useCountUp";
 
 /**
  * How many reviews the studio has, said the way a shop window would: in round
@@ -13,59 +14,18 @@ export function roundedCount(count: number): { value: number; plus: boolean } {
   return hundred > 0 ? { value: hundred, plus: true } : { value: count, plus: false };
 }
 
-/** How long the count takes, in milliseconds, whatever the number: quick at first, the last few tick by one at a time. */
-const DURATION = 3000;
-
 /**
- * The number itself. It is in the page from the start (for search engines and
- * screen readers); when it scrolls into view it counts up from 1 in order, and
- * the plus appears as it lands. Plays once, and for everyone: the studio wants
- * its motion shown even where the system asks for less.
+ * The number itself, worded for the page's language. It counts up when it
+ * scrolls into view (see useCountUp).
  */
 export function ReviewCount({ count, locale, className = "" }: { count: number; locale: string; className?: string }) {
   const { value, plus } = roundedCount(count);
-  const numberRef = useRef<HTMLSpanElement>(null);
-  const plusRef = useRef<HTMLSpanElement>(null);
-  const format = new Intl.NumberFormat(locale);
-  const final = format.format(value);
-
-  useEffect(() => {
-    const el = numberRef.current;
-    const sign = plusRef.current;
-    if (!el || value < 2) return;
-
-    const write = new Intl.NumberFormat(locale);
-    let frame = 0;
-    // waits at 1, out of sight, until the visitor scrolls down to it
-    el.textContent = write.format(1);
-    if (sign) sign.style.opacity = "0";
-
-    const watcher = new IntersectionObserver(
-      (entries) => {
-        if (!entries.some((e) => e.isIntersecting)) return;
-        watcher.disconnect();
-        const start = performance.now();
-        const tick = (now: number) => {
-          const t = Math.min(1, (now - start) / DURATION);
-          // eases out: most of the way in the first half, then slower and slower
-          const eased = 1 - Math.pow(1 - t, 3);
-          el.textContent = write.format(Math.max(1, Math.round(1 + (value - 1) * eased)));
-          if (t < 1) frame = requestAnimationFrame(tick);
-          else if (sign) sign.style.opacity = "1";
-        };
-        frame = requestAnimationFrame(tick);
-      },
-      { threshold: 0.6 },
-    );
-    watcher.observe(el);
-
-    return () => {
-      watcher.disconnect();
-      cancelAnimationFrame(frame);
-      el.textContent = write.format(value);
-      if (sign) sign.style.opacity = "1";
-    };
-  }, [value, locale]);
+  const write = useMemo(() => {
+    const format = new Intl.NumberFormat(locale);
+    return (n: number) => format.format(n);
+  }, [locale]);
+  const { numberRef, plusRef } = useCountUp(value, write);
+  const final = write(value);
 
   return (
     <>

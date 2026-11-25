@@ -84,6 +84,10 @@ export const en = {
     sourceNote: "The most relevant reviews, as chosen by",
   },
   /** Frequently asked questions (home page). The questions and answers come from the admin panel. */
+  /** The row of figures on the home page; the figures and their lines come from the admin panel. */
+  stats: {
+    aria: "The studio in numbers",
+  },
   faq: {
     eyebrow: "Myst / FAQ",
     title: "Frequently asked questions",

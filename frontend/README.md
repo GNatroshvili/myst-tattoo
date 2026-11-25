@@ -28,6 +28,9 @@ components/
   Hero.tsx            # headline + CTA + HeroLily
   HeroLily.tsx        # lily artwork (public/images/hero-lily.webp) via next/image
   QuickLinks.tsx      # Tattoos / Piercing / Our Artists / Why Myst
+  StudioStats.tsx     # the row of figures ("700+ reviews on Google") from the admin panel; left out while there are none (server)
+  StatNumber.tsx      # one figure, counting up when scrolled to (client)
+  useCountUp.ts       # the counting itself, shared with the review count
   GiftVouchers.tsx    # voucher banner
   StudioReviews.tsx   # Google rating, reviews and the map's frame (server)
   StudioMap.tsx       # the Google map itself, loaded when scrolled to (client)
