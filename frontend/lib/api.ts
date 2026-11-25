@@ -9,6 +9,7 @@ import type {
   Piercing,
   PiercingZone,
   PrivacyPolicy,
+  Stat,
   Style,
   Tattoo,
 } from "./types";
@@ -76,6 +77,9 @@ export const getBlogPost = (slug: string) => get<BlogPost>(`/blog/posts/${encode
 
 /** The tattoo course; `null` while none has been posted. */
 export const getCourse = () => get<Course>("/course");
+
+/** The figures the home page shows about the studio, in the order the admin panel puts them in. */
+export const getStats = async () => (await get<Stat[]>("/stats")) ?? [];
 
 /** The home page's frequently asked questions, in the order the admin panel puts them in. */
 export const getFaqs = async () => (await get<Faq[]>("/faqs")) ?? [];

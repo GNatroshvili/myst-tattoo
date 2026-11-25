@@ -12,6 +12,7 @@ import type {
   Piercing,
   PiercingZone,
   PrivacyPolicy,
+  Stat,
   Style,
   Tattoo,
 } from "@/lib/types";
@@ -24,6 +25,7 @@ import { FaqPanel } from "./FaqPanel";
 import { LoginForm } from "./LoginForm";
 import { PiercingPanel } from "./PiercingPanel";
 import { PrivacyPanel } from "./PrivacyPanel";
+import { StatsPanel } from "./StatsPanel";
 import { StylesPanel } from "./StylesPanel";
 import { TattoosPanel } from "./TattoosPanel";
 import { Notice } from "./ui";
@@ -45,6 +47,8 @@ export type AdminData = {
   course: Course | null;
   /** the /about page's sections, in the order the site shows them */
   about: AboutSection[];
+  /** the figures the home page shows about the studio, in the order the site shows them */
+  stats: Stat[];
   /** the home page's frequently asked questions, in the order the site shows them */
   faqs: Faq[];
   /** the privacy policy's text; null while the site shows its standard one */
@@ -73,6 +77,7 @@ const tabs = [
   { key: "posts", label: "ბლოგი" },
   { key: "course", label: "კურსი" },
   { key: "about", label: "ჩვენ შესახებ" },
+  { key: "stats", label: "მიღწევები" },
   { key: "faqs", label: "კითხვები" },
   { key: "privacy", label: "კონფიდენციალურობა" },
 ] as const;
@@ -92,7 +97,7 @@ export function AdminApp() {
 
   const reload = useCallback(async () => {
     try {
-      const [artists, tattoos, piercings, zones, styles, posts, topics, course, about, faqs, privacy] =
+      const [artists, tattoos, piercings, zones, styles, posts, topics, course, about, stats, faqs, privacy] =
         await Promise.all([
           api<Artist[]>("/artists"),
           api<Tattoo[]>("/tattoos"),
@@ -104,11 +109,12 @@ export function AdminApp() {
           // "not found" is an answer here: no course has been posted
           api<Course>("/course").catch(missing),
           api<AboutSection[]>("/about/sections"),
+          api<Stat[]>("/stats"),
           api<Faq[]>("/faqs"),
           // and here: no text has been saved, the site shows its standard one
           api<PrivacyPolicy>("/privacy").catch(missing),
         ]);
-      setData({ artists, tattoos, piercings, zones, styles, posts, topics, course, about, faqs, privacy });
+      setData({ artists, tattoos, piercings, zones, styles, posts, topics, course, about, stats, faqs, privacy });
       setLoadError("");
     } catch (err) {
       setLoadError(errorText(err));
@@ -199,6 +205,7 @@ export function AdminApp() {
       {panel && tab === "posts" && <BlogPanel {...panel} />}
       {panel && tab === "course" && <CoursePanel {...panel} />}
       {panel && tab === "about" && <AboutPanel {...panel} />}
+      {panel && tab === "stats" && <StatsPanel {...panel} />}
       {panel && tab === "faqs" && <FaqPanel {...panel} />}
       {panel && tab === "privacy" && <PrivacyPanel {...panel} />}
     </div>

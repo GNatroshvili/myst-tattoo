@@ -92,6 +92,14 @@ export function errorText(err: unknown): string {
       return "კითხვა ორივე ენაზე შეავსე: ქართულად და ინგლისურად.";
     case "answer_missing":
       return "პასუხი ერთ ენაზე მაინც დაწერე.";
+    case "stat_value_missing":
+      return "ჩაწერე რიცხვი.";
+    case "stat_label_both_languages":
+      return "წარწერა ორივე ენაზე შეავსე: ქართულად და ინგლისურად.";
+    case "too_many_stats":
+      return `მთავარ გვერდზე მაქსიმუმ ${err.details?.max ?? 4} მიღწევა ეტევა. ახლის დასამატებლად ჯერ ერთ-ერთი წაშალე.`;
+    case "stats_bad_order":
+      return "მიღწევების სია სხვაგან შეიცვალა. სია განახლდა: სცადე თავიდან.";
     case "about_body_missing":
       return "სექციის ტექსტი ერთ ენაზე მაინც დაწერე.";
     case "about_bad_order":

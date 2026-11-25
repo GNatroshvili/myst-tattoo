@@ -112,6 +112,15 @@ export type Course = {
   updatedAt: string;
 };
 
+/** One of the figures the home page shows about the studio. One record serves both sites. */
+export type Stat = {
+  id: string;
+  /** the figure as the site shows it, the same on both sites: "700+", "5,000+" */
+  value: string;
+  /** the line under the figure: "Reviews on Google" */
+  label: Localized;
+};
+
 /** One of the home page's frequently asked questions. One record serves both sites. */
 export type Faq = {
   id: string;
