@@ -54,9 +54,10 @@ export function PiercingWorks({
       </p>
 
       <div className="work-grid mt-3.5">
-        {shown.map((piercing) => (
+        {shown.map((piercing, i) => (
           <WorkTile
             key={piercing.id}
+            order={i}
             photo={piercing.image}
             aria={piercingAlt(piercing, t, lang)}
             title={piercing.place ? localized(piercing.place.name, lang) : ""}

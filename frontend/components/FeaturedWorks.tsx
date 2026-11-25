@@ -6,6 +6,7 @@ import type { Dictionary } from "@/lib/i18n/dictionaries/en";
 import { tattooAlt } from "@/lib/tattoos";
 import { localized } from "@/lib/types";
 import { FeaturedSlider } from "./FeaturedSlider";
+import { Reveal } from "./motion/Reveal";
 import { StarRule } from "./StarRule";
 import { ArrowRightIcon } from "./ui/Icons";
 import { WorkTile } from "./WorkTile";
@@ -34,9 +35,10 @@ async function Featured({ lang, dict }: Props) {
   const gallery = localePath(lang, "/tattoos");
   const t = dict.featured;
 
-  const tiles = tattoos.map((tattoo) => (
+  const tiles = tattoos.map((tattoo, i) => (
     <WorkTile
       key={tattoo.id}
+      order={i}
       photo={tattoo.image}
       aria={`${t.openGallery}: ${tattooAlt(tattoo, dict.tattoos, lang)}`}
       title={tattoo.style ? localized(tattoo.style.name, lang) : ""}
@@ -69,7 +71,7 @@ function Section({ lang, dict, children }: Props & { children: React.ReactNode }
 
   return (
     <section id="featured" aria-labelledby={titleId} className="scroll-mt-6 pt-16 lg:pt-[84px]">
-      <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-4 lg:pl-5">
+      <Reveal className="flex flex-wrap items-end justify-between gap-x-8 gap-y-4 lg:pl-5">
         <div>
           <p className="caps eyebrow">{displayCase(t.eyebrow, lang)}</p>
           <h2
@@ -84,7 +86,7 @@ function Section({ lang, dict, children }: Props & { children: React.ReactNode }
         <Link href={localePath(lang, "/tattoos")} className="link-arrow min-h-11 gap-3 text-[17px]">
           {t.viewAll} <ArrowRightIcon className="h-3 w-[18px]" />
         </Link>
-      </div>
+      </Reveal>
       {children}
     </section>
   );

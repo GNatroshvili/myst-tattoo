@@ -2,6 +2,7 @@ import { useId } from "react";
 import Link from "next/link";
 import { displayCase, localePath, type Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/dictionaries/en";
+import { Reveal } from "./motion/Reveal";
 import { ArrowRightIcon } from "./ui/Icons";
 import { VoucherCard } from "./VoucherCard";
 
@@ -10,7 +11,8 @@ export function GiftVouchers({ lang, t }: { lang: Locale; t: Dictionary["voucher
   const id = useId();
 
   return (
-    <section
+    <Reveal
+      as="section"
       id="vouchers"
       aria-labelledby={`${id}-title`}
       className="voucher-panel relative isolate mt-14 grid min-h-[220px] scroll-mt-6 grid-cols-[minmax(0,1fr)] items-center justify-items-center gap-y-7 overflow-hidden px-6 py-9 text-center md:grid-cols-[minmax(0,1fr)_auto] md:justify-items-start md:gap-x-7 md:gap-y-6 md:pl-[52px] md:pr-11 md:text-left lg:mt-16 lg:grid-cols-[minmax(0,440px)_auto_auto] lg:justify-between"
@@ -36,6 +38,6 @@ export function GiftVouchers({ lang, t }: { lang: Locale; t: Dictionary["voucher
       >
         {t.cta} <ArrowRightIcon className="h-3 w-[18px]" />
       </Link>
-    </section>
+    </Reveal>
   );
 }

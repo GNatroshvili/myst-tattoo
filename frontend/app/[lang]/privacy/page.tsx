@@ -177,7 +177,7 @@ export default async function PrivacyPage() {
       <div className="container-x">
         <Header lang={lang} nav={dict.nav} common={dict.common} switcherLabel={dict.langSwitcher.aria} />
         <main>
-          <section className="pt-10 sm:pt-16 lg:pl-5">
+          <section className="enter pt-10 sm:pt-16 lg:pl-5">
             <p className="caps eyebrow">{displayCase(t.eyebrow, lang)}</p>
             {/* the Georgian title has a nineteen-letter word in it: sized so that word fits a phone's width */}
             <h1

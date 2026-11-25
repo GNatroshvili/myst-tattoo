@@ -1,5 +1,6 @@
 import { useId, type ReactNode } from "react";
 import { displayCase, type Locale } from "@/lib/i18n/config";
+import { Reveal } from "./motion/Reveal";
 
 type Props = {
   lang: Locale;
@@ -20,7 +21,8 @@ export function CtaPanel({ lang, titleLine1, titleLine2, text, className = "", c
   const titleId = useId();
 
   return (
-    <section
+    <Reveal
+      as="section"
       id="book"
       aria-labelledby={titleId}
       className={`voucher-panel relative isolate flex min-h-[220px] scroll-mt-6 flex-wrap items-center justify-between gap-x-7 gap-y-6 overflow-hidden px-6 py-9 md:pl-[52px] md:pr-11 ${className}`}
@@ -39,6 +41,6 @@ export function CtaPanel({ lang, titleLine1, titleLine2, text, className = "", c
       </div>
 
       {children}
-    </section>
+    </Reveal>
   );
 }

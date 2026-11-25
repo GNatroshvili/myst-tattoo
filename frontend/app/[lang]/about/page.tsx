@@ -7,6 +7,7 @@ import { CtaPanel } from "@/components/CtaPanel";
 import { EmptyNote } from "@/components/EmptyNote";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
+import { Reveal } from "@/components/motion/Reveal";
 import { PageIntro } from "@/components/PageIntro";
 import { ArrowUpRightIcon } from "@/components/ui/Icons";
 import { getAboutSections } from "@/lib/api";
@@ -49,7 +50,11 @@ async function Sections({ lang, t }: Copy) {
       {sections.map((section, i) => {
         const title = localized(section.title, lang);
         return (
-          <article key={section.id} className={`${row} ${i % 2 ? "lg:flex-row-reverse" : "lg:flex-row"}`}>
+          <Reveal
+            as="article"
+            key={section.id}
+            className={`${row} ${i % 2 ? "lg:flex-row-reverse" : "lg:flex-row"}`}
+          >
             <div role="img" aria-label={t.photoAria.replace("{number}", String(i + 1))} className={frame}>
               {/* Already sized and compressed by the backend. */}
               <Image
@@ -87,7 +92,7 @@ async function Sections({ lang, t }: Copy) {
                 </p>
               ))}
             </div>
-          </article>
+          </Reveal>
         );
       })}
     </section>

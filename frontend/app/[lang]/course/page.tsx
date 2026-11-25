@@ -7,6 +7,7 @@ import { CourseSignup } from "@/components/CourseSignup";
 import { EmptyNote } from "@/components/EmptyNote";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
+import { Reveal } from "@/components/motion/Reveal";
 import { StarRule } from "@/components/StarRule";
 import { ArrowRightIcon, CalendarIcon } from "@/components/ui/Icons";
 import { getCourse } from "@/lib/api";
@@ -54,7 +55,8 @@ function Photos({ photos, t }: { photos: CoursePhoto[]; t: Dictionary["course"] 
   if (!layout) return null;
 
   return (
-    <section
+    <Reveal
+      as="section"
       aria-label={t.photosAria}
       className="mt-10 grid grid-cols-6 gap-2.5 sm:mt-12 sm:auto-rows-[clamp(150px,19.6vw,250px)] sm:grid-cols-4 sm:gap-4"
     >
@@ -79,7 +81,7 @@ function Photos({ photos, t }: { photos: CoursePhoto[]; t: Dictionary["course"] 
           />
         </div>
       ))}
-    </section>
+    </Reveal>
   );
 }
 
@@ -87,13 +89,13 @@ function Photos({ photos, t }: { photos: CoursePhoto[]; t: Dictionary["course"] 
 function Intro({ lang, t, title, children }: Copy & { title: string; children?: ReactNode }) {
   return (
     <section className="pt-10 sm:pt-16 lg:pl-5">
-      <p className="caps eyebrow">{displayCase(t.eyebrow, lang)}</p>
+      <p className="caps eyebrow enter">{displayCase(t.eyebrow, lang)}</p>
       {/* an admin's title can be long: a little smaller than the other pages', and balanced */}
-      <h1 className="display mt-[22px] max-w-[940px] text-balance break-words text-[length:calc(clamp(34px,9.4vw,40px)*var(--display-scale))] leading-[1.06] tracking-[0.5px] text-cream sm:text-[length:calc(clamp(40px,4.8vw,62px)*var(--display-scale))]">
+      <h1 className="display enter enter-1 mt-[22px] max-w-[940px] text-balance break-words text-[length:calc(clamp(34px,9.4vw,40px)*var(--display-scale))] leading-[1.06] tracking-[0.5px] text-cream sm:text-[length:calc(clamp(40px,4.8vw,62px)*var(--display-scale))]">
         {displayCase(title, lang)}
       </h1>
       {children}
-      <StarRule className="-ml-1.5 mt-6" star="h-[30px] w-[30px]" />
+      <StarRule className="enter enter-3 -ml-1.5 mt-6" star="h-[30px] w-[30px]" />
     </section>
   );
 }
@@ -120,7 +122,7 @@ async function CourseContent({ lang, t }: Copy) {
   return (
     <>
       <Intro lang={lang} t={t} title={title}>
-        <p className="caps mt-5 flex items-center gap-2.5 text-[12px] leading-[22px] tracking-[2.4px] text-muted sm:text-[14px] sm:tracking-[3.2px]">
+        <p className="caps enter enter-2 mt-5 flex items-center gap-2.5 text-[12px] leading-[22px] tracking-[2.4px] text-muted sm:text-[14px] sm:tracking-[3.2px]">
           <CalendarIcon className="h-[18px] w-[18px] shrink-0" strokeWidth={1.6} />
           <span>
             {displayCase(t.published, lang)}:{" "}
@@ -135,7 +137,7 @@ async function CourseContent({ lang, t }: Copy) {
 
       {/* The text in a column of reading width. Wide screens put its label in
           the margin beside it, with a button down to the sign-up panel. */}
-      <div className="grid grid-cols-[minmax(0,1fr)] gap-x-14 gap-y-6 pt-10 sm:pt-14 lg:grid-cols-[260px_minmax(0,720px)] lg:pl-5">
+      <Reveal className="grid grid-cols-[minmax(0,1fr)] gap-x-14 gap-y-6 pt-10 sm:pt-14 lg:grid-cols-[260px_minmax(0,720px)] lg:pl-5">
         <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-4 lg:flex-col lg:items-start lg:justify-start lg:pt-1.5">
           <h2 className="caps label-caps text-gold">{displayCase(t.about, lang)}</h2>
           <a href="#signup" className="btn btn-outline-gold btn-sm">
@@ -156,15 +158,16 @@ async function CourseContent({ lang, t }: Copy) {
             </p>
           ))}
         </article>
-      </div>
+      </Reveal>
 
-      <CourseSignup
-        lang={lang}
-        course={title}
-        instagramUrl={instagramDmUrl(site.instagram[0].handle)}
-        t={t.signup}
-        className="mt-14 sm:mt-[72px]"
-      />
+      <Reveal className="mt-14 sm:mt-[72px]">
+        <CourseSignup
+          lang={lang}
+          course={title}
+          instagramUrl={instagramDmUrl(site.instagram[0].handle)}
+          t={t.signup}
+        />
+      </Reveal>
     </>
   );
 }

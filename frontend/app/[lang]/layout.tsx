@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 import { hasLocale, locales, localeTags } from "@/lib/i18n/config";
 import { dictionaryFor } from "@/lib/i18n";
+import { MotionProvider } from "@/components/motion/MotionProvider";
 import { fontVariables } from "../fonts";
 import "../globals.css";
 
@@ -40,7 +41,14 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
 
   return (
     <html lang={lang} className={fontVariables}>
-      <body className="min-h-dvh">{children}</body>
+      <body className="min-h-dvh">
+        {/* Parts that reveal on scroll are transparent until a script shows them:
+            without scripts they are simply shown. */}
+        <noscript>
+          <style>{"[data-reveal]{opacity:1!important;transform:none!important}"}</style>
+        </noscript>
+        <MotionProvider>{children}</MotionProvider>
+      </body>
     </html>
   );
 }

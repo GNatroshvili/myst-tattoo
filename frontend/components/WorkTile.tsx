@@ -1,4 +1,6 @@
+import { cascade } from "@/lib/cascade";
 import type { Photo } from "@/lib/types";
+import { Reveal } from "./motion/Reveal";
 import { PhotoFrame } from "./PhotoFrame";
 import { TattooIcon } from "./ui/Icons";
 
@@ -19,6 +21,8 @@ type Props = {
   href?: string;
   /** the placeholder's colouring; the piercing gallery uses "wine" */
   tone?: "dark" | "wine";
+  /** where the tile stands in its grid, from 0: tiles of one row then arrive one after another */
+  order?: number;
 };
 
 /**
@@ -26,6 +30,9 @@ type Props = {
  * tile is 3:4, whatever the photo's own shape; a photo of another shape is
  * cropped to fit (the tattoo details window shows it whole). Under the mouse
  * the whole tile grows a touch, over 0.2s.
+ *
+ * A tile fades in and rises into place when it is scrolled to. That happens
+ * on a wrapper around it, so it does not interfere with the growing.
  */
 export function WorkTile({
   aria,
@@ -36,23 +43,26 @@ export function WorkTile({
   onOpen,
   href,
   tone = "dark",
+  order = 0,
 }: Props) {
   return (
-    <figure className="transition-transform duration-200 hover:scale-[1.03]">
-      <PhotoFrame
-        ratio="3 / 4"
-        aria={aria}
-        photo={photo}
-        label={photoLabel}
-        icon={<TattooIcon className={`h-10 w-10 ${tone === "wine" ? "text-[#d9a3be]" : "text-rose"}`} />}
-        onClick={onOpen}
-        href={href}
-        tone={tone}
-      />
-      <figcaption className="flex flex-wrap items-baseline justify-between gap-x-2.5 gap-y-0.5 px-1 pt-2.5">
-        <span className="text-[15px] font-medium leading-5 text-cream">{title}</span>
-        {note && <span className="text-[13px] leading-5 text-muted">{note}</span>}
-      </figcaption>
-    </figure>
+    <Reveal delay={cascade(order, 0.06)}>
+      <figure className="transition-transform duration-200 hover:scale-[1.03]">
+        <PhotoFrame
+          ratio="3 / 4"
+          aria={aria}
+          photo={photo}
+          label={photoLabel}
+          icon={<TattooIcon className={`h-10 w-10 ${tone === "wine" ? "text-[#d9a3be]" : "text-rose"}`} />}
+          onClick={onOpen}
+          href={href}
+          tone={tone}
+        />
+        <figcaption className="flex flex-wrap items-baseline justify-between gap-x-2.5 gap-y-0.5 px-1 pt-2.5">
+          <span className="text-[15px] font-medium leading-5 text-cream">{title}</span>
+          {note && <span className="text-[13px] leading-5 text-muted">{note}</span>}
+        </figcaption>
+      </figure>
+    </Reveal>
   );
 }
