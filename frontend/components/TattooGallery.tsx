@@ -108,6 +108,7 @@ export function TattooGallery({ lang, t, tattoos }: Props) {
         {shown.map((tattoo, position) => (
           <WorkTile
             key={tattoo.id}
+            order={position}
             photo={tattoo.image}
             aria={`${t.modal.open}: ${tattooAlt(tattoo, t, lang)}`}
             title={tattoo.style ? localized(tattoo.style.name, lang) : ""}

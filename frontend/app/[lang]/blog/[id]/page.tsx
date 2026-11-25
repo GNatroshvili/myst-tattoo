@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { Backdrop } from "@/components/Backdrop";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
+import { Reveal } from "@/components/motion/Reveal";
 import { SectionDivider } from "@/components/SectionDivider";
 import { ArrowLeftIcon } from "@/components/ui/Icons";
 import { getBlogPost } from "@/lib/api";
@@ -63,7 +64,7 @@ export default async function BlogArticlePage({ params }: PageProps<"/[lang]/blo
           </Link>
 
           <article className="mx-auto max-w-[860px] pt-[26px]">
-            <header className="text-center">
+            <header className="enter text-center">
               {topic && <p className="caps label-caps text-gold">{displayCase(topic, lang)}</p>}
               <p className="caps mt-3 text-[15px] leading-[22px] tracking-[3.2px] text-muted">
                 <time dateTime={post.createdAt}>{displayCase(postDate(post.createdAt, lang), lang)}</time>
@@ -77,7 +78,7 @@ export default async function BlogArticlePage({ params }: PageProps<"/[lang]/blo
 
             {/* The frame describes nothing by itself: the title above already
                 says what the article is about. */}
-            <div className="relative mt-10 aspect-video w-full overflow-hidden rounded-[18px] border border-cream/16 bg-[linear-gradient(160deg,#24131b_0%,#150e11_55%,#0e0b0c_100%)]">
+            <div className="enter enter-2 relative mt-10 aspect-video w-full overflow-hidden rounded-[18px] border border-cream/16 bg-[linear-gradient(160deg,#24131b_0%,#150e11_55%,#0e0b0c_100%)]">
               <Image
                 src={post.image.full}
                 alt=""
@@ -89,7 +90,7 @@ export default async function BlogArticlePage({ params }: PageProps<"/[lang]/blo
               />
             </div>
 
-            <div className="mx-auto max-w-[720px] pt-9">
+            <Reveal className="mx-auto max-w-[720px] pt-9">
               {paragraphs(postBody(post, lang)).map((paragraph, i) => (
                 <p
                   key={i}
@@ -100,7 +101,7 @@ export default async function BlogArticlePage({ params }: PageProps<"/[lang]/blo
                   {paragraph}
                 </p>
               ))}
-            </div>
+            </Reveal>
           </article>
         </main>
         <Footer lang={lang} dict={dict} />

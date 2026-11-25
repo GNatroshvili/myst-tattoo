@@ -6,6 +6,7 @@ import type { Dictionary } from "@/lib/i18n/dictionaries/en";
 import { instagramDmUrl, site } from "@/lib/site";
 import { whatsappUrl } from "@/lib/whatsapp";
 import { IdeaForm, IdeaFormSkeleton } from "./IdeaForm";
+import { Reveal } from "./motion/Reveal";
 import { SectionDivider } from "./SectionDivider";
 
 type FormCopy = Dictionary["form"];
@@ -32,29 +33,35 @@ export function IdeaSection({ lang, dict }: { lang: Locale; dict: Dictionary }) 
 
   return (
     <section id="idea" aria-labelledby={titleId} className="scroll-mt-4 pt-16 lg:pt-[76px]">
-      <SectionDivider />
+      <Reveal>
+        <SectionDivider />
 
-      <h2
-        id={titleId}
-        className="display mt-[22px] text-balance text-center text-[length:calc(clamp(36px,4vw,52px)*var(--display-scale))] leading-[1.04] tracking-[0.5px] text-cream"
-      >
-        {displayCase(t.title, lang)}
-      </h2>
-      <p className="mx-auto mt-4 max-w-[480px] text-center text-[17px] font-light leading-[25px] text-body">
-        {t.lead}
-      </p>
+        <h2
+          id={titleId}
+          className="display mt-[22px] text-balance text-center text-[length:calc(clamp(36px,4vw,52px)*var(--display-scale))] leading-[1.04] tracking-[0.5px] text-cream"
+        >
+          {displayCase(t.title, lang)}
+        </h2>
+        <p className="mx-auto mt-4 max-w-[480px] text-center text-[17px] font-light leading-[25px] text-body">
+          {t.lead}
+        </p>
+      </Reveal>
 
       {/* explicit minmax(0,…) tracks so the day picker scrolls instead of widening the form */}
       <div className="mx-auto mt-[34px] grid max-w-[960px] grid-cols-[minmax(0,1fr)] items-start gap-[26px] md:grid-cols-[minmax(0,11fr)_minmax(0,9fr)]">
-        <Suspense fallback={<IdeaFormSkeleton />}>
-          <IdeaFormWithDays lang={lang} t={dict.form} />
-        </Suspense>
+        <Reveal className="min-w-0">
+          <Suspense fallback={<IdeaFormSkeleton />}>
+            <IdeaFormWithDays lang={lang} t={dict.form} />
+          </Suspense>
+        </Reveal>
 
         <div className="flex min-w-0 flex-col gap-2.5">
           <ol className="flex flex-col gap-2.5">
             {t.steps.map((step, i) => (
-              <li
+              <Reveal
+                as="li"
                 key={step.title}
+                delay={0.1 + i * 0.08}
                 className="flex min-h-[76px] items-center gap-[18px] rounded-[14px] border border-cream/14 bg-surface px-5 py-3.5"
               >
                 <span
@@ -67,11 +74,14 @@ export function IdeaSection({ lang, dict }: { lang: Locale; dict: Dictionary }) 
                   <h3 className="text-[16px] font-medium leading-[22px] text-cream">{step.title}</h3>
                   <p className="mt-[3px] text-[14px] font-light leading-5 text-body">{step.text}</p>
                 </div>
-              </li>
+              </Reveal>
             ))}
           </ol>
 
-          <div className="rounded-[14px] border border-cream/16 bg-[radial-gradient(90%_160%_at_85%_80%,rgba(125,46,85,0.72),rgba(125,46,85,0)_72%),linear-gradient(90deg,#120c0e,#170d12)] px-6 pb-6 pt-[22px] sm:px-7">
+          <Reveal
+            delay={0.34}
+            className="rounded-[14px] border border-cream/16 bg-[radial-gradient(90%_160%_at_85%_80%,rgba(125,46,85,0.72),rgba(125,46,85,0)_72%),linear-gradient(90deg,#120c0e,#170d12)] px-6 pb-6 pt-[22px] sm:px-7"
+          >
             <h3 className="text-[16px] leading-[22px] text-cream">{t.directTitle}</h3>
             <div className="mt-4 flex flex-wrap gap-x-3 gap-y-2.5">
               <a
@@ -91,7 +101,7 @@ export function IdeaSection({ lang, dict }: { lang: Locale; dict: Dictionary }) 
                 {t.instagramDm}
               </a>
             </div>
-          </div>
+          </Reveal>
         </div>
       </div>
     </section>

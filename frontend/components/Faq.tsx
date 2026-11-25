@@ -5,6 +5,7 @@ import type { Dictionary } from "@/lib/i18n/dictionaries/en";
 import { localized } from "@/lib/types";
 import { whatsappUrl } from "@/lib/whatsapp";
 import { FaqList } from "./FaqList";
+import { Reveal } from "./motion/Reveal";
 import { StarRule } from "./StarRule";
 import { ArrowUpRightIcon } from "./ui/Icons";
 
@@ -43,7 +44,7 @@ function Section({ lang, dict, children }: Props & { children: ReactNode }) {
       aria-labelledby={titleId}
       className="grid scroll-mt-6 grid-cols-[minmax(0,1fr)] gap-y-9 pt-16 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-x-16 lg:pl-5 lg:pt-[84px]"
     >
-      <div>
+      <Reveal>
         <p className="caps eyebrow">{displayCase(t.eyebrow, lang)}</p>
         <h2
           id={titleId}
@@ -61,8 +62,10 @@ function Section({ lang, dict, children }: Props & { children: ReactNode }) {
         >
           {t.ask} <ArrowUpRightIcon className="h-[13px] w-[13px]" />
         </a>
-      </div>
-      {children}
+      </Reveal>
+      <Reveal delay={0.12} className="min-w-0">
+        {children}
+      </Reveal>
     </section>
   );
 }

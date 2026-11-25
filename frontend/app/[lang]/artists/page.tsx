@@ -6,10 +6,12 @@ import { CtaPanel } from "@/components/CtaPanel";
 import { EmptyNote } from "@/components/EmptyNote";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
+import { Reveal } from "@/components/motion/Reveal";
 import { PageIntro } from "@/components/PageIntro";
 import { PhotoFrame } from "@/components/PhotoFrame";
 import { ArrowRightIcon, PersonIcon } from "@/components/ui/Icons";
 import { getArtists } from "@/lib/api";
+import { cascade } from "@/lib/cascade";
 import { dictionaryFor, getDictionary, type Dictionary, type Locale } from "@/lib/i18n";
 import { displayCase, hasLocale, localePath } from "@/lib/i18n/config";
 import { instagramHandle, localized } from "@/lib/types";
@@ -33,7 +35,7 @@ async function ArtistsGrid({ lang, t }: { lang: Locale; t: Dictionary["artists"]
 
   return (
     <section aria-label={t.gridAria} className={grid}>
-      {artists.map((artist) => {
+      {artists.map((artist, i) => {
         const profile = localePath(lang, `/artists/${artist.slug}`);
         const name = localized(artist.nickname, lang);
         const bio = localized(artist.bio, lang);
@@ -41,51 +43,51 @@ async function ArtistsGrid({ lang, t }: { lang: Locale; t: Dictionary["artists"]
         const tags = artist.styles.map((style) => localized(style.name, lang));
         if (artist.piercingCount) tags.push(t.piercingTag);
         return (
-          // like the gallery tiles, the card grows a touch under the mouse
-          <article
-            key={artist.id}
-            className="flex flex-col transition-transform duration-200 hover:scale-[1.03]"
-          >
-            <PhotoFrame
-              ratio="3 / 4"
-              aria={`${t.openProfile}: ${name}`}
-              photo={artist.photo}
-              label={displayCase(t.photoLabel, lang)}
-              icon={<PersonIcon className="h-11 w-11 text-rose" />}
-              href={profile}
-            />
-            <div className="flex flex-wrap items-baseline justify-between gap-x-2.5 gap-y-0.5 px-1 pt-3">
-              <h2 className="text-[18px] font-medium leading-6 text-cream">{name}</h2>
-              <span className="text-[13px] leading-5 text-muted">
-                {tags.join(" / ")}
-              </span>
-            </div>
-            {bio && (
-              <p className="mx-1 mt-2 line-clamp-3 text-[14.5px] font-light leading-[22px] text-body">
-                {bio}
-              </p>
-            )}
-            {artist.instagramUrl && (
-              <a
-                href={artist.instagramUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="ml-1 inline-flex min-h-11 items-center self-start text-[14.5px] text-cream transition-colors hover:text-gold"
-              >
-                {instagramHandle(artist.instagramUrl)}
-              </a>
-            )}
-            {/* pinned to the bottom so the buttons line up across a row of cards */}
-            <div className="mt-auto flex flex-wrap items-center justify-between gap-x-[18px] gap-y-2 px-1 pt-1">
-              <Link href={profile} className="link-arrow h-11 gap-2.5 text-[15px]">
-                {t.viewProfile}
-                <ArrowRightIcon className="h-3 w-[18px]" />
-              </Link>
-              <a href="#book" className="btn btn-outline-gold btn-sm">
-                {t.book}
-              </a>
-            </div>
-          </article>
+          // Like the gallery tiles, the card grows a touch under the mouse. It
+          // reveals on a wrapper of its own, which leaves that growing alone.
+          <Reveal key={artist.id} delay={cascade(i)} className="flex min-w-0">
+            <article className="flex w-full min-w-0 flex-col transition-transform duration-200 hover:scale-[1.03]">
+              <PhotoFrame
+                ratio="3 / 4"
+                aria={`${t.openProfile}: ${name}`}
+                photo={artist.photo}
+                label={displayCase(t.photoLabel, lang)}
+                icon={<PersonIcon className="h-11 w-11 text-rose" />}
+                href={profile}
+              />
+              <div className="flex flex-wrap items-baseline justify-between gap-x-2.5 gap-y-0.5 px-1 pt-3">
+                <h2 className="text-[18px] font-medium leading-6 text-cream">{name}</h2>
+                <span className="text-[13px] leading-5 text-muted">
+                  {tags.join(" / ")}
+                </span>
+              </div>
+              {bio && (
+                <p className="mx-1 mt-2 line-clamp-3 text-[14.5px] font-light leading-[22px] text-body">
+                  {bio}
+                </p>
+              )}
+              {artist.instagramUrl && (
+                <a
+                  href={artist.instagramUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="ml-1 inline-flex min-h-11 items-center self-start text-[14.5px] text-cream transition-colors hover:text-gold"
+                >
+                  {instagramHandle(artist.instagramUrl)}
+                </a>
+              )}
+              {/* pinned to the bottom so the buttons line up across a row of cards */}
+              <div className="mt-auto flex flex-wrap items-center justify-between gap-x-[18px] gap-y-2 px-1 pt-1">
+                <Link href={profile} className="link-arrow h-11 gap-2.5 text-[15px]">
+                  {t.viewProfile}
+                  <ArrowRightIcon className="h-3 w-[18px]" />
+                </Link>
+                <a href="#book" className="btn btn-outline-gold btn-sm">
+                  {t.book}
+                </a>
+              </div>
+            </article>
+          </Reveal>
         );
       })}
     </section>

@@ -1,18 +1,16 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
 import { Backdrop } from "@/components/Backdrop";
-import { CtaPanel } from "@/components/CtaPanel";
 import { EmptyNote } from "@/components/EmptyNote";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
+import { Reveal } from "@/components/motion/Reveal";
 import { PageIntro } from "@/components/PageIntro";
-import { ArrowUpRightIcon } from "@/components/ui/Icons";
 import { getAboutSections } from "@/lib/api";
 import { paragraphs } from "@/lib/blog";
 import { dictionaryFor, getDictionary, type Dictionary, type Locale } from "@/lib/i18n";
-import { displayCase, hasLocale, localePath } from "@/lib/i18n/config";
+import { displayCase, hasLocale } from "@/lib/i18n/config";
 import { localized } from "@/lib/types";
 
 export async function generateMetadata({ params }: PageProps<"/[lang]/about">): Promise<Metadata> {
@@ -49,7 +47,11 @@ async function Sections({ lang, t }: Copy) {
       {sections.map((section, i) => {
         const title = localized(section.title, lang);
         return (
-          <article key={section.id} className={`${row} ${i % 2 ? "lg:flex-row-reverse" : "lg:flex-row"}`}>
+          <Reveal
+            as="article"
+            key={section.id}
+            className={`${row} ${i % 2 ? "lg:flex-row-reverse" : "lg:flex-row"}`}
+          >
             <div role="img" aria-label={t.photoAria.replace("{number}", String(i + 1))} className={frame}>
               {/* Already sized and compressed by the backend. */}
               <Image
@@ -87,7 +89,7 @@ async function Sections({ lang, t }: Copy) {
                 </p>
               ))}
             </div>
-          </article>
+          </Reveal>
         );
       })}
     </section>
@@ -129,23 +131,6 @@ export default async function AboutPage() {
           <Suspense fallback={<SectionsSkeleton />}>
             <Sections lang={lang} t={t} />
           </Suspense>
-
-          <CtaPanel
-            lang={lang}
-            titleLine1={t.ctaTitleLine1}
-            titleLine2={t.ctaTitleLine2}
-            text={t.ctaText}
-            className="mt-16 lg:mt-24"
-          >
-            <div className="relative flex flex-wrap gap-x-4 gap-y-3">
-              <Link href={localePath(lang, "/artists")} className="btn btn-outline">
-                {dict.common.ourArtists}
-              </Link>
-              <Link href={localePath(lang, "#idea")} className="btn btn-gold">
-                {dict.common.bookAppointment} <ArrowUpRightIcon className="h-[13px] w-[13px]" />
-              </Link>
-            </div>
-          </CtaPanel>
         </main>
         <Footer lang={lang} dict={dict} />
       </div>

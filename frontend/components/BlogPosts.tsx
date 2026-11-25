@@ -8,6 +8,8 @@ import type { Dictionary } from "@/lib/i18n/dictionaries/en";
 import type { Photo } from "@/lib/types";
 import { EmptyNote } from "./EmptyNote";
 import { FilterChip } from "./FilterChip";
+import { cascade } from "@/lib/cascade";
+import { Reveal } from "./motion/Reveal";
 import { PhotoFrame } from "./PhotoFrame";
 import { ArrowRightIcon, ImageIcon } from "./ui/Icons";
 
@@ -77,7 +79,8 @@ export function BlogPosts({ lang, t, posts, topics }: Props) {
       )}
 
       {latest && (
-        <article
+        <Reveal
+          as="article"
           className={`flex flex-wrap items-stretch overflow-hidden rounded-[18px] border border-cream/16 bg-surface ${
             topics.length > 1 ? "mt-9" : "mt-[52px]"
           }`}
@@ -113,7 +116,7 @@ export function BlogPosts({ lang, t, posts, topics }: Props) {
               </Link>
             </div>
           </div>
-        </article>
+        </Reveal>
       )}
 
       <p aria-live="polite" className="ml-1 mt-[30px] text-[14px] leading-5 text-muted">
@@ -125,8 +128,8 @@ export function BlogPosts({ lang, t, posts, topics }: Props) {
           aria-label={t.articlesAria}
           className="mt-4 grid grid-cols-[repeat(auto-fill,minmax(min(300px,100%),1fr))] gap-x-6 gap-y-10"
         >
-          {inGrid.map((post) => (
-            <article key={post.slug} className="flex flex-col">
+          {inGrid.map((post, i) => (
+            <Reveal as="article" key={post.slug} delay={cascade(i)} className="flex flex-col">
               <PhotoFrame
                 ratio="4 / 3"
                 aria={`${t.openArticle}: ${post.title}`}
@@ -152,7 +155,7 @@ export function BlogPosts({ lang, t, posts, topics }: Props) {
                   {t.read} <ArrowRightIcon className="h-3 w-[18px]" />
                 </Link>
               </div>
-            </article>
+            </Reveal>
           ))}
         </section>
       )}

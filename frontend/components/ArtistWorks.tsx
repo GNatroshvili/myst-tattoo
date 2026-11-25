@@ -51,9 +51,10 @@ export function ArtistWorks({ lang, t, tattoosCopy, tattoos }: Props) {
       </p>
 
       <div className="work-grid mt-3.5">
-        {shown.map((tattoo) => (
+        {shown.map((tattoo, i) => (
           <WorkTile
             key={tattoo.id}
+            order={i}
             photo={tattoo.image}
             aria={tattooAlt(tattoo, tattoosCopy, lang)}
             title={tattoo.style ? localized(tattoo.style.name, lang) : ""}

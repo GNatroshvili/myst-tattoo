@@ -15,7 +15,7 @@ export default async function NotFound() {
       <Backdrop scope="404" />
       <div className="container-x">
         <Header lang={lang} nav={dict.nav} common={dict.common} switcherLabel={dict.langSwitcher.aria} />
-        <main className="flex min-h-[52vh] flex-col items-center justify-center py-20 text-center">
+        <main className="enter flex min-h-[52vh] flex-col items-center justify-center py-20 text-center">
           <SectionDivider />
           <p className="eyebrow mt-6">404</p>
           <h1 className="display mt-[22px] text-[length:calc(clamp(40px,7vw,66px)*var(--display-scale))] leading-[1.04] tracking-[0.5px] text-cream">

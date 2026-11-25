@@ -6,6 +6,7 @@ import { CtaPanel } from "@/components/CtaPanel";
 import { EmptyNote } from "@/components/EmptyNote";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
+import { Reveal } from "@/components/motion/Reveal";
 import { PageIntro } from "@/components/PageIntro";
 import { PiercingPrices } from "@/components/PiercingPrices";
 import { PiercingWorks } from "@/components/PiercingWorks";
@@ -86,21 +87,25 @@ export default async function PiercingPage() {
         <main>
           <PageIntro lang={lang} eyebrow={t.eyebrow} title={t.title} subtitle={t.subtitle} />
 
-          <Suspense fallback={<PricesSkeleton />}>
-            <Prices lang={lang} t={t} />
-          </Suspense>
+          <Reveal>
+            <Suspense fallback={<PricesSkeleton />}>
+              <Prices lang={lang} t={t} />
+            </Suspense>
+          </Reveal>
 
           <section id="works" aria-labelledby="works-title" className="scroll-mt-6 pt-16 lg:pt-[84px]">
-            <SectionDivider />
-            <h2
-              id="works-title"
-              className="display mt-5 text-balance text-center text-[length:calc(clamp(42px,5vw,64px)*var(--display-scale))] leading-[1.04] tracking-[1px] text-cream"
-            >
-              {displayCase(t.worksTitle, lang)}
-            </h2>
-            <p className="mx-auto mt-3.5 max-w-[470px] text-center text-[17px] font-light leading-[25px] text-body">
-              {t.worksLead}
-            </p>
+            <Reveal>
+              <SectionDivider />
+              <h2
+                id="works-title"
+                className="display mt-5 text-balance text-center text-[length:calc(clamp(42px,5vw,64px)*var(--display-scale))] leading-[1.04] tracking-[1px] text-cream"
+              >
+                {displayCase(t.worksTitle, lang)}
+              </h2>
+              <p className="mx-auto mt-3.5 max-w-[470px] text-center text-[17px] font-light leading-[25px] text-body">
+                {t.worksLead}
+              </p>
+            </Reveal>
 
             <Suspense fallback={<WorksSkeleton />}>
               <Works lang={lang} t={t} />

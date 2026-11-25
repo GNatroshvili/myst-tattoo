@@ -3,6 +3,8 @@ import { getStats } from "@/lib/api";
 import { displayCase, type Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/dictionaries/en";
 import { localized } from "@/lib/types";
+import { cascade } from "@/lib/cascade";
+import { Reveal } from "./motion/Reveal";
 import { StatNumber } from "./StatNumber";
 
 type Props = { lang: Locale; dict: Dictionary };
@@ -35,19 +37,23 @@ async function Figures({ lang, dict }: Props) {
   return (
     <section id="numbers" aria-label={dict.stats.aria} className={band}>
       <ul className={`${row} ${columns[stats.length]}`}>
-        {stats.map((stat) => (
-          <li
+        {stats.map((stat, i) => (
+          <Reveal
+            as="li"
             key={stat.id}
+            delay={cascade(i, 0.1)}
             className="flex min-w-0 flex-col items-center px-2 text-center sm:px-5"
           >
-            {/* three share a phone's width: smaller there, so "5,000+" still fits its column */}
-            <p className="display text-[length:clamp(34px,10.5vw,58px)] leading-none tracking-[0.5px] text-cream md:text-[length:clamp(58px,6.6vw,84px)]">
+            {/* Set in the text face, not the display one: its figures are plain to
+                read, where the display face draws "10" like the letters "IO".
+                Three share a phone's width: smaller there, so "5,000+" still fits its column. */}
+            <p className="text-[length:clamp(32px,9.6vw,52px)] font-medium leading-none tracking-[-0.5px] text-cream md:text-[length:clamp(52px,5.8vw,76px)]">
               <StatNumber text={stat.value} />
             </p>
             <p className="caps mt-3.5 max-w-[300px] text-balance break-words text-[10.5px] leading-[16px] tracking-[1.6px] text-body sm:mt-5 sm:text-[13px] sm:leading-5 sm:tracking-[3.2px]">
               {displayCase(localized(stat.label, lang), lang)}
             </p>
-          </li>
+          </Reveal>
         ))}
       </ul>
     </section>

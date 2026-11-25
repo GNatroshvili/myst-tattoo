@@ -40,6 +40,9 @@ components/
   IdeaForm.tsx        # booking form -> WhatsApp deep link (client)
   CourseSignup.tsx    # the /course page's sign-up card -> WhatsApp deep link (client)
   Footer.tsx
+  motion/MotionProvider.tsx  # around every public page: loads the animation code after the page is up (client)
+  motion/Reveal.tsx   # a part that fades in and rises the first time it is scrolled to (client)
+  motion/features.ts  # what the motion library needs, kept in a file of its own so it loads late
   ui/Icons.tsx
 lib/
   site.ts             # studio details, nav, services
@@ -47,6 +50,7 @@ lib/
   google-place.ts     # the studio on Google Maps: rating, reviews, coordinates (Places API)
   privacy.ts          # the privacy policy's standard text, and how its text becomes headings and paragraphs
   dates.ts            # upcoming days in the studio's time zone
+  cascade.ts          # the wait that makes a row of revealing parts arrive one after another
   whatsapp.ts         # message + wa.me URL builders
 ```
 

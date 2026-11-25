@@ -387,10 +387,56 @@
   }
 }
 
-/* Hover and press animations play for everyone; only smooth scrolling follows
-   the system's reduced-motion setting. */
+/* ----- entrance: the opening of a page rises into place as it is first drawn -----
+   For what a visitor sees before scrolling: the hero, a page's title. It is
+   plain CSS, so it starts with the first paint and waits for no script. Parts
+   further down reveal as they are scrolled to (components/motion/Reveal).
+   `enter-1` … `enter-6` make neighbours arrive one after another. */
+@keyframes enter-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+}
+@keyframes enter-fade {
+  from {
+    opacity: 0;
+  }
+}
+.enter {
+  animation: enter-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+/* for artwork: it only fades, a little slower */
+.enter-fade {
+  animation: enter-fade 1.2s ease-out both;
+}
+.enter-1 {
+  animation-delay: 80ms;
+}
+.enter-2 {
+  animation-delay: 160ms;
+}
+.enter-3 {
+  animation-delay: 240ms;
+}
+.enter-4 {
+  animation-delay: 320ms;
+}
+.enter-5 {
+  animation-delay: 400ms;
+}
+.enter-6 {
+  animation-delay: 480ms;
+}
+
+/* Hover and press animations play for everyone. Smooth scrolling follows the
+   system's reduced-motion setting, and so does the travel of what enters or
+   reveals: it still fades in, in place. */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+  .enter {
+    animation-name: enter-fade;
   }
 }

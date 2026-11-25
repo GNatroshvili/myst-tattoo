@@ -3,6 +3,7 @@ import { getPlace, type PlaceReview } from "@/lib/google-place";
 import { displayCase, localeTags, type Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/dictionaries/en";
 import { FeaturedSlider } from "./FeaturedSlider";
+import { Reveal } from "./motion/Reveal";
 import { ReviewCount } from "./ReviewCount";
 import { StarRule } from "./StarRule";
 import { StudioMap } from "./StudioMap";
@@ -133,7 +134,7 @@ function Section({ lang, t, place }: { lang: Locale; t: Copy; place: NonNullable
 
   return (
     <section id="reviews" aria-labelledby={titleId} className="scroll-mt-6 pt-16 lg:pt-[84px]">
-      <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-4 lg:pl-5">
+      <Reveal className="flex flex-wrap items-end justify-between gap-x-8 gap-y-4 lg:pl-5">
         <div>
           <p className="caps eyebrow">{displayCase(t.eyebrow, lang)}</p>
           <h2
@@ -148,9 +149,9 @@ function Section({ lang, t, place }: { lang: Locale; t: Copy; place: NonNullable
         <a href={links.reviews} target="_blank" rel="noopener noreferrer" className="link-arrow min-h-11 gap-3 text-[17px]">
           {t.allReviews} <ArrowRightIcon className="h-3 w-[18px]" />
         </a>
-      </div>
+      </Reveal>
 
-      <div className="mt-10 grid grid-cols-[minmax(0,1fr)] gap-4 sm:gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+      <Reveal className="mt-10 grid grid-cols-[minmax(0,1fr)] gap-4 sm:gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
         {place.location ? (
           <StudioMap
             apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY?.trim() || undefined}
@@ -225,10 +226,10 @@ function Section({ lang, t, place }: { lang: Locale; t: Copy; place: NonNullable
             )}
           </div>
         </div>
-      </div>
+      </Reveal>
 
       {reviews.length > 0 && (
-        <>
+        <Reveal>
           <FeaturedSlider previous={t.previous} next={t.next} arrows="edge">
             {reviews.map((review) => (
               <div key={review.id} className={slide}>
@@ -239,7 +240,7 @@ function Section({ lang, t, place }: { lang: Locale; t: Copy; place: NonNullable
           <p className="mt-5 text-[13px] font-light leading-[18px] text-faint lg:pl-5">
             {t.sourceNote} <GoogleMaps />
           </p>
-        </>
+        </Reveal>
       )}
     </section>
   );

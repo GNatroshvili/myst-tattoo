@@ -47,8 +47,7 @@ export function StatNumber({ text }: { text: string }) {
         {plus && (
           <span
             ref={plusRef}
-            // the display face draws its plus as a hairline: the text face's holds its gold at this size
-            className="ml-[0.06em] mt-[0.02em] font-sans text-[0.52em] font-light leading-none text-gold transition-opacity duration-300"
+            className="ml-[0.06em] mt-[0.04em] text-[0.52em] font-normal leading-none text-gold transition-opacity duration-300"
           >
             +
           </span>

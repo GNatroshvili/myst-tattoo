@@ -6,6 +6,7 @@ import { Backdrop } from "@/components/Backdrop";
 import { CtaPanel } from "@/components/CtaPanel";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
+import { Reveal } from "@/components/motion/Reveal";
 import { PhotoFrame } from "@/components/PhotoFrame";
 import { SectionDivider } from "@/components/SectionDivider";
 import { StarRule } from "@/components/StarRule";
@@ -90,10 +91,10 @@ export default async function ArtistPage({ params }: PageProps<"/[lang]/artists/
               size="full"
               label={displayCase(dict.artists.photoLabel, lang)}
               icon={<PersonIcon strokeWidth={1.2} className="h-[52px] w-[52px] text-rose" />}
-              className="mx-auto w-[min(100%,max(240px,(100svh_-_400px)_*_0.75))] min-[898px]:mx-0 min-[898px]:w-auto min-[898px]:min-w-[240px] min-[898px]:flex-[0_1_350px]"
+              className="enter mx-auto w-[min(100%,max(240px,(100svh_-_400px)_*_0.75))] min-[898px]:mx-0 min-[898px]:w-auto min-[898px]:min-w-[240px] min-[898px]:flex-[0_1_350px]"
             />
 
-            <div className="min-w-0 min-[898px]:flex-[1_1_420px]">
+            <div className="enter enter-1 min-w-0 min-[898px]:flex-[1_1_420px]">
               <p className="caps eyebrow">{displayCase(t.eyebrow, lang)}</p>
               <h1 className="display mt-[22px] break-words text-[length:calc(clamp(44px,5.2vw,66px)*var(--display-scale))] leading-[1.02] tracking-[0.5px] text-cream">
                 {displayCase(name, lang)}
@@ -136,16 +137,18 @@ export default async function ArtistPage({ params }: PageProps<"/[lang]/artists/
 
           {showTattoos && (
             <section id="works" aria-labelledby="works-title" className="scroll-mt-6 pt-[72px]">
-              <SectionDivider />
-              <h2
-                id="works-title"
-                className="display mt-[22px] text-center text-[length:calc(clamp(36px,4vw,52px)*var(--display-scale))] leading-[1.04] tracking-[0.5px] text-cream"
-              >
-                {displayCase(t.worksTitle, lang)}
-              </h2>
-              <p className="mx-auto mt-3.5 max-w-[470px] text-center text-[17px] font-light leading-[25px] text-body">
-                {t.worksLead}
-              </p>
+              <Reveal>
+                <SectionDivider />
+                <h2
+                  id="works-title"
+                  className="display mt-[22px] text-center text-[length:calc(clamp(36px,4vw,52px)*var(--display-scale))] leading-[1.04] tracking-[0.5px] text-cream"
+                >
+                  {displayCase(t.worksTitle, lang)}
+                </h2>
+                <p className="mx-auto mt-3.5 max-w-[470px] text-center text-[17px] font-light leading-[25px] text-body">
+                  {t.worksLead}
+                </p>
+              </Reveal>
 
               <ArtistWorks lang={lang} t={t} tattoosCopy={dict.tattoos} tattoos={tattoos} />
             </section>
@@ -158,21 +161,24 @@ export default async function ArtistPage({ params }: PageProps<"/[lang]/artists/
               aria-labelledby="piercings-title"
               className="scroll-mt-6 pt-[72px]"
             >
-              <SectionDivider />
-              <h2
-                id="piercings-title"
-                className="display mt-[22px] text-center text-[length:calc(clamp(36px,4vw,52px)*var(--display-scale))] leading-[1.04] tracking-[0.5px] text-cream"
-              >
-                {displayCase(t.piercingsTitle, lang)}
-              </h2>
-              <p className="mx-auto mt-3.5 max-w-[470px] text-center text-[17px] font-light leading-[25px] text-body">
-                {t.piercingsLead}
-              </p>
+              <Reveal>
+                <SectionDivider />
+                <h2
+                  id="piercings-title"
+                  className="display mt-[22px] text-center text-[length:calc(clamp(36px,4vw,52px)*var(--display-scale))] leading-[1.04] tracking-[0.5px] text-cream"
+                >
+                  {displayCase(t.piercingsTitle, lang)}
+                </h2>
+                <p className="mx-auto mt-3.5 max-w-[470px] text-center text-[17px] font-light leading-[25px] text-body">
+                  {t.piercingsLead}
+                </p>
+              </Reveal>
 
               <div className="work-grid mt-9">
-                {piercings.map((piercing) => (
+                {piercings.map((piercing, i) => (
                   <WorkTile
                     key={piercing.id}
+                    order={i}
                     photo={piercing.image}
                     aria={piercingAlt(piercing, dict.piercing, lang)}
                     title={piercing.place ? localized(piercing.place.name, lang) : ""}
