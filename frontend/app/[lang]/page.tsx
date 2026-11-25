@@ -26,8 +26,8 @@ export default async function HomePage() {
           <FeaturedWorks lang={lang} dict={dict} />
           <GiftVouchers lang={lang} t={dict.vouchers} />
           <StudioReviews lang={lang} dict={dict} />
-          <Faq lang={lang} dict={dict} />
           <IdeaSection lang={lang} dict={dict} />
+          <Faq lang={lang} dict={dict} />
         </main>
         <Footer lang={lang} dict={dict} />
       </div>
