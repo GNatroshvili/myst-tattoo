@@ -7,7 +7,8 @@ const links = [
   { key: "tattoos", href: "/tattoos", Icon: TattooIcon },
   { key: "piercing", href: "/piercing", Icon: PiercingIcon },
   { key: "artists", href: "/artists", Icon: ArtistsIcon },
-  { key: "info", href: "/info", Icon: InfoIcon },
+  // "Info & Care" opens the blog: that is where the care guides are
+  { key: "info", href: "/blog", Icon: InfoIcon },
 ] as const;
 
 export function QuickLinks({ lang, t }: { lang: Locale; t: Dictionary["quickLinks"] }) {
