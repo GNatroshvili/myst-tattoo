@@ -315,9 +315,6 @@ export const ka: Dictionary = {
     photoAria: "სტუდიის ფოტო {number}",
     emptyTitle: "ჩვენი ისტორია მალე დაემატება",
     emptyText: "ამ გვერდს ვამზადებთ. მალე შემოიხედე.",
-    ctaTitleLine1: "დაჯავშნე",
-    ctaTitleLine2: "შენი ვიზიტი",
-    ctaText: "მოგვწერე შენი იდეა და ერთად შევარჩევთ არტისტს, ზომასა და დროს.",
   },
   privacy: {
     metaTitle: "კონფიდენციალურობის პოლიტიკა",

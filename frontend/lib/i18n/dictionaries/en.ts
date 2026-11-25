@@ -346,9 +346,6 @@ export const en = {
     /** Shown while no sections have been added in the admin panel. */
     emptyTitle: "Our story is coming soon",
     emptyText: "We're putting this page together. Check back shortly.",
-    ctaTitleLine1: "Book",
-    ctaTitleLine2: "your visit",
-    ctaText: "Send us your idea and we'll choose the artist, the size and the time together.",
   },
   /** The privacy policy's page. Its text comes from the admin panel, or is the standard one in lib/privacy.ts. */
   privacy: {
