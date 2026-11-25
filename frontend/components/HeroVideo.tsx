@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { MENU_EVENT } from "@/lib/site-menu";
 
 /**
  * The film behind the hero: a silent loop of the studio, in two cuts made
@@ -23,7 +24,8 @@ const fill = "absolute inset-0 h-full w-full object-cover lg:object-left";
  * drawn at once and nothing waits for the film. The film itself is fetched
  * only after the page is up, starts over the still (they are the same
  * picture, so nothing jumps) and runs only while the hero is on screen: out
- * of view it is paused and costs nothing.
+ * of view it is paused and costs nothing. So it is under the open phone
+ * menu, where the page is blurred anyway.
  *
  * It stays a still where the system asks for less motion or for less data,
  * where scripts are off, and where the browser will not start a film by
@@ -42,18 +44,32 @@ export function HeroVideo() {
     video.muted = true;
     video.src = window.matchMedia(PHONE).matches ? UPRIGHT : WIDE;
 
+    let inView = false;
+    let covered = false;
+    const run = () => {
+      // refused where films may not start by themselves: the still stays
+      if (inView && !covered) video.play().catch(() => {});
+      else video.pause();
+    };
+
     const watcher = new IntersectionObserver(
       ([entry]) => {
-        // refused where films may not start by themselves: the still stays
-        if (entry.isIntersecting) video.play().catch(() => {});
-        else video.pause();
+        inView = entry.isIntersecting;
+        run();
       },
       { threshold: 0.05 },
     );
     watcher.observe(video);
 
+    const onMenu = (event: Event) => {
+      covered = (event as CustomEvent<boolean>).detail;
+      run();
+    };
+    window.addEventListener(MENU_EVENT, onMenu);
+
     return () => {
       watcher.disconnect();
+      window.removeEventListener(MENU_EVENT, onMenu);
       video.pause();
     };
   }, []);
