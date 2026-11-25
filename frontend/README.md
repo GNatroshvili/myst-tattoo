@@ -20,6 +20,8 @@ app/
   [lang]/about/       # "About us": sections (photo, optional title, text) from the admin panel
   [lang]/course/      # the tattoo course: title, date, photos and text from the admin panel
   [lang]/privacy/     # the privacy policy: the admin panel's text, or the standard one in lib/privacy.ts
+  sitemap.ts          # /sitemap.xml: every public page in both languages, with its photos
+  robots.ts           # /robots.txt: what crawlers may open, and where the sitemap is
   globals.css         # design tokens (@theme) + component classes
 components/
   Header.tsx          # nav + mobile menu (client)
@@ -38,6 +40,7 @@ components/
   ui/Icons.tsx
 lib/
   site.ts             # studio details, nav, services
+  site-url.ts         # the site's public address (SITE_URL), for the sitemap and robots.txt
   google-place.ts     # the studio on Google Maps: rating, reviews, coordinates (Places API)
   privacy.ts          # the privacy policy's standard text, and how its text becomes headings and paragraphs
   dates.ts            # upcoming days in the studio's time zone

@@ -63,6 +63,7 @@ still go to `backend/uploads/` and the database is the local MongoDB.
    | --- | --- |
    | `API_URL` | The backend's production address, e.g. `https://<backend>.vercel.app` (no trailing slash) |
    | `NEXT_PUBLIC_WHATSAPP_NUMBER` | The studio's WhatsApp number, digits only |
+   | `SITE_URL` | Optional. The site's public address, written into `/sitemap.xml` and `/robots.txt`. Without it Vercel's production domain for the project is used, which is your own domain once you add one |
    | `GOOGLE_PLACES_API_KEY` | Optional. Google key for the Places API (New): the rating and reviews on the home page |
    | `GOOGLE_PLACE_ID` | Optional. The studio's place ID on Google Maps |
    | `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` | Optional. Google key for the Maps JavaScript API: the map on the home page |
