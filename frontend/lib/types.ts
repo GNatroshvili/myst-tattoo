@@ -120,6 +120,16 @@ export type Faq = {
   answer: Localized;
 };
 
+/** One section of the /about page. One record serves both sites. */
+export type AboutSection = {
+  id: string;
+  /** "" in both languages where the section has no title; with one only, the page shows that one */
+  title: Localized;
+  /** "" in a language that has none, and the page then shows the other one */
+  body: Localized;
+  image: Photo;
+};
+
 /** The privacy policy's text as saved in the admin panel. One record serves both sites. */
 export type PrivacyPolicy = {
   /** "" in a language that has none, and the page then shows the other one */

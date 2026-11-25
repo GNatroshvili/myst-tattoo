@@ -36,6 +36,7 @@ export const site = {
 /** Main navigation; `key` picks the label from the dictionary's `nav` section. */
 export const nav = [
   { key: "home", href: "/" },
+  { key: "about", href: "/about" },
   { key: "artists", href: "/artists" },
   { key: "tattoos", href: "/tattoos" },
   { key: "piercing", href: "/piercing" },

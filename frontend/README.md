@@ -17,6 +17,7 @@ app/
   layout.tsx          # fonts (Cormorant Garamond + Inter), metadata
   page.tsx            # home page composition
   not-found.tsx       # styled 404
+  [lang]/about/       # "About us": sections (photo, optional title, text) from the admin panel
   [lang]/course/      # the tattoo course: title, date, photos and text from the admin panel
   [lang]/privacy/     # the privacy policy: the admin panel's text, or the standard one in lib/privacy.ts
   globals.css         # design tokens (@theme) + component classes

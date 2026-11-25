@@ -19,6 +19,7 @@ export const en = {
     openMenu: "Open menu",
     closeMenu: "Close menu",
     home: "Home",
+    about: "About",
     artists: "Artists",
     tattoos: "Tattoos",
     piercing: "Piercing",
@@ -325,6 +326,25 @@ export const en = {
         note: "Question: {note}",
       },
     },
+  },
+  /** The "About us" page. Its sections (photo, title, text) come from the admin panel. */
+  about: {
+    metaTitle: "About Us",
+    metaDescription:
+      "Myst Tattoo Studio in Tbilisi: who we are, how we work and what to expect when you come in for a tattoo or a piercing.",
+    eyebrow: "Myst / About",
+    title: "About Us",
+    subtitle: "Our Story",
+    lead: "Myst Tattoo Studio — a creative space for self-expression, unique ideas and high-quality body art.",
+    sectionsAria: "About the studio",
+    /** read out for a section's photo; {number} counts from 1 */
+    photoAria: "Studio photo {number}",
+    /** Shown while no sections have been added in the admin panel. */
+    emptyTitle: "Our story is coming soon",
+    emptyText: "We're putting this page together. Check back shortly.",
+    ctaTitleLine1: "Book",
+    ctaTitleLine2: "your visit",
+    ctaText: "Send us your idea and we'll choose the artist, the size and the time together.",
   },
   /** The privacy policy's page. Its text comes from the admin panel, or is the standard one in lib/privacy.ts. */
   privacy: {

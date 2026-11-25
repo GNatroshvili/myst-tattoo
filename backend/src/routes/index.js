@@ -1,4 +1,5 @@
 import { Router } from "express";
+import * as aboutSections from "../controllers/aboutSections.js";
 import * as artists from "../controllers/artists.js";
 import * as auth from "../controllers/auth.js";
 import * as blogPosts from "../controllers/blogPosts.js";
@@ -80,6 +81,14 @@ api.post("/faqs", requireAdmin, faqs.createFaq);
 api.put("/faqs/order", requireAdmin, faqs.orderFaqs);
 api.patch("/faqs/:id", requireAdmin, faqs.updateFaq);
 api.delete("/faqs/:id", requireAdmin, faqs.deleteFaq);
+
+// the /about page's sections (a photo, an optional title and a text each), in
+// the order the admin panel gives them
+api.get("/about/sections", aboutSections.listSections);
+api.post("/about/sections", requireAdmin, photoUpload, aboutSections.createSection);
+api.put("/about/sections/order", requireAdmin, aboutSections.orderSections);
+api.patch("/about/sections/:id", requireAdmin, photoUpload, aboutSections.updateSection);
+api.delete("/about/sections/:id", requireAdmin, aboutSections.deleteSection);
 
 // the privacy policy's text, shown on the site's /privacy page: one record at
 // most. While there is none the page shows the standard text the site carries.

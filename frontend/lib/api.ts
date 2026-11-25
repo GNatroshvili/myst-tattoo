@@ -1,5 +1,6 @@
 import { apiOrigin } from "./api-url";
 import type {
+  AboutSection,
   Artist,
   BlogPost,
   BlogTopic,
@@ -78,6 +79,9 @@ export const getCourse = () => get<Course>("/course");
 
 /** The home page's frequently asked questions, in the order the admin panel puts them in. */
 export const getFaqs = async () => (await get<Faq[]>("/faqs")) ?? [];
+
+/** The /about page's sections, in the order the admin panel puts them in. */
+export const getAboutSections = async () => (await get<AboutSection[]>("/about/sections")) ?? [];
 
 /** The privacy policy's text as saved in the admin panel; `null` while the site shows its standard one. */
 export const getPrivacy = () => get<PrivacyPolicy>("/privacy");

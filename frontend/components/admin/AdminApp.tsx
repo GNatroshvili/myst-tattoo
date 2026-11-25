@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import type {
+  AboutSection,
   Artist,
   BlogPost,
   BlogTopic,
@@ -14,6 +15,7 @@ import type {
   Style,
   Tattoo,
 } from "@/lib/types";
+import { AboutPanel } from "./AboutPanel";
 import { ApiError, api, errorText, isSignedOut } from "./api";
 import { ArtistsPanel } from "./ArtistsPanel";
 import { BlogPanel } from "./BlogPanel";
@@ -41,6 +43,8 @@ export type AdminData = {
   topics: BlogTopic[];
   /** the tattoo course; null while none is posted */
   course: Course | null;
+  /** the /about page's sections, in the order the site shows them */
+  about: AboutSection[];
   /** the home page's frequently asked questions, in the order the site shows them */
   faqs: Faq[];
   /** the privacy policy's text; null while the site shows its standard one */
@@ -68,6 +72,7 @@ const tabs = [
   { key: "styles", label: "სტილები" },
   { key: "posts", label: "ბლოგი" },
   { key: "course", label: "კურსი" },
+  { key: "about", label: "ჩვენ შესახებ" },
   { key: "faqs", label: "კითხვები" },
   { key: "privacy", label: "კონფიდენციალურობა" },
 ] as const;
@@ -87,21 +92,23 @@ export function AdminApp() {
 
   const reload = useCallback(async () => {
     try {
-      const [artists, tattoos, piercings, zones, styles, posts, topics, course, faqs, privacy] = await Promise.all([
-        api<Artist[]>("/artists"),
-        api<Tattoo[]>("/tattoos"),
-        api<Piercing[]>("/piercings"),
-        api<PiercingZone[]>("/piercing/zones"),
-        api<Style[]>("/styles"),
-        api<BlogPost[]>("/blog/posts"),
-        api<BlogTopic[]>("/blog/topics"),
-        // "not found" is an answer here: no course has been posted
-        api<Course>("/course").catch(missing),
-        api<Faq[]>("/faqs"),
-        // and here: no text has been saved, the site shows its standard one
-        api<PrivacyPolicy>("/privacy").catch(missing),
-      ]);
-      setData({ artists, tattoos, piercings, zones, styles, posts, topics, course, faqs, privacy });
+      const [artists, tattoos, piercings, zones, styles, posts, topics, course, about, faqs, privacy] =
+        await Promise.all([
+          api<Artist[]>("/artists"),
+          api<Tattoo[]>("/tattoos"),
+          api<Piercing[]>("/piercings"),
+          api<PiercingZone[]>("/piercing/zones"),
+          api<Style[]>("/styles"),
+          api<BlogPost[]>("/blog/posts"),
+          api<BlogTopic[]>("/blog/topics"),
+          // "not found" is an answer here: no course has been posted
+          api<Course>("/course").catch(missing),
+          api<AboutSection[]>("/about/sections"),
+          api<Faq[]>("/faqs"),
+          // and here: no text has been saved, the site shows its standard one
+          api<PrivacyPolicy>("/privacy").catch(missing),
+        ]);
+      setData({ artists, tattoos, piercings, zones, styles, posts, topics, course, about, faqs, privacy });
       setLoadError("");
     } catch (err) {
       setLoadError(errorText(err));
@@ -191,6 +198,7 @@ export function AdminApp() {
       {panel && tab === "styles" && <StylesPanel {...panel} />}
       {panel && tab === "posts" && <BlogPanel {...panel} />}
       {panel && tab === "course" && <CoursePanel {...panel} />}
+      {panel && tab === "about" && <AboutPanel {...panel} />}
       {panel && tab === "faqs" && <FaqPanel {...panel} />}
       {panel && tab === "privacy" && <PrivacyPanel {...panel} />}
     </div>

@@ -2,6 +2,7 @@ import "dotenv/config";
 import path from "node:path";
 import { connectDB, disconnectDB } from "../config/db.js";
 import { env } from "../config/env.js";
+import { AboutSection } from "../models/AboutSection.js";
 import { Artist } from "../models/Artist.js";
 import { BlogPost } from "../models/BlogPost.js";
 import { Course } from "../models/Course.js";
@@ -29,7 +30,8 @@ await connectDB(env.mongoUri);
 
 let moved = 0;
 let missing = 0;
-for (const [model, field] of [[Artist, "photo"], [Tattoo, "image"], [Piercing, "image"], [BlogPost, "image"]]) {
+const kinds = [[Artist, "photo"], [Tattoo, "image"], [Piercing, "image"], [BlogPost, "image"], [AboutSection, "image"]];
+for (const [model, field] of kinds) {
   for await (const doc of model.find({ [field]: { $ne: null } })) {
     const image = doc[field];
     const set = {};
