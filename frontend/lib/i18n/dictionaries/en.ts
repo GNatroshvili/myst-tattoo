@@ -36,7 +36,6 @@ export const en = {
     subtitle: "In Tbilisi",
     tagline:
       "Myst Tattoo Studio — a creative space for self-expression, unique ideas and high-quality body art.",
-    lilyAlt: "Burgundy lily with a golden crescent and a four-point star",
   },
   quickLinks: {
     aria: "Explore",

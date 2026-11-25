@@ -25,8 +25,8 @@ app/
   globals.css         # design tokens (@theme) + component classes
 components/
   Header.tsx          # nav + mobile menu (client)
-  Hero.tsx            # headline + CTA + HeroLily
-  HeroLily.tsx        # lily artwork (public/images/hero-lily.webp) via next/image
+  Hero.tsx            # headline + CTA over the studio film, which fills the section
+  HeroVideo.tsx       # the film itself (public/videos): a still at first, the film once the page is up (client)
   QuickLinks.tsx      # Tattoos / Piercing / Our Artists / Why Myst
   StudioStats.tsx     # the row of figures ("700+ reviews on Google") from the admin panel; left out while there are none (server)
   StatNumber.tsx      # one figure, counting up when scrolled to (client)

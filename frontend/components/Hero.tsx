@@ -1,16 +1,47 @@
 import Link from "next/link";
 import { displayCase, localePath, type Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/dictionaries/en";
-import { HeroLily } from "./HeroLily";
+import { HeroVideo } from "./HeroVideo";
 import { StarRule } from "./StarRule";
 import { ArrowUpRightIcon } from "./ui/Icons";
 
+/**
+ * The opening of the home page: the headline and the two buttons over a film
+ * of the studio that fills the whole section, edge to edge of the screen and
+ * up behind the header.
+ *
+ * On wide screens the text stands on the left, where the film is dark, and
+ * the film shows on the right. Below 1024px there is no room beside the film:
+ * the text starts right under the header, as close as it always has, and the
+ * section is only as tall as the text, so the film is simply scaled down to
+ * that size and lies behind it under a dark veil.
+ */
 export function Hero({ lang, dict }: { lang: Locale; dict: Dictionary }) {
   const t = dict.hero;
 
   return (
-    <section className="flex flex-col lg:flex-row lg:items-center lg:gap-x-6 lg:pl-5">
-      <div className="min-w-0 pt-10 sm:pt-14 lg:flex-[1_1_400px] lg:pb-[60px] lg:pt-[70px]">
+    // No height of its own at any width: the text sets it, with the same space
+    // above it under the header as before the film (40 / 56 / 70px).
+    <section className="relative isolate flex flex-col pb-10 sm:pb-14 lg:pb-0 lg:pl-5">
+      {/* The film and the veils over it. The box is as wide as the screen,
+          wall to wall, whatever the page's column is, and starts above the
+          section so it also lies behind the header; what would stick out
+          above the page is cut off by the page itself. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-40 bottom-0 left-1/2 -z-10 w-screen -translate-x-1/2 overflow-hidden"
+      >
+        <HeroVideo />
+        {/* below 1024px the text covers the whole film: dark enough behind it for any frame, bright ones too */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(9,8,8,0.5)_0%,rgba(9,8,8,0.62)_45%,rgba(9,8,8,0.82)_82%,#090808_100%)] lg:hidden" />
+        {/* wide screens: the picture reaches the left wall, and darkens towards it under the text */}
+        <div className="absolute inset-0 hidden bg-[linear-gradient(90deg,rgba(9,8,8,0.9)_0%,rgba(9,8,8,0.78)_30%,rgba(9,8,8,0.5)_50%,rgba(9,8,8,0)_72%)] lg:block" />
+        {/* behind the header, and down into the page so the film ends on no line */}
+        <div className="absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-ink/85 to-ink/0" />
+        <div className="absolute inset-x-0 bottom-0 hidden h-[30%] bg-gradient-to-t from-ink to-ink/0 lg:block" />
+      </div>
+
+      <div className="min-w-0 pt-10 sm:pt-14 lg:max-w-[560px] lg:pb-[60px] lg:pt-[70px]">
         <p
           className={`caps eyebrow enter ${
             // the Georgian line is longer: tighter on phones so it stays on one line
@@ -42,12 +73,6 @@ export function Hero({ lang, dict }: { lang: Locale; dict: Dictionary }) {
             {dict.common.ourArtists}
           </Link>
         </div>
-      </div>
-
-      {/* the artwork; on wide screens it reaches past the column into the
-          gutter, as in the design */}
-      <div className="enter-fade mt-6 flex min-w-0 justify-center lg:-mb-[30px] lg:-mr-[30px] lg:-mt-[50px] lg:flex-[1_1_440px] lg:justify-end">
-        <HeroLily alt={t.lilyAlt} />
       </div>
     </section>
   );
