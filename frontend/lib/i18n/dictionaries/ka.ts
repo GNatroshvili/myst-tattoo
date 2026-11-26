@@ -103,6 +103,10 @@ export const ka: Dictionary = {
     whatsapp: "WhatsApp",
     instagramDm: "Instagram DM",
   },
+  book: {
+    metaTitle: "ვიზიტის დაჯავშნა",
+    backHome: "მთავარზე დაბრუნება",
+  },
   form: {
     aria: "ჯავშნის მოთხოვნა",
     name: "შენი სახელი",

@@ -27,21 +27,35 @@ async function IdeaFormWithDays({ lang, t }: { lang: Locale; t: FormCopy }) {
   return <IdeaForm days={days} names={getCalendarNames(intl)} t={t} />;
 }
 
-export function IdeaSection({ lang, dict }: { lang: Locale; dict: Dictionary }) {
+type Props = {
+  lang: Locale;
+  dict: Dictionary;
+  /** on the booking page it is the whole page: its title is the page's, and it sits closer to the top */
+  page?: boolean;
+};
+
+export function IdeaSection({ lang, dict, page = false }: Props) {
   const t = dict.idea;
   const titleId = useId();
+  // the headings move one level up when the section's title is the page's
+  const Title = page ? "h1" : "h2";
+  const Sub = page ? "h2" : "h3";
 
   return (
-    <section id="idea" aria-labelledby={titleId} className="scroll-mt-4 pt-16 lg:pt-[76px]">
+    <section
+      id="idea"
+      aria-labelledby={titleId}
+      className={page ? "pt-8 sm:pt-10" : "scroll-mt-4 pt-16 lg:pt-[76px]"}
+    >
       <Reveal>
         <SectionDivider />
 
-        <h2
+        <Title
           id={titleId}
           className="display mt-[22px] text-balance text-center text-[length:calc(clamp(36px,4vw,52px)*var(--display-scale))] leading-[1.04] tracking-[0.5px] text-cream"
         >
           {displayCase(t.title, lang)}
-        </h2>
+        </Title>
         <p className="mx-auto mt-4 max-w-[480px] text-center text-[17px] font-light leading-[25px] text-body">
           {t.lead}
         </p>
@@ -71,7 +85,7 @@ export function IdeaSection({ lang, dict }: { lang: Locale; dict: Dictionary }) 
                   {i + 1}
                 </span>
                 <div>
-                  <h3 className="text-[16px] font-medium leading-[22px] text-cream">{step.title}</h3>
+                  <Sub className="text-[16px] font-medium leading-[22px] text-cream">{step.title}</Sub>
                   <p className="mt-[3px] text-[14px] font-light leading-5 text-body">{step.text}</p>
                 </div>
               </Reveal>
@@ -82,7 +96,7 @@ export function IdeaSection({ lang, dict }: { lang: Locale; dict: Dictionary }) 
             delay={0.34}
             className="rounded-[14px] border border-cream/16 bg-[radial-gradient(90%_160%_at_85%_80%,rgba(125,46,85,0.72),rgba(125,46,85,0)_72%),linear-gradient(90deg,#120c0e,#170d12)] px-6 pb-6 pt-[22px] sm:px-7"
           >
-            <h3 className="text-[16px] leading-[22px] text-cream">{t.directTitle}</h3>
+            <Sub className="text-[16px] leading-[22px] text-cream">{t.directTitle}</Sub>
             <div className="mt-4 flex flex-wrap gap-x-3 gap-y-2.5">
               <a
                 href={whatsappUrl()}

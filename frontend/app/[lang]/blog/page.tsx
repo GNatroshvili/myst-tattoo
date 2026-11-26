@@ -11,7 +11,7 @@ import { ArrowRightIcon } from "@/components/ui/Icons";
 import { getBlogPosts, getBlogTopics } from "@/lib/api";
 import { excerpt, postBody, postDate, readMinutes } from "@/lib/blog";
 import { dictionaryFor, getDictionary, type Dictionary, type Locale } from "@/lib/i18n";
-import { hasLocale, localePath } from "@/lib/i18n/config";
+import { bookPath, hasLocale } from "@/lib/i18n/config";
 import { localized } from "@/lib/types";
 
 export async function generateMetadata({ params }: PageProps<"/[lang]/blog">): Promise<Metadata> {
@@ -100,7 +100,7 @@ export default async function BlogPage() {
             text={t.ctaText}
             className="mt-16"
           >
-            <Link href={localePath(lang, "#idea")} className="btn btn-outline-gold relative">
+            <Link href={bookPath(lang)} className="btn btn-outline-gold relative">
               {t.cta} <ArrowRightIcon className="h-3 w-[18px]" />
             </Link>
           </CtaPanel>

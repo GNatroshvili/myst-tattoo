@@ -107,6 +107,11 @@ export const en = {
     whatsapp: "WhatsApp",
     instagramDm: "Instagram DM",
   },
+  /** The booking page: the form above on a page of its own. */
+  book: {
+    metaTitle: "Book a Visit",
+    backHome: "Back to Home",
+  },
   form: {
     aria: "Booking request",
     name: "Your name",

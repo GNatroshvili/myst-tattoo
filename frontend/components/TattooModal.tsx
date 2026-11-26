@@ -3,7 +3,7 @@
 import { useEffect, useRef, type KeyboardEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { displayCase, localePath, type Locale } from "@/lib/i18n/config";
+import { bookPath, displayCase, localePath, type Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/dictionaries/en";
 import { tattooAlt } from "@/lib/tattoos";
 import { localized, type Tattoo } from "@/lib/types";
@@ -146,10 +146,10 @@ export function TattooModal({ lang, t, tattoo, position, onClose, onPrev, onNext
             </>
           )}
 
-          {/* closes the window and scrolls to the page's booking panel */}
-          <a href="#book" onClick={onClose} className="btn btn-gold mt-auto flex px-6">
+          {/* closes the window on the way to the booking page, so coming back finds the gallery */}
+          <Link href={bookPath(lang)} onClick={onClose} className="btn btn-gold mt-auto flex px-6">
             {m.bookSimilar} <ArrowUpRightIcon className="h-[13px] w-[13px]" />
-          </a>
+          </Link>
 
           <div className="mt-[18px] flex items-center justify-between gap-2 sm:gap-3">
             <button type="button" onClick={onPrev} className={step}>

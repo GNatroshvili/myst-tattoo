@@ -14,8 +14,9 @@ type Props = {
 
 /**
  * Closing call-to-action of an inner page: the glowing panel from the gift
- * vouchers with a two-line title on the left and buttons on the right.
- * Carries the `book` anchor that the "Book" buttons on the page scroll to.
+ * vouchers with a two-line title on the left and buttons on the right. Its
+ * booking button leads to the booking page (`bookPath`), as every other
+ * "Book" button on an inner page does.
  */
 export function CtaPanel({ lang, titleLine1, titleLine2, text, className = "", children }: Props) {
   const titleId = useId();
@@ -23,9 +24,8 @@ export function CtaPanel({ lang, titleLine1, titleLine2, text, className = "", c
   return (
     <Reveal
       as="section"
-      id="book"
       aria-labelledby={titleId}
-      className={`voucher-panel relative isolate flex min-h-[220px] scroll-mt-6 flex-wrap items-center justify-between gap-x-7 gap-y-6 overflow-hidden px-6 py-9 md:pl-[52px] md:pr-11 ${className}`}
+      className={`voucher-panel relative isolate flex min-h-[220px] flex-wrap items-center justify-between gap-x-7 gap-y-6 overflow-hidden px-6 py-9 md:pl-[52px] md:pr-11 ${className}`}
     >
       {/* Georgian titles run longer, so their column is a little wider */}
       <div className={`relative ${lang === "ka" ? "flex-[0_1_540px]" : "flex-[0_1_440px]"}`}>

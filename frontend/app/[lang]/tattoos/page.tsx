@@ -10,7 +10,7 @@ import { TattooGallery } from "@/components/TattooGallery";
 import { ArrowUpRightIcon } from "@/components/ui/Icons";
 import { getTattoos } from "@/lib/api";
 import { dictionaryFor, getDictionary, type Dictionary, type Locale } from "@/lib/i18n";
-import { hasLocale, localePath } from "@/lib/i18n/config";
+import { bookPath, hasLocale, localePath } from "@/lib/i18n/config";
 
 export async function generateMetadata({ params }: PageProps<"/[lang]/tattoos">): Promise<Metadata> {
   const { lang } = await params;
@@ -71,7 +71,7 @@ export default async function TattoosPage() {
               <Link href={localePath(lang, "/artists")} className="btn btn-outline">
                 {dict.common.ourArtists}
               </Link>
-              <Link href={localePath(lang, "#idea")} className="btn btn-gold">
+              <Link href={bookPath(lang)} className="btn btn-gold">
                 {dict.common.bookAppointment} <ArrowUpRightIcon className="h-[13px] w-[13px]" />
               </Link>
             </div>

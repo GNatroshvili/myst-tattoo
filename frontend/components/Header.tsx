@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence } from "motion/react";
 import * as m from "motion/react-m";
-import { localePath, type Locale } from "@/lib/i18n/config";
+import { bookPath, localePath, type Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/dictionaries/en";
 import { nav } from "@/lib/site";
 import { MENU_EVENT } from "@/lib/site-menu";
@@ -80,7 +80,8 @@ export function Header({ lang, nav: t, common, switcherLabel }: Props) {
   }, [open]);
 
   const items = nav.map((item) => ({ ...item, href: localePath(lang, item.href), label: t[item.key] }));
-  const bookHref = localePath(lang, "#idea");
+  // the home page has the form further down; from anywhere else it is a page of its own
+  const bookHref = pathname === localePath(lang) ? localePath(lang, "#idea") : bookPath(lang);
   // a page under a section (an artist's profile) keeps that section lit
   const isActive = (item: (typeof items)[number]) =>
     pathname === item.href || (item.key !== "home" && pathname.startsWith(`${item.href}/`));

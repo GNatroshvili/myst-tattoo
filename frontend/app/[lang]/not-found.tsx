@@ -4,7 +4,7 @@ import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { SectionDivider } from "@/components/SectionDivider";
 import { getDictionary } from "@/lib/i18n";
-import { displayCase, localePath } from "@/lib/i18n/config";
+import { bookPath, displayCase, localePath } from "@/lib/i18n/config";
 
 export default async function NotFound() {
   const { lang, dict } = await getDictionary();
@@ -26,7 +26,7 @@ export default async function NotFound() {
             <Link href={localePath(lang)} className="btn btn-gold">
               {t.home}
             </Link>
-            <Link href={localePath(lang, "#idea")} className="btn btn-outline">
+            <Link href={bookPath(lang)} className="btn btn-outline">
               {t.idea}
             </Link>
           </div>

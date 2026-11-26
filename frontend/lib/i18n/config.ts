@@ -36,3 +36,9 @@ export function displayCase(text: string, lang: Locale) {
 export function localePath(lang: Locale, path = "/") {
   return path === "/" ? `/${lang}` : `/${lang}${path}`;
 }
+
+/**
+ * The booking page (app/[lang]/book): where every "Book" button outside the
+ * home page leads. The home page's own buttons scroll to its form, "#idea".
+ */
+export const bookPath = (lang: Locale) => localePath(lang, "/book");

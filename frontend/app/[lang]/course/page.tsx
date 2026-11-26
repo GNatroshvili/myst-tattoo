@@ -13,7 +13,7 @@ import { ArrowRightIcon, CalendarIcon } from "@/components/ui/Icons";
 import { getCourse } from "@/lib/api";
 import { paragraphs, postDay } from "@/lib/blog";
 import { dictionaryFor, getDictionary, type Dictionary, type Locale } from "@/lib/i18n";
-import { displayCase, hasLocale, localePath } from "@/lib/i18n/config";
+import { bookPath, displayCase, hasLocale } from "@/lib/i18n/config";
 import { instagramDmUrl, site } from "@/lib/site";
 import { localized, type CoursePhoto } from "@/lib/types";
 
@@ -109,7 +109,7 @@ async function CourseContent({ lang, t }: Copy) {
       <>
         <Intro lang={lang} t={t} title={t.metaTitle} />
         <EmptyNote lang={lang} title={t.emptyTitle} text={t.emptyText} className="mt-12">
-          <Link href={localePath(lang, "#idea")} className="btn btn-outline-gold mt-2">
+          <Link href={bookPath(lang)} className="btn btn-outline-gold mt-2">
             {t.emptyCta} <ArrowRightIcon className="h-3 w-[18px]" />
           </Link>
         </EmptyNote>
