@@ -1,7 +1,7 @@
 import { useId } from "react";
-import Link from "next/link";
-import { displayCase, localePath, type Locale } from "@/lib/i18n/config";
+import { displayCase, type Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/dictionaries/en";
+import { whatsappUrl } from "@/lib/whatsapp";
 import { Reveal } from "./motion/Reveal";
 import { ArrowRightIcon } from "./ui/Icons";
 import { VoucherCard } from "./VoucherCard";
@@ -32,12 +32,15 @@ export function GiftVouchers({ lang, t }: { lang: Locale; t: Dictionary["voucher
       {/* the voucher itself: a dark card with the studio mark, tilted */}
       <VoucherCard />
 
-      <Link
-        href={localePath(lang, "#idea")}
+      {/* opens WhatsApp with a ready-made request for a voucher, as the booking form does */}
+      <a
+        href={whatsappUrl(t.message)}
+        target="_blank"
+        rel="noopener noreferrer"
         className="btn btn-outline-gold relative z-[1] md:col-start-1 md:row-start-2 md:self-start lg:col-start-3 lg:row-start-1 lg:self-center"
       >
         {t.cta} <ArrowRightIcon className="h-3 w-[18px]" />
-      </Link>
+      </a>
     </Reveal>
   );
 }

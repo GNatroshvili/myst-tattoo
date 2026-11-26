@@ -58,6 +58,8 @@ export const en = {
     titleLine2: "Vouchers",
     text: "A meaningful gift for someone special.",
     cta: "Get a Voucher",
+    /** The pre-filled WhatsApp message the button opens. */
+    message: "Hi Myst! I'd like to get a gift voucher.",
   },
   /** The studio on Google Maps: a map, its rating and reviews (home page). */
   reviews: {
