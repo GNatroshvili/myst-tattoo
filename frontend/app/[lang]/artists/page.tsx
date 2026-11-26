@@ -82,7 +82,7 @@ async function ArtistsGrid({ lang, t }: { lang: Locale; t: Dictionary["artists"]
                   {t.viewProfile}
                   <ArrowRightIcon className="h-3 w-[18px]" />
                 </Link>
-                <Link href={bookPath(lang, artist.slug)} className="btn btn-outline-gold btn-sm">
+                <Link href={bookPath(lang, { artist: artist.slug })} className="btn btn-outline-gold btn-sm">
                   {t.book}
                 </Link>
               </div>

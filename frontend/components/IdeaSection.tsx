@@ -2,7 +2,7 @@ import { Suspense, useId } from "react";
 import { connection } from "next/server";
 import { getArtist } from "@/lib/api";
 import { getCalendarNames, getUpcomingDays } from "@/lib/dates";
-import { displayCase, localeTags, type Locale } from "@/lib/i18n/config";
+import { bookServices, displayCase, localeTags, type BookPreset, type Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/dictionaries/en";
 import { instagramDmUrl, site } from "@/lib/site";
 import { localized } from "@/lib/types";
@@ -17,11 +17,11 @@ type FormCopy = Dictionary["form"];
 const DAYS_AHEAD = 30;
 
 /** Day pills depend on "today", so this part renders at request time. */
-async function IdeaFormWithDays({ lang, t, artist }: { lang: Locale; t: FormCopy; artist?: Promise<string | undefined> }) {
+async function IdeaFormWithDays({ lang, t, preset }: { lang: Locale; t: FormCopy; preset?: Promise<BookPreset> }) {
   await connection();
   // The address names the artist by their profile's slug; the name shown and
   // sent is the backend's own. An unknown slug books with no artist chosen.
-  const slug = await artist;
+  const { artist: slug, service } = (await preset) ?? {};
   const booked = slug ? await getArtist(slug) : null;
   const intl = localeTags[lang].intl;
   const days = getUpcomingDays(DAYS_AHEAD, site.timeZone, {
@@ -36,6 +36,8 @@ async function IdeaFormWithDays({ lang, t, artist }: { lang: Locale; t: FormCopy
       names={getCalendarNames(intl)}
       t={t}
       artist={booked ? localized(booked.nickname, lang) : null}
+      // the dictionary lists the services in the order the address names them
+      service={service ? t.services[bookServices.indexOf(service)] : undefined}
     />
   );
 }
@@ -46,13 +48,14 @@ type Props = {
   /** on the booking page it is the whole page: its title is the page's, and it sits closer to the top */
   page?: boolean;
   /**
-   * The slug of the artist to book with, from the booking page's address. A
-   * promise, read where the form streams in, so the rest of the page does not wait for it.
+   * What the form starts with (the artist, the service), from the booking
+   * page's address. A promise, read where the form streams in, so the rest of
+   * the page does not wait for it.
    */
-  artist?: Promise<string | undefined>;
+  preset?: Promise<BookPreset>;
 };
 
-export function IdeaSection({ lang, dict, page = false, artist }: Props) {
+export function IdeaSection({ lang, dict, page = false, preset }: Props) {
   const t = dict.idea;
   const titleId = useId();
   // the headings move one level up when the section's title is the page's
@@ -83,7 +86,7 @@ export function IdeaSection({ lang, dict, page = false, artist }: Props) {
       <div className="mx-auto mt-[34px] grid max-w-[960px] grid-cols-[minmax(0,1fr)] items-start gap-[26px] md:grid-cols-[minmax(0,11fr)_minmax(0,9fr)]">
         <Reveal className="min-w-0">
           <Suspense fallback={<IdeaFormSkeleton />}>
-            <IdeaFormWithDays lang={lang} t={dict.form} artist={artist} />
+            <IdeaFormWithDays lang={lang} t={dict.form} preset={preset} />
           </Suspense>
         </Reveal>
 

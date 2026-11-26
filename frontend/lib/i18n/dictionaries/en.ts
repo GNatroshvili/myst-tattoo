@@ -116,6 +116,7 @@ export const en = {
     aria: "Booking request",
     name: "Your name",
     service: "Service",
+    /** in the order of `bookServices` (lib/i18n/config): a booking link picks one by its place */
     services: ["Tattoo Consultation", "Piercing", "Gift Card"],
     idea: "Idea",
     optional: "(optional)",
@@ -272,6 +273,20 @@ export const en = {
     /** Shown while no piercing photos have been added in the admin panel. */
     worksEmptyTitle: "Piercings coming soon",
     worksEmptyText: "We're adding our work to the gallery. Check back shortly.",
+    /** The window a piercing's photo opens: the same one the tattoos have. */
+    modal: {
+      open: "Open piercing details",
+      aria: "Piercing details",
+      eyebrow: "Myst / Piercing",
+      /** over the place's name when it belongs to no zone; otherwise the zone's name stands there */
+      placeLabel: "Placement",
+      piercedBy: "Pierced by",
+      viewProfile: "View profile",
+      bookSimilar: "Book a similar piercing",
+      previous: "Previous",
+      next: "Next",
+      close: "Close",
+    },
     ctaTitleLine1: "Ready for a",
     ctaTitleLine2: "new piercing?",
     ctaText: "Tell us the placement you want and we'll agree a day and time.",

@@ -38,11 +38,32 @@ export function localePath(lang: Locale, path = "/") {
 }
 
 /**
+ * What the booking form offers, in the order of the dictionaries'
+ * `form.services`: the names an address uses for them ("?service=piercing").
+ */
+export const bookServices = ["tattoo", "piercing", "gift"] as const;
+export type BookService = (typeof bookServices)[number];
+
+/** What a "Book" button asks the booking form to start with. */
+export type BookPreset = {
+  /** the artist to book with, by the slug of their profile */
+  artist?: string;
+  /** the service picked in the form; without one it is the first, the tattoo consultation */
+  service?: BookService;
+};
+
+/**
  * The booking page (app/[lang]/book): where every "Book" button outside the
  * home page leads. The home page's own buttons scroll to its form, "#idea".
  *
- * A button that belongs to one artist (their card, their profile) names them
- * by the slug of their profile, and the form then books with that artist.
+ * A button that belongs to one artist (their card, their profile) names them,
+ * and the form then books with that artist. A button about piercing names the
+ * service, and the form opens with it picked.
  */
-export const bookPath = (lang: Locale, artist?: string) =>
-  localePath(lang, artist ? `/book?artist=${encodeURIComponent(artist)}` : "/book");
+export function bookPath(lang: Locale, { artist, service }: BookPreset = {}) {
+  const query = new URLSearchParams();
+  if (artist) query.set("artist", artist);
+  if (service) query.set("service", service);
+  const search = query.toString();
+  return localePath(lang, search ? `/book?${search}` : "/book");
+}

@@ -15,7 +15,7 @@ type Props = {
   title: string;
   /** right of the caption: who did it, or the jewellery */
   note?: string;
-  /** when set, the photo is a button that opens the tattoo's details */
+  /** when set, the photo is a button that opens the piece's details */
   onOpen?: () => void;
   /** when set, the photo is a link (the home page's picks open the gallery) */
   href?: string;
@@ -28,7 +28,7 @@ type Props = {
 /**
  * One piece in a gallery: the photo with a two-part caption under it. Every
  * tile is 3:4, whatever the photo's own shape; a photo of another shape is
- * cropped to fit (the tattoo details window shows it whole). Under the mouse
+ * cropped to fit (the details window shows it whole). Under the mouse
  * the whole tile grows a touch, over 0.2s.
  *
  * A tile fades in and rises into place when it is scrolled to. That happens

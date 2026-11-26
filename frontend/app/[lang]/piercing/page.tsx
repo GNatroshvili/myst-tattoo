@@ -119,7 +119,7 @@ export default async function PiercingPage() {
             text={t.ctaText}
             className="mt-11"
           >
-            <Link href={bookPath(lang)} className="btn btn-gold relative">
+            <Link href={bookPath(lang, { service: "piercing" })} className="btn btn-gold relative">
               {dict.common.bookAppointment} <ArrowUpRightIcon className="h-[13px] w-[13px]" />
             </Link>
           </CtaPanel>
