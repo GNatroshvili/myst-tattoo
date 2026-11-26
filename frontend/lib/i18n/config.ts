@@ -40,5 +40,9 @@ export function localePath(lang: Locale, path = "/") {
 /**
  * The booking page (app/[lang]/book): where every "Book" button outside the
  * home page leads. The home page's own buttons scroll to its form, "#idea".
+ *
+ * A button that belongs to one artist (their card, their profile) names them
+ * by the slug of their profile, and the form then books with that artist.
  */
-export const bookPath = (lang: Locale) => localePath(lang, "/book");
+export const bookPath = (lang: Locale, artist?: string) =>
+  localePath(lang, artist ? `/book?artist=${encodeURIComponent(artist)}` : "/book");

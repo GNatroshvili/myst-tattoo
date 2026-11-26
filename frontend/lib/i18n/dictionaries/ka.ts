@@ -130,8 +130,11 @@ export const ka: Dictionary = {
     time: "დღის მონაკვეთი",
     times: ["დილა", "შუადღე", "საღამო"],
     submit: "გაგზავნა WhatsApp-ით",
+    artist: "არტისტი",
+    removeArtist: "{artist} — მოხსნა",
     message: {
       greeting: "გამარჯობა, Myst! მინდა ჩავეწერო: {service}.",
+      artist: "არტისტი: {artist}",
       name: "სახელი: {name}",
       idea: "იდეა: {idea}",
       day: "სასურველი დღე: {day}",

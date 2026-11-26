@@ -12,7 +12,8 @@ import { hasLocale, localePath } from "@/lib/i18n/config";
  * The booking page: the home page's "Tell us your idea" form on a page of its
  * own, with a way back home and nothing else. Every "Book" button outside the
  * home page leads here (`bookPath`), so a visitor books in one step instead of
- * being walked to the home page's form.
+ * being walked to the home page's form. An artist's own buttons add
+ * "?artist=<slug>", and the form then books with that artist.
  *
  * It is reached from those buttons only: it is not in the menu, not in the
  * sitemap, and asks search engines not to list it.
@@ -28,9 +29,12 @@ export async function generateMetadata({ params }: PageProps<"/[lang]/book">): P
   };
 }
 
-export default async function BookPage() {
+export default async function BookPage({ searchParams }: PageProps<"/[lang]/book">) {
   const { lang, dict } = await getDictionary();
   const home = localePath(lang);
+  // "?artist=<slug>", set by an artist's own "Book" buttons. Not awaited here:
+  // the form reads it as it streams in, and the page around it does not wait.
+  const artist = searchParams.then((query) => (typeof query.artist === "string" ? query.artist : undefined));
 
   return (
     <div className="page-ground relative isolate min-h-dvh overflow-hidden">
@@ -51,7 +55,7 @@ export default async function BookPage() {
         </header>
         {/* the room under the last card lets it reveal: see Reveal */}
         <main className="pb-24">
-          <IdeaSection lang={lang} dict={dict} page />
+          <IdeaSection lang={lang} dict={dict} page artist={artist} />
         </main>
       </div>
     </div>

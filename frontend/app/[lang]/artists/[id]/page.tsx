@@ -125,7 +125,7 @@ export default async function ArtistPage({ params }: PageProps<"/[lang]/artists/
               )}
 
               <div className="mt-6 flex flex-wrap gap-x-6 gap-y-3.5">
-                <Link href={bookPath(lang)} className="btn btn-gold">
+                <Link href={bookPath(lang, artist.slug)} className="btn btn-gold">
                   {t.book} <ArrowUpRightIcon className="h-[13px] w-[13px]" />
                 </Link>
                 <a href="#works" className="btn btn-outline">
@@ -200,7 +200,7 @@ export default async function ArtistPage({ params }: PageProps<"/[lang]/artists/
               <Link href={localePath(lang, "/tattoos")} className="btn btn-outline">
                 {t.allTattoos}
               </Link>
-              <Link href={bookPath(lang)} className="btn btn-gold">
+              <Link href={bookPath(lang, artist.slug)} className="btn btn-gold">
                 {dict.common.bookAppointment} <ArrowUpRightIcon className="h-[13px] w-[13px]" />
               </Link>
             </div>

@@ -1,9 +1,11 @@
 import { Suspense, useId } from "react";
 import { connection } from "next/server";
+import { getArtist } from "@/lib/api";
 import { getCalendarNames, getUpcomingDays } from "@/lib/dates";
 import { displayCase, localeTags, type Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/dictionaries/en";
 import { instagramDmUrl, site } from "@/lib/site";
+import { localized } from "@/lib/types";
 import { whatsappUrl } from "@/lib/whatsapp";
 import { IdeaForm, IdeaFormSkeleton } from "./IdeaForm";
 import { Reveal } from "./motion/Reveal";
@@ -15,8 +17,12 @@ type FormCopy = Dictionary["form"];
 const DAYS_AHEAD = 30;
 
 /** Day pills depend on "today", so this part renders at request time. */
-async function IdeaFormWithDays({ lang, t }: { lang: Locale; t: FormCopy }) {
+async function IdeaFormWithDays({ lang, t, artist }: { lang: Locale; t: FormCopy; artist?: Promise<string | undefined> }) {
   await connection();
+  // The address names the artist by their profile's slug; the name shown and
+  // sent is the backend's own. An unknown slug books with no artist chosen.
+  const slug = await artist;
+  const booked = slug ? await getArtist(slug) : null;
   const intl = localeTags[lang].intl;
   const days = getUpcomingDays(DAYS_AHEAD, site.timeZone, {
     intl,
@@ -24,7 +30,14 @@ async function IdeaFormWithDays({ lang, t }: { lang: Locale; t: FormCopy }) {
     tomorrow: t.tomorrow,
   });
   // month and weekday names come from the server: not every browser knows the Georgian ones
-  return <IdeaForm days={days} names={getCalendarNames(intl)} t={t} />;
+  return (
+    <IdeaForm
+      days={days}
+      names={getCalendarNames(intl)}
+      t={t}
+      artist={booked ? localized(booked.nickname, lang) : null}
+    />
+  );
 }
 
 type Props = {
@@ -32,9 +45,14 @@ type Props = {
   dict: Dictionary;
   /** on the booking page it is the whole page: its title is the page's, and it sits closer to the top */
   page?: boolean;
+  /**
+   * The slug of the artist to book with, from the booking page's address. A
+   * promise, read where the form streams in, so the rest of the page does not wait for it.
+   */
+  artist?: Promise<string | undefined>;
 };
 
-export function IdeaSection({ lang, dict, page = false }: Props) {
+export function IdeaSection({ lang, dict, page = false, artist }: Props) {
   const t = dict.idea;
   const titleId = useId();
   // the headings move one level up when the section's title is the page's
@@ -65,7 +83,7 @@ export function IdeaSection({ lang, dict, page = false }: Props) {
       <div className="mx-auto mt-[34px] grid max-w-[960px] grid-cols-[minmax(0,1fr)] items-start gap-[26px] md:grid-cols-[minmax(0,11fr)_minmax(0,9fr)]">
         <Reveal className="min-w-0">
           <Suspense fallback={<IdeaFormSkeleton />}>
-            <IdeaFormWithDays lang={lang} t={dict.form} />
+            <IdeaFormWithDays lang={lang} t={dict.form} artist={artist} />
           </Suspense>
         </Reveal>
 

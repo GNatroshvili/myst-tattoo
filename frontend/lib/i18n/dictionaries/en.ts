@@ -139,9 +139,15 @@ export const en = {
     time: "Time of day",
     times: ["Morning", "Afternoon", "Evening"],
     submit: "Send on WhatsApp",
+    /** On the booking page, when it was opened from an artist's card or profile. */
+    artist: "Artist",
+    /** read out for the artist's chip; pressing it books without a chosen artist */
+    removeArtist: "Remove {artist}",
     /** Lines of the pre-filled WhatsApp message; {placeholders} are filled in. */
     message: {
       greeting: "Hi Myst! I'd like to book: {service}.",
+      /** only when the booking is with a chosen artist */
+      artist: "Artist: {artist}",
       name: "Name: {name}",
       idea: "Idea: {idea}",
       day: "Preferred day: {day}",

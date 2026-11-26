@@ -1,7 +1,11 @@
 "use client";
 
+import { useSyncExternalStore } from "react";
 import { usePathname } from "next/navigation";
 import { localeLabels, locales, type Locale } from "@/lib/i18n/config";
+
+/** the address's query does not change under a page that is up: nothing to listen for */
+const noSubscription = () => () => {};
 
 /**
  * ENG / ქარ toggle. Each side links to the same page in that language. The
@@ -21,8 +25,16 @@ export function LangSwitcher({
   className?: string;
 }) {
   const pathname = usePathname();
+  // What follows "?" in the address (the booking page's "?artist=…") goes along
+  // to the other language. The server does not know it when it draws the page,
+  // so it is read in the browser, once the page is up.
+  const query = useSyncExternalStore(
+    noSubscription,
+    () => window.location.search,
+    () => "",
+  );
   // "/en/artists" → "/artists"; the bare "/en" → ""
-  const rest = pathname.replace(/^\/[^/]+/, "");
+  const rest = pathname.replace(/^\/[^/]+/, "") + query;
 
   return (
     <nav
