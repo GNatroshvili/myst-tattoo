@@ -1,9 +1,11 @@
 import { Suspense, useId } from "react";
 import { connection } from "next/server";
+import { getArtist } from "@/lib/api";
 import { getCalendarNames, getUpcomingDays } from "@/lib/dates";
-import { displayCase, localeTags, type Locale } from "@/lib/i18n/config";
+import { bookServices, displayCase, localeTags, type BookPreset, type Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/dictionaries/en";
 import { instagramDmUrl, site } from "@/lib/site";
+import { localized } from "@/lib/types";
 import { whatsappUrl } from "@/lib/whatsapp";
 import { IdeaForm, IdeaFormSkeleton } from "./IdeaForm";
 import { Reveal } from "./motion/Reveal";
@@ -15,8 +17,12 @@ type FormCopy = Dictionary["form"];
 const DAYS_AHEAD = 30;
 
 /** Day pills depend on "today", so this part renders at request time. */
-async function IdeaFormWithDays({ lang, t }: { lang: Locale; t: FormCopy }) {
+async function IdeaFormWithDays({ lang, t, preset }: { lang: Locale; t: FormCopy; preset?: Promise<BookPreset> }) {
   await connection();
+  // The address names the artist by their profile's slug; the name shown and
+  // sent is the backend's own. An unknown slug books with no artist chosen.
+  const { artist: slug, service } = (await preset) ?? {};
+  const booked = slug ? await getArtist(slug) : null;
   const intl = localeTags[lang].intl;
   const days = getUpcomingDays(DAYS_AHEAD, site.timeZone, {
     intl,
@@ -24,24 +30,53 @@ async function IdeaFormWithDays({ lang, t }: { lang: Locale; t: FormCopy }) {
     tomorrow: t.tomorrow,
   });
   // month and weekday names come from the server: not every browser knows the Georgian ones
-  return <IdeaForm days={days} names={getCalendarNames(intl)} t={t} />;
+  return (
+    <IdeaForm
+      days={days}
+      names={getCalendarNames(intl)}
+      t={t}
+      artist={booked ? localized(booked.nickname, lang) : null}
+      // the dictionary lists the services in the order the address names them
+      service={service ? t.services[bookServices.indexOf(service)] : undefined}
+    />
+  );
 }
 
-export function IdeaSection({ lang, dict }: { lang: Locale; dict: Dictionary }) {
+type Props = {
+  lang: Locale;
+  dict: Dictionary;
+  /** on the booking page it is the whole page: its title is the page's, and it sits closer to the top */
+  page?: boolean;
+  /**
+   * What the form starts with (the artist, the service), from the booking
+   * page's address. A promise, read where the form streams in, so the rest of
+   * the page does not wait for it.
+   */
+  preset?: Promise<BookPreset>;
+};
+
+export function IdeaSection({ lang, dict, page = false, preset }: Props) {
   const t = dict.idea;
   const titleId = useId();
+  // the headings move one level up when the section's title is the page's
+  const Title = page ? "h1" : "h2";
+  const Sub = page ? "h2" : "h3";
 
   return (
-    <section id="idea" aria-labelledby={titleId} className="scroll-mt-4 pt-16 lg:pt-[76px]">
+    <section
+      id="idea"
+      aria-labelledby={titleId}
+      className={page ? "pt-8 sm:pt-10" : "scroll-mt-4 pt-16 lg:pt-[76px]"}
+    >
       <Reveal>
         <SectionDivider />
 
-        <h2
+        <Title
           id={titleId}
           className="display mt-[22px] text-balance text-center text-[length:calc(clamp(36px,4vw,52px)*var(--display-scale))] leading-[1.04] tracking-[0.5px] text-cream"
         >
           {displayCase(t.title, lang)}
-        </h2>
+        </Title>
         <p className="mx-auto mt-4 max-w-[480px] text-center text-[17px] font-light leading-[25px] text-body">
           {t.lead}
         </p>
@@ -51,7 +86,7 @@ export function IdeaSection({ lang, dict }: { lang: Locale; dict: Dictionary }) 
       <div className="mx-auto mt-[34px] grid max-w-[960px] grid-cols-[minmax(0,1fr)] items-start gap-[26px] md:grid-cols-[minmax(0,11fr)_minmax(0,9fr)]">
         <Reveal className="min-w-0">
           <Suspense fallback={<IdeaFormSkeleton />}>
-            <IdeaFormWithDays lang={lang} t={dict.form} />
+            <IdeaFormWithDays lang={lang} t={dict.form} preset={preset} />
           </Suspense>
         </Reveal>
 
@@ -71,7 +106,7 @@ export function IdeaSection({ lang, dict }: { lang: Locale; dict: Dictionary }) 
                   {i + 1}
                 </span>
                 <div>
-                  <h3 className="text-[16px] font-medium leading-[22px] text-cream">{step.title}</h3>
+                  <Sub className="text-[16px] font-medium leading-[22px] text-cream">{step.title}</Sub>
                   <p className="mt-[3px] text-[14px] font-light leading-5 text-body">{step.text}</p>
                 </div>
               </Reveal>
@@ -82,7 +117,7 @@ export function IdeaSection({ lang, dict }: { lang: Locale; dict: Dictionary }) 
             delay={0.34}
             className="rounded-[14px] border border-cream/16 bg-[radial-gradient(90%_160%_at_85%_80%,rgba(125,46,85,0.72),rgba(125,46,85,0)_72%),linear-gradient(90deg,#120c0e,#170d12)] px-6 pb-6 pt-[22px] sm:px-7"
           >
-            <h3 className="text-[16px] leading-[22px] text-cream">{t.directTitle}</h3>
+            <Sub className="text-[16px] leading-[22px] text-cream">{t.directTitle}</Sub>
             <div className="mt-4 flex flex-wrap gap-x-3 gap-y-2.5">
               <a
                 href={whatsappUrl()}

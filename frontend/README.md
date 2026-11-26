@@ -17,6 +17,7 @@ app/
   layout.tsx          # fonts (Cormorant Garamond + Inter), metadata
   page.tsx            # home page composition
   not-found.tsx       # styled 404
+  [lang]/book/        # the booking form on a page of its own: where "Book" leads from every page but home (not in the menu, sitemap or search)
   [lang]/about/       # "About us": sections (photo, optional title, text) from the admin panel
   [lang]/course/      # the tattoo course: title, date, photos and text from the admin panel
   [lang]/privacy/     # the privacy policy: the admin panel's text, or the standard one in lib/privacy.ts

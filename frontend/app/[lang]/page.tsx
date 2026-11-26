@@ -29,7 +29,7 @@ export default async function HomePage() {
           <IdeaSection lang={lang} dict={dict} />
           <Faq lang={lang} dict={dict} />
         </main>
-        <Footer lang={lang} dict={dict} />
+        <Footer lang={lang} dict={dict} home />
       </div>
     </div>
   );

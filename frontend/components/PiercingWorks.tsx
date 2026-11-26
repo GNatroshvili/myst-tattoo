@@ -6,12 +6,14 @@ import type { Dictionary } from "@/lib/i18n/dictionaries/en";
 import { piercingAlt } from "@/lib/piercing";
 import { localized, type Piercing } from "@/lib/types";
 import { FilterChip } from "./FilterChip";
+import { PiercingModal } from "./PiercingModal";
 import { WorkTile } from "./WorkTile";
 
 /**
  * Piercings done at the studio: one row of zone filters (only the zones that
  * have photos), a count, and the masonry gallery. Each tile names the place
- * and, when the piercing is attached to one, the artist.
+ * and, when the piercing is attached to one, the artist. Picking a piercing
+ * opens its details, which step through what is showing, as the tattoos do.
  */
 export function PiercingWorks({
   lang,
@@ -23,6 +25,8 @@ export function PiercingWorks({
   piercings: Piercing[];
 }) {
   const [zone, setZone] = useState("all");
+  /** position, among the piercings showing, of the one whose details are open */
+  const [open, setOpen] = useState<number | null>(null);
 
   const zones = new Map<string, string>();
   for (const { place } of piercings) {
@@ -31,6 +35,7 @@ export function PiercingWorks({
   const shown = piercings.filter((piercing) => zone === "all" || piercing.place?.zone?.id === zone);
   const countLabel =
     shown.length === 1 ? t.countOne : t.countMany.replace("{count}", String(shown.length));
+  const opened = open !== null && open < shown.length ? shown[open] : null;
 
   return (
     <>
@@ -59,12 +64,25 @@ export function PiercingWorks({
             key={piercing.id}
             order={i}
             photo={piercing.image}
-            aria={piercingAlt(piercing, t, lang)}
+            aria={`${t.modal.open}: ${piercingAlt(piercing, t, lang)}`}
             title={piercing.place ? localized(piercing.place.name, lang) : ""}
             note={piercing.artist ? localized(piercing.artist.nickname, lang) : undefined}
+            onOpen={() => setOpen(i)}
           />
         ))}
       </div>
+
+      {opened && open !== null && (
+        <PiercingModal
+          lang={lang}
+          t={t}
+          piercing={opened}
+          position={`${open + 1} / ${shown.length}`}
+          onClose={() => setOpen(null)}
+          onPrev={() => setOpen((at) => (at === null ? at : (at - 1 + shown.length) % shown.length))}
+          onNext={() => setOpen((at) => (at === null ? at : (at + 1) % shown.length))}
+        />
+      )}
     </>
   );
 }

@@ -17,7 +17,11 @@ import type { Photo } from "@/lib/types";
  * its page shows, which is how they are found in image search.
  */
 
-/** The pages that exist whatever the admin panel holds; a new page is added here. */
+/**
+ * The pages that exist whatever the admin panel holds; a new page is added here.
+ * The booking page (/book) is left out on purpose: it is reached from the
+ * "Book" buttons only, and asks not to be listed.
+ */
 const pages = ["/", "/about", "/artists", "/tattoos", "/piercing", "/course", "/blog", "/privacy"];
 
 /** A sitemap may name at most this many photos for one page. */

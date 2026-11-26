@@ -14,7 +14,7 @@ import { SectionDivider } from "@/components/SectionDivider";
 import { ArrowUpRightIcon } from "@/components/ui/Icons";
 import { getPiercings, getPiercingZones } from "@/lib/api";
 import { dictionaryFor, getDictionary, type Dictionary, type Locale } from "@/lib/i18n";
-import { displayCase, hasLocale, localePath } from "@/lib/i18n/config";
+import { bookPath, displayCase, hasLocale } from "@/lib/i18n/config";
 
 export async function generateMetadata({ params }: PageProps<"/[lang]/piercing">): Promise<Metadata> {
   const { lang } = await params;
@@ -119,7 +119,7 @@ export default async function PiercingPage() {
             text={t.ctaText}
             className="mt-11"
           >
-            <Link href={localePath(lang, "#idea")} className="btn btn-gold relative">
+            <Link href={bookPath(lang, { service: "piercing" })} className="btn btn-gold relative">
               {dict.common.bookAppointment} <ArrowUpRightIcon className="h-[13px] w-[13px]" />
             </Link>
           </CtaPanel>

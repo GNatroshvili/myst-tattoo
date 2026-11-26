@@ -14,6 +14,10 @@ type Props = {
   /** month and weekday names in the page's language, for the calendar */
   names: CalendarNames;
   t: Dictionary["form"];
+  /** the artist to book with, by name: set when the form was opened from their card or profile */
+  artist?: string | null;
+  /** the service the form opens on, one of `t.services`: set when it was opened for that service */
+  service?: string;
 };
 
 /** how far ahead the calendar reaches, in days */
@@ -24,11 +28,14 @@ const MAX_DAYS = 3;
 const formShell =
   "flex min-w-0 flex-col gap-2 rounded-[18px] border border-cream/16 bg-surface px-5 pb-[30px] pt-[26px] sm:px-7";
 
-export function IdeaForm({ days, names, t }: Props) {
+export function IdeaForm({ days, names, t, artist = null, service: opensOn = t.services[0] }: Props) {
   // unique per instance: a hidden copy of the page can share the document
   const id = useId();
+  /** the visitor may drop the artist they came with, and book with whoever is free */
+  const [withArtist, setWithArtist] = useState(true);
+  const bookedArtist = withArtist ? artist : null;
   const [name, setName] = useState("");
-  const [service, setService] = useState<string>(t.services[0]);
+  const [service, setService] = useState<string>(opensOn);
   const [idea, setIdea] = useState("");
   /** the picked days, earliest first: the row's own, or later ones picked in the calendar */
   const [picked, setPicked] = useState<DayOption[]>([]);
@@ -59,12 +66,32 @@ export function IdeaForm({ days, names, t }: Props) {
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const message = buildWhatsAppMessage({ name, service, idea, days: picked, time }, t.message);
+    const message = buildWhatsAppMessage(
+      { name, service, idea, days: picked, time, artist: bookedArtist },
+      t.message,
+    );
     window.open(whatsappUrl(message), "_blank", "noopener,noreferrer");
   }
 
   return (
     <form onSubmit={handleSubmit} className={formShell} aria-label={t.aria}>
+      {/* Who the booking is with, when the form was opened from an artist: it goes
+          into the message. Pressing the chip drops the artist, as with a picked day. */}
+      {bookedArtist && (
+        <div className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-2">
+          <span className="field-label">{t.artist}</span>
+          <button
+            type="button"
+            aria-label={t.removeArtist.replace("{artist}", bookedArtist)}
+            onClick={() => setWithArtist(false)}
+            className="flex h-9 items-center gap-2 rounded-full border border-gold/55 bg-raised pl-3.5 pr-2.5 text-[13.5px] leading-none text-cream transition-colors hover:border-gold"
+          >
+            {bookedArtist}
+            <XIcon className="h-3 w-3 text-gold" />
+          </button>
+        </div>
+      )}
+
       <label htmlFor={`${id}-name`} className="field-label">
         {t.name}
       </label>

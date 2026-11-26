@@ -8,11 +8,14 @@ export type IdeaPayload = {
   /** the picked days, earliest first; none is fine */
   days?: DayOption[];
   time?: string | null;
+  /** the artist the visitor is booking with, when they came from that artist's card or profile */
+  artist?: string | null;
 };
 
 /** One template per line of the message; `{placeholders}` are filled in. */
 export type MessageTemplates = {
   greeting: string;
+  artist: string;
   name: string;
   idea: string;
   day: string;
@@ -26,10 +29,9 @@ const fill = (template: string, values: Record<string, string>) =>
 
 /** Builds the pre-filled text that opens in WhatsApp, in the page's language. */
 export function buildWhatsAppMessage(p: IdeaPayload, t: MessageTemplates) {
-  const lines = [
-    fill(t.greeting, { service: p.service }),
-    fill(t.name, { name: p.name.trim() || "-" }),
-  ];
+  const lines = [fill(t.greeting, { service: p.service })];
+  if (p.artist) lines.push(fill(t.artist, { artist: p.artist }));
+  lines.push(fill(t.name, { name: p.name.trim() || "-" }));
   if (p.idea?.trim()) lines.push(fill(t.idea, { idea: p.idea.trim() }));
   const days = p.days ?? [];
   if (days.length === 1) lines.push(fill(t.day, { day: days[0].long }));

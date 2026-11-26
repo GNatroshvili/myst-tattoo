@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { localePath, type Locale } from "@/lib/i18n/config";
+import { bookPath, localePath, type Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/dictionaries/en";
 import { site } from "@/lib/site";
 import { ArrowRightIcon, CalendarIcon, InstagramIcon, MapPinIcon } from "./ui/Icons";
@@ -14,8 +14,11 @@ const link = "transition-colors hover:text-gold";
  * sizes each column by its content (260 / 320 / 260px) and adds the left inset
  * (and the 1px divider) on top, so the starting widths here include both.
  * Under them, on a hairline, the studio's name and the link to the privacy policy.
+ *
+ * "Contact us" scrolls to the form on the home page (`home`), and opens the
+ * booking page from every other one.
  */
-export function Footer({ lang, dict }: { lang: Locale; dict: Dictionary }) {
+export function Footer({ lang, dict, home = false }: { lang: Locale; dict: Dictionary; home?: boolean }) {
   const t = dict.footer;
 
   return (
@@ -56,7 +59,7 @@ export function Footer({ lang, dict }: { lang: Locale; dict: Dictionary }) {
           <p>
             {t.question}
             <br />
-            <Link href={localePath(lang, "#idea")} className="link-arrow min-h-6 gap-3">
+            <Link href={home ? localePath(lang, "#idea") : bookPath(lang)} className="link-arrow min-h-6 gap-3">
               {t.contact} <ArrowRightIcon className="h-3 w-[18px]" />
             </Link>
           </p>

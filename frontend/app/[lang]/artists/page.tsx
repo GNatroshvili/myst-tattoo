@@ -13,7 +13,7 @@ import { ArrowRightIcon, PersonIcon } from "@/components/ui/Icons";
 import { getArtists } from "@/lib/api";
 import { cascade } from "@/lib/cascade";
 import { dictionaryFor, getDictionary, type Dictionary, type Locale } from "@/lib/i18n";
-import { displayCase, hasLocale, localePath } from "@/lib/i18n/config";
+import { bookPath, displayCase, hasLocale, localePath } from "@/lib/i18n/config";
 import { instagramHandle, localized } from "@/lib/types";
 
 export async function generateMetadata({ params }: PageProps<"/[lang]/artists">): Promise<Metadata> {
@@ -82,9 +82,9 @@ async function ArtistsGrid({ lang, t }: { lang: Locale; t: Dictionary["artists"]
                   {t.viewProfile}
                   <ArrowRightIcon className="h-3 w-[18px]" />
                 </Link>
-                <a href="#book" className="btn btn-outline-gold btn-sm">
+                <Link href={bookPath(lang, { artist: artist.slug })} className="btn btn-outline-gold btn-sm">
                   {t.book}
-                </a>
+                </Link>
               </div>
             </article>
           </Reveal>
@@ -139,7 +139,7 @@ export default async function ArtistsPage() {
             text={t.ctaText}
             className="mt-[60px]"
           >
-            <Link href={localePath(lang, "#idea")} className="btn btn-outline-gold relative">
+            <Link href={bookPath(lang)} className="btn btn-outline-gold relative">
               {t.cta} <ArrowRightIcon className="h-3 w-[18px]" />
             </Link>
           </CtaPanel>
