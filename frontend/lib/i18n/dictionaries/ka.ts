@@ -60,6 +60,7 @@ export const ka: Dictionary = {
     titleLine2: "ვაუჩერები",
     text: "განსაკუთრებული საჩუქარი განსაკუთრებული ადამიანისთვის.",
     cta: "ვაუჩერის შეძენა",
+    message: "გამარჯობა, Myst! მინდა სასაჩუქრე ვაუჩერის შეძენა.",
   },
   reviews: {
     eyebrow: "Myst / Google Maps-ზე",
