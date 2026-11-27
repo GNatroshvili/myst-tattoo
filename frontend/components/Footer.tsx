@@ -9,6 +9,8 @@ const divided = "md:border-l md:border-cream/18 md:pl-7 lg:pl-16";
 const icon = "h-[34px] w-[34px] shrink-0";
 const link = "transition-colors hover:text-gold";
 
+const fullYear = new Date().getFullYear();
+
 /**
  * Three columns. On wide screens their widths follow the design exactly: it
  * sizes each column by its content (260 / 320 / 260px) and adds the left inset
@@ -67,7 +69,7 @@ export function Footer({ lang, dict, home = false }: { lang: Locale; dict: Dicti
       </div>
 
       <div className="mt-10 flex flex-wrap items-center justify-between gap-x-8 gap-y-1 border-t border-cream/12 pt-5 text-[14px] leading-5 text-muted md:px-2 lg:px-11">
-        <p>© {site.name}</p>
+        <p>© {fullYear} {t.rights}</p>
         <Link href={localePath(lang, "/privacy")} className={`flex min-h-11 items-center ${link}`}>
           {t.privacy}
         </Link>
