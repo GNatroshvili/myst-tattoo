@@ -57,3 +57,31 @@ lib/
 
 Nav targets `/artists`, `/tattoos`, `/piercing`, `/why-myst` are not built yet and
 show the styled 404 page.
+
+## The hero film
+
+`public/videos` holds the cuts of one 4K recording that `HeroVideo.tsx` plays. The wide cut is the
+recording's picture without its black left band (`crop=2764:1728:1076:216`), in three files:
+
+| File | Picture | Codec | Size | For |
+| --- | --- | --- | --- | --- |
+| `hero-desktop.mp4` | 1920×1200 | H.264 | 15 MB | every browser |
+| `hero-desktop-av1.mp4` | 1920×1200 | AV1, 10-bit | 11 MB | browsers that play AV1 well |
+| `hero-desktop-hd-av1.mp4` | 2764×1728 | AV1, 10-bit | 19 MB | the same, on screens wider than 1920 device pixels |
+
+To cut them again from the recording (`-an` drops the sound; add `scale=1920:1200:flags=lanczos`
+after the crop for the two smaller files):
+
+```bash
+ffmpeg -i recording.mp4 -an -vf "crop=2764:1728:1076:216,scale=1920:1200:flags=lanczos" \
+  -c:v libx264 -preset veryslow -refs 5 -level 5.0 -crf 21 -pix_fmt yuv420p -x264-params aq-mode=3 \
+  -movflags +faststart hero-desktop.mp4
+ffmpeg -i recording.mp4 -an -vf "crop=2764:1728:1076:216,scale=1920:1200:flags=lanczos" \
+  -c:v libsvtav1 -preset 3 -crf 30 -g 240 -pix_fmt yuv420p10le \
+  -svtav1-params tune=0:enable-variance-boost=1 -movflags +faststart hero-desktop-av1.mp4
+ffmpeg -i recording.mp4 -an -vf "crop=2764:1728:1076:216" \
+  -c:v libsvtav1 -preset 3 -crf 33 -g 240 -pix_fmt yuv420p10le \
+  -svtav1-params tune=0:enable-variance-boost=1 -movflags +faststart hero-desktop-hd-av1.mp4
+```
+
+`hero-desktop.jpg` is the first frame of the same crop at 1920×1200, shown until the film starts.
