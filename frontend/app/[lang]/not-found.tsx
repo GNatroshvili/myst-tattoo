@@ -11,11 +11,13 @@ export default async function NotFound() {
   const t = dict.notFound;
 
   return (
-    <div className="page-ground relative isolate overflow-hidden">
+    // At least as tall as the screen: the message takes whatever height is left
+    // over, so the footer rests on the bottom edge instead of ending short of it.
+    <div className="page-ground relative isolate flex min-h-dvh flex-col overflow-hidden">
       <Backdrop scope="404" />
-      <div className="container-x">
+      <div className="container-x flex flex-1 flex-col">
         <Header lang={lang} nav={dict.nav} common={dict.common} switcherLabel={dict.langSwitcher.aria} />
-        <main className="enter flex min-h-[52vh] flex-col items-center justify-center py-20 text-center">
+        <main className="enter flex min-h-[52vh] flex-1 flex-col items-center justify-center py-20 text-center">
           <SectionDivider />
           <p className="eyebrow mt-6">404</p>
           <h1 className="display mt-[22px] text-[length:calc(clamp(40px,7vw,66px)*var(--display-scale))] leading-[1.04] tracking-[0.5px] text-cream">

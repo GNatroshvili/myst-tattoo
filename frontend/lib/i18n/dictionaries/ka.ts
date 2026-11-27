@@ -353,6 +353,7 @@ export const ka: Dictionary = {
     question: "გაქვს შეკითხვა?",
     contact: "დაგვიკავშირდი",
     privacy: "კონფიდენციალურობის პოლიტიკა",
+    rights: "ყველა უფლება დაცულია.",
   },
   notFound: {
     title: "გვერდი ვერ მოიძებნა",

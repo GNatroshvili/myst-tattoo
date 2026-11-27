@@ -395,6 +395,7 @@ export const en = {
     question: "Have a question?",
     contact: "Contact us",
     privacy: "Privacy Policy",
+    rights: "All rights reserved.",
   },
   notFound: {
     title: "Page not found",
