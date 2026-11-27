@@ -5,26 +5,23 @@ import { useId, useState } from "react";
 export type FaqItem = { id: string; question: string; answer: string };
 
 /**
- * The questions, each opening its answer when pressed. Any number may be open
- * at once, so opening one never moves the one being read. A closed answer is
- * hidden from screen readers and from the keyboard too, not only from sight.
+ * The questions, each opening its answer when pressed. Only one is open at a
+ * time: opening another closes the one before it, and pressing the open one
+ * closes it. A closed answer is hidden from screen readers and from the
+ * keyboard too, not only from sight.
  */
 export function FaqList({ items }: { items: FaqItem[] }) {
   const base = useId();
-  const [open, setOpen] = useState<ReadonlySet<string>>(new Set());
+  const [open, setOpen] = useState<string | null>(null);
 
   function toggle(id: string) {
-    setOpen((before) => {
-      const after = new Set(before);
-      if (!after.delete(id)) after.add(id);
-      return after;
-    });
+    setOpen((before) => (before === id ? null : id));
   }
 
   return (
     <ul className="border-t border-cream/18">
       {items.map(({ id, question, answer }) => {
-        const on = open.has(id);
+        const on = open === id;
         return (
           <li key={id} className="border-b border-cream/18">
             <h3>
